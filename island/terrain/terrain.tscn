@@ -1,3 +1,6 @@
-[gd_scene format=3 uid="uid://cjklklxubiss0"]
+[gd_scene load_steps=2 format=3 uid="uid://cjklklxubiss0"]
 
-[node name="Terrain" type="Node3D"]
+[ext_resource type="Script" path="res://island/terrain/meshgen.gd" id="1_51v3l"]
+
+[node name="Terrain" type="MeshInstance3D"]
+script = ExtResource("1_51v3l")

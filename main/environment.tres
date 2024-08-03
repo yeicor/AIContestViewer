@@ -1,0 +1,15 @@
+[gd_resource type="Environment" load_steps=4 format=3 uid="uid://4g5i147j1mn3"]
+
+[ext_resource type="Texture2D" uid="uid://j3fi71nosu84" path="res://sky/kloppenheim_02_puresky_1k.hdr" id="1_t82ct"]
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_1f1ox"]
+turbidity = 0.0
+ground_color = Color(0.0156863, 0.0196078, 0.0666667, 1)
+night_sky = ExtResource("1_t82ct")
+
+[sub_resource type="Sky" id="Sky_br00s"]
+sky_material = SubResource("PhysicalSkyMaterial_1f1ox")
+
+[resource]
+background_mode = 2
+sky = SubResource("Sky_br00s")

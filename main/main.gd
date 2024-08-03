@@ -16,5 +16,7 @@ func _ready() -> void:
 		print(lh.to_ascii_string())
 	for conn: GameState.Connection in first_round.connections():
 		print(conn.to_ascii_string())
-
+		
+	var mesh: Mesh = MeshGen.from_heightmap(island._grid, Vector2.ZERO, 20.0, 0.0)
+	$"World/TerrainTmp".mesh = mesh
 	

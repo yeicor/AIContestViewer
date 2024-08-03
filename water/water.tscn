@@ -1,0 +1,47 @@
+[gd_scene load_steps=10 format=3 uid="uid://bbvx0y3ablhoa"]
+
+[ext_resource type="Shader" path="res://water/water.gdshader" id="1_4o0j8"]
+[ext_resource type="CompressedTexture2DArray" uid="uid://dcvujep4v7k1b" path="res://water/textures/Caustic.png" id="2_6av4m"]
+[ext_resource type="Texture2D" uid="uid://bnbsbssh473o0" path="res://water/textures/Foam.png" id="2_xb3qk"]
+[ext_resource type="Texture2D" uid="uid://bfa4xeh5thwio" path="res://water/textures/Water_N_A.png" id="3_fhbq7"]
+[ext_resource type="Texture2D" uid="uid://dpwv0qf6tb7we" path="res://water/textures/Water_N_B.png" id="4_e4lan"]
+[ext_resource type="Texture2D" uid="uid://ch1eb1v8e4utn" path="res://water/textures/Water_UV.png" id="5_0fwac"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0pkip"]
+render_priority = 0
+shader = ExtResource("1_4o0j8")
+shader_parameter/wave_speed = 0.5
+shader_parameter/wave_a = Vector4(1, 1, 0.2, 4)
+shader_parameter/wave_b = Vector4(1, 0.6, 0.15, 2.55)
+shader_parameter/wave_c = Vector4(1, 1.3, 0.3, 1.9)
+shader_parameter/sampler_scale = Vector2(0.25, 0.25)
+shader_parameter/sampler_direction = Vector2(0.05, 0.04)
+shader_parameter/uv_sampler_scale = Vector2(0.25, 0.25)
+shader_parameter/uv_sampler_strength = 0.04
+shader_parameter/foam_level = 0.5
+shader_parameter/refraction = 0.075
+shader_parameter/color_deep = Color(0, 0, 0.472656, 1)
+shader_parameter/color_shallow = Color(0.145098, 0.152941, 1, 1)
+shader_parameter/beers_law = 2.0
+shader_parameter/depth_offset = -0.75
+shader_parameter/projector = null
+shader_parameter/uv_sampler = ExtResource("5_0fwac")
+shader_parameter/normalmap_a_sampler = ExtResource("3_fhbq7")
+shader_parameter/normalmap_b_sampler = ExtResource("4_e4lan")
+shader_parameter/foam_sampler = ExtResource("2_xb3qk")
+shader_parameter/caustic_sampler = ExtResource("2_6av4m")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_0xeoj"]
+lightmap_size_hint = Vector2i(1002, 1002)
+material = SubResource("ShaderMaterial_0pkip")
+size = Vector2(1000, 1000)
+subdivide_width = 1000
+subdivide_depth = 1000
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_y36es"]
+
+[node name="Water" type="MeshInstance3D"]
+mesh = SubResource("PlaneMesh_0xeoj")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_y36es")

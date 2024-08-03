@@ -1,0 +1,36 @@
+[gd_scene load_steps=7 format=3 uid="uid://ordobflcpuj4"]
+
+[ext_resource type="Script" path="res://main/main.gd" id="1_rrmnf"]
+[ext_resource type="Texture2D" uid="uid://j3fi71nosu84" path="res://sky/kloppenheim_02_puresky_1k.hdr" id="2_8kt75"]
+[ext_resource type="PackedScene" uid="uid://bbvx0y3ablhoa" path="res://water/water.tscn" id="3_opt86"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_76dnp"]
+panorama = ExtResource("2_8kt75")
+
+[sub_resource type="Sky" id="Sky_2p17s"]
+sky_material = SubResource("PanoramaSkyMaterial_76dnp")
+
+[sub_resource type="Environment" id="Environment_byxdg"]
+background_mode = 2
+sky = SubResource("Sky_2p17s")
+ambient_light_source = 3
+reflected_light_source = 2
+volumetric_fog_density = 0.0
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_rrmnf")
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="Water" parent="World" instance=ExtResource("3_opt86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.175, 1.54135, 36.6976)
+visible = false
+
+[node name="GUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_byxdg")

@@ -11,14 +11,14 @@ config_version=5
 [application]
 
 config/name="AI Contest Renderer"
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://main/main.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
 
 [autoload]
 
-Config="*res://scripts/config.gd"
+Config="*res://autoload/config.gd"
 
 [rendering]
 

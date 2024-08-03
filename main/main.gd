@@ -1,6 +1,6 @@
 extends Node3D
 
-func _ready():
+func _ready() -> void:
 	var game_reader: GameReader = GameReader.open(Config.game_path())
 	if game_reader == null:
 		print("Failed to create game reader")

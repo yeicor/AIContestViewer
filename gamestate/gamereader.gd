@@ -29,7 +29,6 @@ static func open(path: String) -> GameReader:
 
 var _stream_peer: StreamPeer
 var _stream_peer_eof: bool = false
-var _last_round: int       = -1
 
 
 ## Create a game state reader from a raw stream (JSONL)
@@ -40,23 +39,29 @@ func _init(_stream_peer: StreamPeer):
 
 ## Parse the complete next round state, including moves from all bots
 func parse_next_round() -> GameState:
-	while true:
-		var state: GameState = parse_next_state()
-		if state == null:
-			break # EOF
-		if state.round() != self._last_round:
-			self._last_round = state.round()
-			return state
-	return null
+	if self.cur_state == null:
+		# Figure out how many players are there in the first round
+		parse_next_state()
+	var num_players: int = cur_state.players().size()
+	# Read the state for each player action, leaving the final state as cur_state
+	var _expected_round: int = cur_state.round()
+	for i in range(num_players):
+		parse_next_state()
+		if cur_state.round() != _expected_round:
+			print("ERROR: Unexpected round, too few/many player moves??")
+	return cur_state
 
+## Returns the current state
+var cur_state: GameState = null
 
 ## Parse the next state, updated after any bot makes a move in their turn (see parse_next_round)
 func parse_next_state() -> GameState:
 	var raw_state: Dictionary = _read_json_line()
-	print("Raw state: " + JSON.stringify(raw_state))
+	# print("Raw state: " + JSON.stringify(raw_state))
 	if raw_state == { }:
 		return null # EOF
-	return GameState.new(raw_state)
+	cur_state = GameState.new(raw_state)
+	return cur_state
 
 
 ## Read a json line from the internal stream, parsing it into a dictionary

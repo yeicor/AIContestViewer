@@ -3,8 +3,7 @@
 [ext_resource type="Script" path="res://main/main.gd" id="1_rrmnf"]
 [ext_resource type="Environment" uid="uid://4g5i147j1mn3" path="res://main/environment.tres" id="3_3dq86"]
 [ext_resource type="PackedScene" uid="uid://bbvx0y3ablhoa" path="res://water/water.tscn" id="3_opt86"]
-
-[sub_resource type="ImmediateMesh" id="ImmediateMesh_vkuo4"]
+[ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="3_wln4f"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_rrmnf")
@@ -12,12 +11,9 @@ script = ExtResource("1_rrmnf")
 [node name="World" type="Node3D" parent="."]
 
 [node name="Water" parent="World" instance=ExtResource("3_opt86")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.175, 1.54135, 36.6976)
-visible = false
 
-[node name="TerrainTmp" type="MeshInstance3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, 0.992677, 0.120795, 0, -0.120795, 0.992677, 0, 1.4968, 0)
-mesh = SubResource("ImmediateMesh_vkuo4")
+[node name="Terrain" parent="World" instance=ExtResource("3_wln4f")]
+mesh = null
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3
@@ -25,9 +21,14 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-1, -2.26267e-08, 8.44439e-08, 0, 0.965926, 0.258819, -8.74228e-08, 0.258819, -0.965926, 0, 11.9905, -39.5596)
 environment = ExtResource("3_3dq86")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 5, 20)
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.793353, 0.331555, -0.51055, 0, 0.838671, 0.544639, 0.608761, -0.432091, 0.665362, 0, 0, 0)
+light_color = Color(1, 0.668649, 0.38143, 1)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_3dq86")

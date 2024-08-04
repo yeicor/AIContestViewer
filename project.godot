@@ -24,3 +24,4 @@ Config="*res://autoload/config.gd"
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_environment="res://main/environment.tres"

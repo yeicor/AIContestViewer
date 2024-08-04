@@ -160,8 +160,7 @@ void fragment()
 			color 						*= 1.0 + pow(caustic_color.r, 1.50) * (1.0-depth_blend) * 6.0;
 
 	// Foam:
-	if(true)
-	{
+    if (depth + VERTEX.z < vertex_height - 0.1) {
 		float foam_noise = clamp(pow(texture(foam_sampler, (uv*4.0) - uv_offset).r, 10.0)*40.0, 0.0, 0.2);
 		float foam_mix = clamp(pow((1.0-(depth + VERTEX.z) + foam_noise), 8.0) * foam_noise * 0.4, 0.0, 1.0);
 		color = mix(color, vec3(1.0), foam_mix);
@@ -173,5 +172,4 @@ void fragment()
 	ROUGHNESS = 0.2;
 	SPECULAR = 0.2 + depth_blend_pow * 0.4;
 	NORMAL_MAP = normalmap;
-	NORMAL_MAP_DEPTH = 1.25;
 }

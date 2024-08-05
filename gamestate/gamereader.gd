@@ -1,7 +1,7 @@
 class_name GameReader
 extends Node
 
-## Open a server to receive real-time game data (tcp://<host>:<port>/) or a prerecorded game file.
+## Open a server to receive real-time game data (tcp://<host>:<port>) or a prerecorded game file.
 static func open(path: String) -> GameReader:
 	var stream: StreamPeer
 	if path.begins_with("tcp://"):

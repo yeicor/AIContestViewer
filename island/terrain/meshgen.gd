@@ -11,13 +11,13 @@ static func from_heightmap(grid: Array, cell_size: Vector3 = Vector3.ONE, offset
 	var origin: Vector3      = -offset_pct * cell_size * cell_counts
 	
 	if offset_pct.y < 0:
-		origin.y = min_y # Keep original y values
+		origin.y = min_y * cell_size.y # Keep original y values
 
 	# Generate vertices and faces
 	for z in range(grid.size()):
 		for x in range(grid[z].size()):
 			var p: Vector3 = Vector3(x, grid[z][x] - min_y, z) * cell_size + origin
-			st.set_smooth_group(0)
+			st.set_smooth_group(1)
 			st.add_vertex(p)
 			if x > 0 and z > 0: # Connect to previous row and column
 				var i0: int = z * grid[z].size() + x
@@ -32,11 +32,12 @@ static func from_heightmap(grid: Array, cell_size: Vector3 = Vector3.ONE, offset
 				st.add_index(i2)
 
 	st.generate_normals()
-	st.generate_tangents()
+	#st.generate_tangents()  # FIXME: Tangents without UV is error?
 	
 	# TODO: Option to expand corners and edges towards -inf
 	
+	print("Generated mesh from heightmap of size " + str(cell_counts.x) + "x" + str(cell_counts.z))
+
 	var mesh: ArrayMesh = st.commit()
-	print("Generated mesh from heightmap with " + str(mesh.get_faces().size()) + " faces")
 	return mesh
 

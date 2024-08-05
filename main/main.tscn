@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://ordobflcpuj4"]
+[gd_scene load_steps=6 format=3 uid="uid://ordobflcpuj4"]
 
 [ext_resource type="Script" path="res://main/main.gd" id="1_rrmnf"]
 [ext_resource type="Environment" uid="uid://4g5i147j1mn3" path="res://main/environment.tres" id="3_3dq86"]
 [ext_resource type="PackedScene" uid="uid://bbvx0y3ablhoa" path="res://water/water.tscn" id="3_opt86"]
 [ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="3_wln4f"]
+[ext_resource type="PackedScene" uid="uid://cggqb75a8w8r" path="res://addons/debug_menu/debug_menu.tscn" id="5_sn6ci"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_rrmnf")
@@ -13,7 +14,6 @@ script = ExtResource("1_rrmnf")
 [node name="Water" parent="World" instance=ExtResource("3_opt86")]
 
 [node name="Terrain" parent="World" instance=ExtResource("3_wln4f")]
-mesh = null
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3
@@ -32,3 +32,5 @@ shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_3dq86")
+
+[node name="DebugMenu" parent="." instance=ExtResource("5_sn6ci")]

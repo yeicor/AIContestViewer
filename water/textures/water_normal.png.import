@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpwv0qf6tb7we"
-path.s3tc="res://.godot/imported/Water_N_B.png-03c2d10bb32434cf6a48e9fd6a293fb5.s3tc.ctex"
+uid="uid://bduktpovmijlj"
+path.s3tc="res://.godot/imported/water_normal.png-3da31a608523ac8e1338e0bc7f676738.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://water/textures/Water_N_B.png"
-dest_files=["res://.godot/imported/Water_N_B.png-03c2d10bb32434cf6a48e9fd6a293fb5.s3tc.ctex"]
+source_file="res://water/textures/water_normal.png"
+dest_files=["res://.godot/imported/water_normal.png-3da31a608523ac8e1338e0bc7f676738.s3tc.ctex"]
 
 [params]
 
@@ -26,7 +26,7 @@ mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
-process/fix_alpha_border=false
+process/fix_alpha_border=true
 process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false

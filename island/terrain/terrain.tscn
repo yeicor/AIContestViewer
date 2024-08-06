@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cjklklxubiss0"]
+[gd_scene load_steps=11 format=3 uid="uid://cjklklxubiss0"]
 
 [ext_resource type="Script" path="res://island/terrain/terrain.gd" id="1_blkia"]
 [ext_resource type="Shader" path="res://island/terrain/terrain.gdshader" id="1_pas75"]
@@ -11,7 +11,7 @@ shader = ExtResource("1_pas75")
 shader_parameter/grass = Color(0, 0.141176, 0, 1)
 shader_parameter/sand = Color(0.180392, 0.156863, 0, 1)
 
-[sub_resource type="Image" id="Image_p0d38"]
+[sub_resource type="Image" id="Image_m6b2k"]
 data = {
 "data": PackedByteArray(142, 85, 85, 56, 28, 28, 28, 56, 56, 56, 85, 85, 85, 85, 142, 142, 85, 56, 85, 142, 142, 85, 56, 56, 56, 85, 85, 85, 142, 142, 142, 142, 170, 170, 142, 85, 56, 85, 85, 142, 85, 85, 85, 142, 142, 142, 170, 170, 170, 170, 199, 170, 142, 85, 85, 142, 142, 170, 142, 142, 142, 170, 170, 170, 199, 199, 199, 199, 199, 170, 142, 85, 85, 142, 170, 170, 170, 170, 170, 199, 199, 199, 227, 227, 227, 227, 227, 199, 170, 142, 142, 142, 142, 142, 170, 199, 199, 227, 227, 227, 255, 255, 255, 255, 227, 199, 170, 142, 85, 85, 85, 85, 142, 170, 199, 227, 227, 227, 255, 255, 227, 227, 227, 199, 170, 142, 56, 85, 85, 142, 170, 199, 227, 227, 199, 199, 227, 227, 199, 199, 199, 170, 142, 85, 85, 142, 142, 170, 199, 227, 227, 199, 170, 170, 199, 199, 170, 170, 170, 170, 142, 85, 85, 142, 170, 170, 199, 199, 199, 170, 142, 142, 170, 170, 142, 142, 142, 142, 85, 56, 85, 142, 170, 142, 170, 170, 170, 142, 85, 85, 142, 142, 85, 85, 85, 142, 85, 56, 85, 142, 142, 85, 142, 142, 170, 170, 142, 142, 142, 142, 142, 142, 142, 142, 85, 56, 85, 142, 142, 85, 85, 85, 142, 142, 142, 85, 85, 85, 85, 85, 85, 85, 56, 28, 85, 142, 142, 142, 85, 56, 85, 85, 142, 142, 142, 85, 85, 85, 85, 56, 28, 0, 56, 85, 85, 85, 85, 85, 85, 85, 142, 170, 170, 142, 142, 142, 142, 85, 56, 28, 28, 56, 56, 85, 142, 142, 142, 142, 142, 142, 142, 85, 85, 85, 142, 142, 85, 56),
 "format": "Lum8",
@@ -20,15 +20,22 @@ data = {
 "width": 18
 }
 
-[sub_resource type="ImageTexture" id="ImageTexture_mve4s"]
-image = SubResource("Image_p0d38")
+[sub_resource type="ImageTexture" id="ImageTexture_lot47"]
+image = SubResource("Image_m6b2k")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_yqydh"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7txjp"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_i6u8t"]
+width = 355
+height = 281
+generate_mipmaps = false
+noise = SubResource("FastNoiseLite_7txjp")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8usiv"]
 shader = ExtResource("3_hlvgl")
-shader_parameter/freq = 1.0
-shader_parameter/seed = 42.0
 shader_parameter/water_level_at = 0.444444
-shader_parameter/distance_to_water_level = SubResource("ImageTexture_mve4s")
+shader_parameter/noise = SubResource("NoiseTexture2D_i6u8t")
+shader_parameter/distance_to_water_level = SubResource("ImageTexture_lot47")
 
 [node name="Terrain" type="MeshInstance3D"]
 material_override = SubResource("ShaderMaterial_ngnwd")
@@ -37,12 +44,12 @@ script = ExtResource("1_blkia")
 [node name="HeightMapGen" type="SubViewport" parent="."]
 disable_3d = true
 handle_input_locally = false
-size = Vector2i(316, 316)
+size = Vector2i(355, 281)
 render_target_update_mode = 0
 script = ExtResource("3_lm46a")
 
 [node name="Heightmap" type="ColorRect" parent="HeightMapGen"]
-material = SubResource("ShaderMaterial_yqydh")
+material = SubResource("ShaderMaterial_8usiv")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

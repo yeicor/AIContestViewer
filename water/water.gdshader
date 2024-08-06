@@ -26,11 +26,12 @@ uniform vec2 	sampler_scale 	 = vec2(0.25, 0.25); 			// Scale for the sampler
 uniform vec2	sampler_direction= vec2(0.05, 0.04); 			// Direction and speed for the sampler offset
 
 uniform sampler2D uv_sampler : hint_anisotropy; 				// UV motion sampler for shifting the normalmap
-uniform vec2 	uv_sampler_scale = vec2(0.25, 0.25); 			// UV sampler scale
+uniform vec2 	uv_sampler_scale = vec2(0.125, 0.25); 			// UV sampler scale
 uniform float 	uv_sampler_strength = 0.04; 					// UV shifting strength
 
 uniform sampler2D normalmap_a_sampler : hint_normal;			// Normalmap sampler A
 uniform sampler2D normalmap_b_sampler : hint_normal;			// Normalmap sampler B
+uniform float 	normalmap_sampler_freq : hint_range(0.001, 5.0) = 0.1;
 
 uniform sampler2D foam_sampler : hint_default_black;					// Foam sampler
 uniform float 	foam_level 		 = 0.5;							// Foam level -> distance from the object (0.0 - 0.5)
@@ -43,9 +44,11 @@ uniform vec4 	color_shallow : source_color;					// Color for lower places in the
 uniform float 	beers_law		 = 2.0;							// Beers law value, regulates the blending size to the deep water level
 uniform float 	depth_offset	 = -0.75;						// Offset for the blending
 
+#ifdef caustic
 // Projector for the water caustics:
 uniform mat4	projector;										// Projector matrix, mostly the matric of the sun / directlight
 uniform sampler2DArray caustic_sampler : hint_default_black;	// Caustic sampler, (Texture array with 16 Textures for the animation)
+#endif
 
 uniform sampler2D DEPTH_TEXTURE : hint_depth_texture, filter_linear_mipmap;
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap;
@@ -127,8 +130,8 @@ void fragment()
 	vec2 	uv 							 = UV + uv_sampler_uv_offset;
 	
 	// Normalmap:
-	vec3 	normalmap					 = texture(normalmap_a_sampler, uv - uv_offset*2.0).rgb * 0.75;		// 75 % sampler A
-			normalmap 					+= texture(normalmap_b_sampler, uv + uv_offset).rgb * 0.25;			// 25 % sampler B
+	vec3 	normalmap					 = texture(normalmap_a_sampler, (uv - uv_offset*2.0)*normalmap_sampler_freq).rgb * 0.75;		// 75 % sampler A
+			normalmap 					+= texture(normalmap_b_sampler, (uv + uv_offset)*normalmap_sampler_freq).rgb * 0.25;			// 25 % sampler B
 	
 	// Refraction UV:
 	vec3	ref_normalmap				 = normalmap * 2.0 - 1.0;
@@ -149,15 +152,17 @@ void fragment()
 	vec3 	dye_color 					 = mix(color_shallow.rgb, color_deep.rgb, depth_blend_pow);
 	vec3	color 						 = mix(screen_color*dye_color, dye_color*0.25, depth_blend_pow*0.5);
 	
+#ifdef caustic
 	// Caustic screen projection
 	vec4 	caustic_screenPos 			 = vec4(ref_uv*2.0-1.0, depth_raw, 1.0);
 	vec4 	caustic_localPos 			 = inv_mvp * caustic_screenPos;
 			caustic_localPos			 = vec4(caustic_localPos.xyz/caustic_localPos.w, caustic_localPos.w);
 	
 	vec2 	caustic_Uv 					 = caustic_localPos.xz / vec2(1024.0) + 0.5;
-	vec4	caustic_color				 = texture(caustic_sampler, vec3(caustic_Uv*300.0, mod(TIME*14.0, 16.0)));
+	vec4	caustic_color				 = texture(caustic_sampler, vec3(caustic_Uv*300.0, mod(TIME*14.0, 32.0)));
 
 			color 						*= 1.0 + pow(caustic_color.r, 1.50) * (1.0-depth_blend) * 6.0;
+#endif
 
 	// Foam:
     if (depth + VERTEX.z < vertex_height - 0.1) {

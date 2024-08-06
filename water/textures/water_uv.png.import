@@ -2,27 +2,26 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bnbsbssh473o0"
-path.s3tc="res://.godot/imported/Foam.png-13d7768b9e9da99a4510f91e738573d5.s3tc.ctex"
+uid="uid://7oakr7mj5tvk"
+path="res://.godot/imported/water_uv.png-f4a9d3c553b77354c659b7078e605552.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
-source_file="res://water/textures/Foam.png"
-dest_files=["res://.godot/imported/Foam.png-13d7768b9e9da99a4510f91e738573d5.s3tc.ctex"]
+source_file="res://water/textures/water_uv.png"
+dest_files=["res://.godot/imported/water_uv.png-f4a9d3c553b77354c659b7078e605552.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -32,4 +31,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

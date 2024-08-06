@@ -3,8 +3,8 @@ class_name Connection
 var _raw: Array
 
 
-func _init(_raw: Array):
-	self._raw = _raw
+func _init(raw: Array):
+	self._raw = raw
 
 
 func from() -> Vector2i:

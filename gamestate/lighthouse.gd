@@ -3,8 +3,8 @@ class_name Lighthouse
 var _raw: Dictionary
 
 
-func _init(_raw: Dictionary):
-	self._raw = _raw
+func _init(raw: Dictionary):
+	self._raw = raw
 
 
 func pos() -> Vector2i:

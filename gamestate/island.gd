@@ -23,6 +23,8 @@ func width() -> int:
 func height() -> int:
 	return len(self._grid)
 
+func size() -> Vector2i:
+	return Vector2i(width(), height())
 
 func energy_at(x: int, z: int) -> int:
 	return self._grid[self.height() - 1 - z][x] # Flip z axis
@@ -32,30 +34,11 @@ func is_walkable(x: int, z: int) -> bool:
 	return self.energy_at(x, z) != -1
 
 
-## Removes all fully non-walkable rows and columns from the edges of the island, and returns a new Island.
-func without_water_edges() -> Island:
-	var start_time: int  = Time.get_ticks_msec()
-	var grid_copy: Array = _grid.map(func(row: Array): return row.map(func(x: int): return x))
-	while grid_copy[0].all(func(x: int): return x == -1):
-		grid_copy.remove_at(0)
-	while grid_copy[grid_copy.size() - 1].all(func(x: int): return x == -1):
-		grid_copy.remove_at(grid_copy.size() - 1)
-	while grid_copy.all(func(row: Array): return row[0] == -1):
-		for row in grid_copy:
-			row.remove_at(0)
-	while grid_copy.all(func(row: Array): return row[row.size() - 1] == -1):
-		for row in grid_copy:
-			row.remove_at(row.size() - 1)
-	var island_copy = Island.new({"_energymap": grid_copy}, true)  # Already contains walkable information
-	print("[timing] Removed water edges in " + str(Time.get_ticks_msec() - start_time) + "ms")
-	return island_copy
-
-
 ## Returns the same cells of the island, but now as a distance to the closest water-level cell (negative for water).
 func distance_to_water_level() -> Array:
 	var init_time: int = Time.get_ticks_msec()
 	var start_time: int = init_time
-	var dist: Array     = _grid.map(func(row: Array): return row.map(func(x: int): return INF))
+	var dist: Array     = _grid.map(func(row: Array): return row.map(func(_x: int): return INF))
 	# Compute the distance for all cells using dynamic programming
 	# Initialize the distance to +-1 for boundary cells (considering outside as water)
 	for z in range(self.height()):
@@ -85,11 +68,12 @@ func distance_to_water_level() -> Array:
 		for z in range(self.height()):
 			for x in range(self.width()):
 				var handle_dir: Callable = func(dx: int, dz: int) -> bool:
-					if x + dx >= 0 and x + dx < self.width() and z + dz >= 0 and z + dz < self.height():
-						var new_dist: int = dist[z][x] + 1 * sign(dist[z][x])
-						if abs(new_dist) < abs(dist[z + dz][x + dx]):
-							dist[z + dz][x + dx] = new_dist
-							return true
+					if dist[z][x] != INF:
+						if x + dx >= 0 and x + dx < self.width() and z + dz >= 0 and z + dz < self.height():
+							var new_dist: int = dist[z][x] + 1 * sign(dist[z][x])
+							if abs(new_dist) < abs(dist[z + dz][x + dx]):
+								dist[z + dz][x + dx] = new_dist
+								return true
 					return false
 				if handle_dir.call(-1, 0):
 					changed += 1

@@ -33,8 +33,10 @@ uniform sampler2D normalmap_a_sampler : hint_normal;			// Normalmap sampler A
 uniform sampler2D normalmap_b_sampler : hint_normal;			// Normalmap sampler B
 uniform float 	normalmap_sampler_freq : hint_range(0.001, 5.0) = 0.1;
 
+#ifdef foam
 uniform sampler2D foam_sampler : hint_default_black;					// Foam sampler
 uniform float 	foam_level 		 = 0.5;							// Foam level -> distance from the object (0.0 - 0.5)
+#endif
 
 // Volume settings:
 uniform float 	refraction 		 = 0.075;						// Refraction of the water
@@ -104,13 +106,15 @@ void vertex()
 	vertex_height	 = (PROJECTION_MATRIX * MODELVIEW_MATRIX * vertex).z;
 
 	// Expand the vertex position to fake an infinite water surface (automatic LOD)
-	vertex.x = (pow(10.0 + abs(vertex.x), 1.2) - pow(10.0, 1.2)) * sign(vertex.x);
-	vertex.z = (pow(10.0 + abs(vertex.z), 1.2) - pow(10.0, 1.2)) * sign(vertex.z);
+	//vertex.x = (pow(1.0 + abs(vertex.x), 1.8) - pow(1.0, 1.8)) * sign(vertex.x);
+	//vertex.z = (pow(1.0 + abs(vertex.z), 1.8) - pow(1.0, 1.8)) * sign(vertex.z);
 
-	TANGENT			 = vertex_tangent;
-	BINORMAL		 = vertex_binormal;
-	vertex_normal	 = normalize(cross(vertex_binormal, vertex_tangent));
-	NORMAL			 = vertex_normal;
+	if (abs(vertex.x) < 485.0 && abs(vertex.z) < 485.0) { // Disable most water features at long distances
+		TANGENT			 = vertex_tangent;
+		BINORMAL		 = vertex_binormal;
+		vertex_normal	 = normalize(cross(vertex_binormal, vertex_tangent));
+		NORMAL			 = vertex_normal;
+	}
 
 	UV				 = vertex.xz * sampler_scale;
 
@@ -164,15 +168,18 @@ void fragment()
 			color 						*= 1.0 + pow(caustic_color.r, 1.50) * (1.0-depth_blend) * 6.0;
 #endif
 
+#ifdef foam
 	// Foam:
     if (depth + VERTEX.z < vertex_height - 0.1) {
 		float foam_noise = clamp(pow(texture(foam_sampler, (uv*4.0) - uv_offset).r, 10.0)*40.0, 0.0, 0.2);
 		float foam_mix = clamp(pow((1.0-(depth + VERTEX.z) + foam_noise), 8.0) * foam_noise * 0.4, 0.0, 1.0);
-		color = mix(color, vec3(1.0), foam_mix);
+		color = mix(color, vec3(1.0), foam_noise);
 	}
+#endif
 	
 	// Set all values:
 	ALBEDO = color;
+	ALPHA = 0.8;
 	METALLIC = 0.1;
 	ROUGHNESS = 0.2;
 	SPECULAR = 0.2 + depth_blend_pow * 0.4;

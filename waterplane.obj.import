@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://d2kbjo4fsa0t4"
+path="res://.godot/imported/waterplane.obj-19dcb761845d2e7ae9c49f5bcb92155a.mesh"
+
+[deps]
+
+files=["res://.godot/imported/waterplane.obj-19dcb761845d2e7ae9c49f5bcb92155a.mesh"]
+
+source_file="res://waterplane.obj"
+dest_files=["res://.godot/imported/waterplane.obj-19dcb761845d2e7ae9c49f5bcb92155a.mesh", "res://.godot/imported/waterplane.obj-19dcb761845d2e7ae9c49f5bcb92155a.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

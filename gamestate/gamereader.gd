@@ -32,8 +32,8 @@ var _stream_peer_eof: bool = false
 
 
 ## Create a game state reader from a raw stream (JSONL)
-func _init(_stream_peer: StreamPeer):
-	self._stream_peer = _stream_peer
+func _init(stream_peer: StreamPeer):
+	self._stream_peer = stream_peer
 	print("Game stream ready to decode!")
 
 

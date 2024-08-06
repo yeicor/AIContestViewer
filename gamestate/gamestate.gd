@@ -4,8 +4,8 @@ extends Node
 var _raw: Dictionary
 
 
-func _init(_raw: Dictionary):
-	self._raw = _raw
+func _init(raw: Dictionary):
+	self._raw = raw
 
 
 func round() -> int:

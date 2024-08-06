@@ -1,38 +1,31 @@
-[gd_scene load_steps=7 format=3 uid="uid://bbvx0y3ablhoa"]
+[gd_scene load_steps=6 format=3 uid="uid://bbvx0y3ablhoa"]
 
+[ext_resource type="ArrayMesh" uid="uid://brpfy70wvh3kb" path="res://water/waterplane.obj" id="1_1d10i"]
 [ext_resource type="Shader" path="res://water/water.gdshader" id="1_4o0j8"]
-[ext_resource type="Texture2D" path="res://water/textures/Foam.png" id="2_xb3qk"]
 [ext_resource type="Texture2D" uid="uid://bduktpovmijlj" path="res://water/textures/water_normal.png" id="4_oj3g4"]
-[ext_resource type="Texture2D" path="res://water/textures/Water_UV.png" id="5_0fwac"]
+[ext_resource type="Texture2D" uid="uid://7oakr7mj5tvk" path="res://water/textures/water_uv.png" id="4_owt21"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0pkip"]
-render_priority = -1
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f18fu"]
+render_priority = 0
 shader = ExtResource("1_4o0j8")
-shader_parameter/wave_speed = 0.5
-shader_parameter/wave_a = Vector4(1, 1, 0.7, 10)
-shader_parameter/wave_b = Vector4(1, 0.75, 0.5, 9)
-shader_parameter/wave_c = Vector4(1, 1.3, 0.4, 11)
+shader_parameter/wave_speed = 1.0
+shader_parameter/wave_a = Vector4(1, 1, 1, 12)
+shader_parameter/wave_b = Vector4(1, 0.6, 0.5, 9)
+shader_parameter/wave_c = Vector4(1, 2, 0.2, 5)
 shader_parameter/sampler_scale = Vector2(0.25, 0.25)
 shader_parameter/sampler_direction = Vector2(0.05, 0.04)
 shader_parameter/uv_sampler_scale = Vector2(0.125, 0.25)
 shader_parameter/uv_sampler_strength = 0.04
 shader_parameter/normalmap_sampler_freq = 0.1
-shader_parameter/foam_level = 0.5
 shader_parameter/refraction = 0.075
-shader_parameter/color_deep = Color(0, 0, 0.472656, 1)
-shader_parameter/color_shallow = Color(0.145098, 0.152941, 1, 1)
+shader_parameter/color_deep = Color(0, 0, 0.360784, 0)
+shader_parameter/color_shallow = Color(0.290196, 0.580392, 0.623529, 0)
 shader_parameter/beers_law = 2.0
 shader_parameter/depth_offset = -0.75
-shader_parameter/uv_sampler = ExtResource("5_0fwac")
+shader_parameter/uv_sampler = ExtResource("4_owt21")
 shader_parameter/normalmap_a_sampler = ExtResource("4_oj3g4")
 shader_parameter/normalmap_b_sampler = ExtResource("4_oj3g4")
-shader_parameter/foam_sampler = ExtResource("2_xb3qk")
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_0xeoj"]
-material = SubResource("ShaderMaterial_0pkip")
-size = Vector2(1000, 1000)
-subdivide_width = 100
-subdivide_depth = 100
 
 [node name="Water" type="MeshInstance3D"]
-mesh = SubResource("PlaneMesh_0xeoj")
+material_override = SubResource("ShaderMaterial_f18fu")
+mesh = ExtResource("1_1d10i")

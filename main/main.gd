@@ -21,7 +21,6 @@ func _ready() -> void:
 	for conn: Connection in first_round.connections():
 		print(conn.to_ascii_string())
 		
-	print(island.without_water_edges().to_ascii_string())
-	print(GameState.array_2d_to_ascii_string(island.without_water_edges().distance_to_water_level()
+	print(GameState.array_2d_to_ascii_string(island.distance_to_water_level()
 		.map(func(row): return row.map(func(x): return str(x)))))
 	

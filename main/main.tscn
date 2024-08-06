@@ -14,6 +14,7 @@ script = ExtResource("1_rrmnf")
 [node name="Water" parent="World" instance=ExtResource("3_opt86")]
 
 [node name="Terrain" parent="World" instance=ExtResource("3_wln4f")]
+mesh = null
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3
@@ -22,7 +23,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-1, -2.26267e-08, 8.44439e-08, 0, 0.965926, 0.258819, -8.74228e-08, 0.258819, -0.965926, 0, 11.9905, -39.5596)
+transform = Transform3D(-1, -2.26267e-08, 8.44439e-08, -1.36579e-08, 0.9945, 0.104737, -8.63493e-08, 0.104737, -0.9945, 0, 37.323, -151.633)
 environment = ExtResource("3_3dq86")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]

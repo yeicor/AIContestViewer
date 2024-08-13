@@ -27,11 +27,13 @@ extends MeshInstance3D
 		steepness = new_steepness
 		if Engine.is_editor_hint():
 			_regenerate_demo()
-			
 
+func _ready():
+	if not Engine.is_editor_hint():
+		_regenerate_demo()
 
 func _regenerate_demo(): # Ignoring errors as this is an internal tool
-	var game_reader: GameReader  = GameReader.open(ConfigClass.DEFAULT_GAME_PATH)
+	var game_reader: GameReader  = Settings.game_reader()
 	var first_round: GameState   = game_reader.parse_next_state()
 	var island: Island = first_round.island(false)
 	generate(island)

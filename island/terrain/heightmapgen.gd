@@ -5,7 +5,7 @@ extends SubViewport
 func _init():
 	self.set_update_mode(SubViewport.UPDATE_DISABLED)
 
-func generate_heightmap(island: Island, mseed: int, target_vertices: int = 100000) -> Array:
+func generate_heightmap(island: Island, mseed: int, target_vertices: int = Settings.terrain_vertex_count()) -> Array:
 	# Create the max heights texture for the shader
 	var height_bounds: Array = island.distance_to_water_level()
 	var min_height: int      = height_bounds.map(func(x): return x.min()).min()
@@ -23,9 +23,9 @@ func generate_heightmap(island: Island, mseed: int, target_vertices: int = 10000
 	var height_bounds_tex: ImageTexture = ImageTexture.create_from_image(height_bounds_img)
 	
 	# Figure out the number of pixels to generate based on the target vertices
-	var gen_ratio_xz = float(height_bounds[0].size()) / float(height_bounds.size())
-	var gen_width: int = int(sqrt(target_vertices) * gen_ratio_xz)
-	var gen_height: int = int(sqrt(target_vertices) / gen_ratio_xz)
+	var gen_ratio_xz: float = float(height_bounds[0].size()) / float(height_bounds.size())
+	var gen_width: int      = int(sqrt(target_vertices) * gen_ratio_xz)
+	var gen_height: int     = int(sqrt(target_vertices) / gen_ratio_xz)
 
 	# Use the shader to render the high-res heightmap to another texture
 	size = Vector2(gen_width, gen_height)

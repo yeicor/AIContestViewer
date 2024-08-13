@@ -26,7 +26,7 @@ static func from_heightmap(grid: Array, cell_size: Vector3 = Vector3.ONE, offset
 			for x in range(grid[z].size()):
 				new_grid[z+1][x+1] = grid[z][x]
 		grid = new_grid
-		print("[timing] Extended bottom of grid in " + str(Time.get_ticks_msec() - start_time) + "ms")
+		print("[timing] Extended bottom of grid in " + str(Time.get_ticks_msec() - start_time_2) + "ms")
 
 	# Generate vertices and faces
 	for z in range(grid.size()):

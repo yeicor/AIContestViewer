@@ -1,9 +1,7 @@
 extends Node3D
 
 func _ready() -> void:
-	
-	
-	var game_reader: GameReader = Config.game_reader()
+	var game_reader: GameReader = Settings.game_reader()
 	if game_reader == null:
 		print("Failed to create game reader")
 

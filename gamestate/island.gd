@@ -40,7 +40,7 @@ func distance_to_water_level() -> Array:
 	var start_time: int = init_time
 	var dist: Array     = _grid.map(func(row: Array): return row.map(func(_x: int): return INF))
 	# Compute the distance for all cells using dynamic programming
-	# Initialize the distance to +-1 for boundary cells (considering outside as water)
+	# Initialize the distance to +-0.5 for boundary cells (considering outside as water)
 	for z in range(self.height()):
 		for x in range(self.width()):
 			if dist[z][x] == INF: # Previously unvisited
@@ -49,11 +49,11 @@ func distance_to_water_level() -> Array:
 					if x + dx >= 0 and x + dx < self.width() and z + dz >= 0 and z + dz < self.height():
 						var dir_walkable: bool = self.is_walkable(x + dx, z + dz)
 						if dir_walkable != walkable:
-							dist[z][x] = 1 if walkable else -1
+							dist[z][x] = 0.5 if walkable else -0.5
 							if dist[z + dz][x + dx] == INF:
-								dist[z + dz][x + dx] = -1 if walkable else 1
+								dist[z + dz][x + dx] = -0.5 if walkable else 0.5
 					elif walkable: # Assume edge is water
-						dist[z][x] = 1
+						dist[z][x] = 0.5
 				handle_dir.call(-1, 0)
 				handle_dir.call(1, 0)
 				handle_dir.call(0, -1)
@@ -70,7 +70,7 @@ func distance_to_water_level() -> Array:
 				var handle_dir: Callable = func(dx: int, dz: int) -> bool:
 					if dist[z][x] != INF:
 						if x + dx >= 0 and x + dx < self.width() and z + dz >= 0 and z + dz < self.height():
-							var new_dist: int = dist[z][x] + 1 * sign(dist[z][x])
+							var new_dist: float = dist[z][x] + 1.0 * sign(dist[z][x])
 							if abs(new_dist) < abs(dist[z + dz][x + dx]):
 								dist[z + dz][x + dx] = new_dist
 								return true

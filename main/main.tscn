@@ -13,6 +13,7 @@ script = ExtResource("1_rrmnf")
 [node name="Water" parent="World" instance=ExtResource("3_opt86")]
 
 [node name="Terrain" parent="World" instance=ExtResource("3_wln4f")]
+mesh = null
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3

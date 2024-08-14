@@ -1,7 +1,7 @@
 class_name MeshGen
 
 ## from_heightmap generates a mesh from a 2D array of heights (X, Z).
-static func from_heightmap(grid: Array, cell_size: Vector3 = Vector3.ONE, offset_pct: Vector3 = Vector3(0.5, -1, 0.5), extend_to_bottom: float = 1000.0) -> Mesh:
+static func from_heightmap(grid: Array, cell_size: Vector3 = Vector3.ONE, offset_pct: Vector3 = Vector3(0.5, -1, 0.5), extend_to_bottom: float = 0.0) -> Mesh:
 	var start_time = Time.get_ticks_msec()
 	var st: SurfaceTool = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -13,6 +13,9 @@ static func from_heightmap(grid: Array, cell_size: Vector3 = Vector3.ONE, offset
 	
 	if offset_pct.y < 0:
 		origin.y = min_y * cell_size.y # Keep original y values
+
+	# TODO: Create the grid at the same time as the GPU works, (and in another thread to avoid blocking)
+	# TODO: Faster with PlaneMesh + displacing vertices?
 
 	if extend_to_bottom > 0: # Add 4 edges to the original grid with large negative y values (slow?)
 		var start_time_2 = Time.get_ticks_msec()
@@ -55,13 +58,12 @@ static func from_heightmap(grid: Array, cell_size: Vector3 = Vector3.ONE, offset
 
 	st.generate_normals()
 	st.generate_tangents()
-	
-	# TODO: Option to expand corners and edges towards -inf
 
 	var mesh: ArrayMesh = st.commit()
 	
 	print("[timing] Generated mesh from heightmap of size " + str(cell_counts.x) + "x" + str(cell_counts.z) +
 	 " in " + str(Time.get_ticks_msec() - start_time) + "ms")
+	print("Cell size: ", cell_size)
 	
 	return mesh
 

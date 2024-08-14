@@ -12,7 +12,7 @@ func round() -> int:
 	return self._raw["round"]
 
 
-func island(energy_only: bool) -> Island:
+func island(energy_only: bool = true) -> Island:
 	return Island.new(self._raw["island"], energy_only)
 
 

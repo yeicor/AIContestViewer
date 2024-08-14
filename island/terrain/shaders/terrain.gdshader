@@ -3,6 +3,10 @@ shader_type spatial;
 uniform vec3 grass : source_color;
 uniform vec3 sand : source_color;
 
+uniform ivec2 cells = ivec2(21, 18); // Number of cells in the terrain TODO: Texture with more cell info!
+uniform vec2 cell_size = vec2(10, 10); // Size of each cells in the terrain
+uniform float cell_border = 0.1f; // Size of the border of each cell
+
 varying vec3 vert;
 
 vec2 random(vec2 uv){
@@ -35,6 +39,11 @@ void fragment() {
 		ALBEDO = sand;
 	}
 	ALBEDO += vec3(noise(vert.yz*10.0), noise(vert.xz*10.0), noise(vert.xy*10.0)) * 0.1;
+
+	// Use the cells to override the color of the terrain and draw the square borders
+	vec2 cell_uv_fract = fract(vert.xz / cell_size - mod(vec2(cells), vec2(2.0)) / 2.0);
+	float border_factor = 1.0 - step(cell_border, cell_uv_fract.x) * step(cell_border, cell_uv_fract.y) * step(cell_uv_fract.x, 1.0 - cell_border) * step(cell_uv_fract.y, 1.0 - cell_border);
+    ALBEDO = mix(ALBEDO, vec3(0.0, 0.0, 0.0), border_factor);
 }
 
 //void light() {

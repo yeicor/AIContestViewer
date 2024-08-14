@@ -1,60 +1,55 @@
-[gd_scene load_steps=11 format=3 uid="uid://cjklklxubiss0"]
+[gd_scene load_steps=9 format=3 uid="uid://cjklklxubiss0"]
 
-[ext_resource type="Script" path="res://island/terrain/terrain.gd" id="1_blkia"]
-[ext_resource type="Shader" path="res://island/terrain/terrain.gdshader" id="1_pas75"]
-[ext_resource type="Shader" path="res://island/terrain/heightmapgen.gdshader" id="3_hlvgl"]
-[ext_resource type="Script" path="res://island/terrain/heightmapgen.gd" id="3_lm46a"]
+[ext_resource type="Script" path="res://island/terrain/scripts/terrain.gd" id="1_blkia"]
+[ext_resource type="Shader" path="res://island/terrain/shaders/terrain.gdshader" id="1_pas75"]
+[ext_resource type="Shader" path="res://island/terrain/shaders/heightmapgen.gdshader" id="3_hlvgl"]
+[ext_resource type="Script" path="res://island/terrain/scripts/heightmapgen.gd" id="3_lm46a"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ngnwd"]
 render_priority = 0
 shader = ExtResource("1_pas75")
-shader_parameter/grass = Color(0, 0.141176, 0, 1)
+shader_parameter/grass = Color(0, 0.257812, 0, 1)
 shader_parameter/sand = Color(0.180392, 0.156863, 0, 1)
+shader_parameter/cells = Vector2i(21, 18)
+shader_parameter/cell_size = Vector2(10, 10)
+shader_parameter/cell_border = 0.02
 
-[sub_resource type="Image" id="Image_jvuss"]
+[sub_resource type="Image" id="Image_iyyl8"]
 data = {
-"data": PackedByteArray(93, 116, 93, 93, 69, 46, 46, 46, 69, 69, 69, 93, 93, 93, 93, 116, 116, 93, 69, 46, 23, 116, 162, 116, 116, 93, 69, 69, 69, 93, 93, 93, 116, 116, 116, 116, 162, 162, 116, 93, 69, 46, 93, 116, 162, 162, 116, 93, 93, 93, 116, 116, 116, 162, 162, 162, 162, 186, 186, 162, 116, 93, 69, 69, 93, 116, 116, 162, 116, 116, 116, 162, 162, 162, 186, 186, 186, 186, 209, 186, 162, 116, 93, 69, 93, 116, 162, 162, 186, 162, 162, 162, 186, 186, 186, 209, 209, 209, 209, 209, 186, 162, 116, 93, 69, 93, 116, 162, 186, 186, 186, 186, 186, 209, 209, 209, 232, 232, 232, 232, 232, 209, 186, 162, 116, 93, 116, 162, 162, 162, 162, 186, 209, 209, 232, 232, 232, 255, 255, 255, 255, 232, 209, 186, 162, 116, 93, 93, 116, 116, 116, 116, 162, 186, 209, 232, 232, 232, 255, 255, 232, 232, 232, 209, 186, 162, 116, 93, 69, 93, 116, 116, 162, 186, 209, 232, 232, 209, 209, 232, 232, 209, 209, 209, 186, 162, 116, 93, 69, 93, 116, 162, 162, 186, 209, 232, 232, 209, 186, 186, 209, 209, 186, 186, 186, 186, 162, 116, 93, 69, 93, 116, 162, 186, 186, 209, 209, 209, 186, 162, 162, 186, 186, 162, 162, 162, 162, 116, 93, 69, 46, 93, 116, 162, 186, 162, 186, 186, 186, 162, 116, 116, 162, 162, 116, 116, 116, 162, 116, 93, 69, 46, 93, 116, 162, 162, 116, 162, 162, 186, 186, 162, 162, 162, 162, 162, 162, 162, 162, 116, 93, 69, 46, 93, 116, 162, 162, 116, 116, 116, 162, 162, 162, 116, 116, 116, 116, 116, 116, 116, 93, 69, 46, 23, 93, 116, 162, 162, 162, 116, 93, 116, 116, 162, 162, 162, 116, 116, 116, 116, 93, 69, 46, 23, 0, 69, 93, 116, 116, 116, 116, 116, 116, 116, 162, 186, 186, 162, 162, 162, 162, 116, 93, 69, 46, 23, 46, 69, 93, 93, 116, 162, 162, 162, 162, 162, 162, 162, 116, 116, 116, 162, 162, 116, 93, 69, 46, 23, 46, 69, 69, 93, 116, 116, 116, 116, 116, 116, 116, 93, 93, 93, 116, 116, 93, 69, 46, 23),
-"format": "Lum8",
+"data": PackedByteArray(102, 0, 127, 0, 102, 0, 102, 0, 76, 0, 51, 0, 51, 0, 51, 0, 76, 0, 76, 0, 76, 0, 102, 0, 102, 0, 102, 0, 102, 0, 127, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 127, 0, 153, 0, 127, 0, 127, 0, 102, 0, 76, 0, 76, 0, 76, 0, 102, 0, 102, 0, 102, 0, 127, 0, 127, 0, 127, 0, 127, 0, 153, 0, 153, 255, 127, 0, 102, 0, 76, 0, 51, 0, 102, 0, 127, 0, 153, 0, 153, 0, 127, 0, 102, 0, 102, 0, 102, 0, 127, 255, 127, 0, 127, 0, 153, 0, 153, 0, 153, 0, 153, 0, 179, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 76, 0, 102, 0, 127, 0, 127, 0, 153, 0, 127, 0, 127, 0, 127, 0, 153, 0, 153, 0, 153, 0, 179, 0, 179, 0, 179, 0, 179, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 0, 153, 0, 153, 255, 179, 0, 153, 0, 153, 0, 153, 0, 179, 0, 179, 0, 179, 0, 204, 255, 204, 0, 204, 0, 204, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 255, 153, 0, 179, 0, 179, 0, 179, 0, 179, 0, 179, 0, 204, 0, 204, 0, 204, 0, 230, 0, 230, 0, 230, 0, 230, 0, 230, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 127, 0, 153, 0, 153, 0, 153, 0, 153, 0, 179, 0, 204, 0, 204, 0, 230, 0, 230, 0, 230, 0, 255, 0, 255, 0, 255, 0, 255, 0, 230, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 102, 0, 127, 0, 127, 0, 127, 0, 127, 0, 153, 0, 179, 0, 204, 0, 230, 0, 230, 0, 230, 0, 255, 0, 255, 0, 230, 0, 230, 0, 230, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 0, 127, 0, 153, 0, 179, 0, 204, 0, 230, 0, 230, 0, 204, 255, 204, 0, 230, 0, 230, 0, 204, 0, 204, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 0, 153, 0, 153, 0, 179, 0, 204, 0, 230, 0, 230, 0, 204, 0, 179, 0, 179, 0, 204, 0, 204, 0, 179, 0, 179, 0, 179, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 0, 153, 0, 179, 0, 179, 0, 204, 0, 204, 0, 204, 0, 179, 0, 153, 0, 153, 0, 179, 0, 179, 0, 153, 0, 153, 255, 153, 0, 153, 0, 127, 0, 102, 0, 76, 0, 51, 0, 102, 0, 127, 0, 153, 0, 179, 0, 153, 0, 179, 0, 179, 255, 179, 0, 153, 0, 127, 0, 127, 0, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 153, 0, 127, 0, 102, 0, 76, 0, 51, 0, 102, 0, 127, 0, 153, 0, 153, 0, 127, 0, 153, 0, 153, 0, 179, 0, 179, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 127, 0, 102, 0, 76, 0, 51, 0, 102, 0, 127, 0, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 153, 0, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 102, 0, 127, 0, 153, 0, 153, 0, 153, 0, 127, 0, 102, 0, 127, 0, 127, 0, 153, 255, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 0, 0, 76, 0, 102, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 153, 0, 179, 0, 179, 0, 153, 0, 153, 0, 153, 0, 153, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 51, 0, 76, 255, 102, 0, 102, 0, 127, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 153, 0, 153, 255, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 51, 0, 76, 0, 76, 0, 102, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 102, 0, 102, 0, 102, 0, 127, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0),
+"format": "RedGreen",
 "height": 18,
 "mipmaps": false,
 "width": 21
 }
 
-[sub_resource type="ImageTexture" id="ImageTexture_f22ob"]
-image = SubResource("Image_jvuss")
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_7txjp"]
-seed = 42
-frequency = 0.005
-domain_warp_enabled = true
-domain_warp_amplitude = 50.0
-domain_warp_frequency = 0.01
-domain_warp_fractal_octaves = 2
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_i6u8t"]
-width = 368
-height = 271
-generate_mipmaps = false
-noise = SubResource("FastNoiseLite_7txjp")
+[sub_resource type="ImageTexture" id="ImageTexture_blbek"]
+image = SubResource("Image_iyyl8")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8usiv"]
 shader = ExtResource("3_hlvgl")
-shader_parameter/water_level_at = 0.545455
-shader_parameter/noise = SubResource("NoiseTexture2D_i6u8t")
-shader_parameter/distance_to_water_level = SubResource("ImageTexture_f22ob")
+shader_parameter/debug_height = false
+shader_parameter/my_seed = 66
+shader_parameter/water_level_at = 0.55
+shader_parameter/y_level_step = 0.1
+shader_parameter/distance_to_water_level = SubResource("ImageTexture_blbek")
 
 [node name="Terrain" type="MeshInstance3D"]
 material_override = SubResource("ShaderMaterial_ngnwd")
 script = ExtResource("1_blkia")
+my_seed = 66
 
 [node name="HeightMapGen" type="SubViewport" parent="."]
 disable_3d = true
 handle_input_locally = false
+use_hdr_2d = true
+canvas_item_default_texture_repeat = 2
 size = Vector2i(368, 271)
+render_target_clear_mode = 1
 render_target_update_mode = 0
 script = ExtResource("3_lm46a")
 
-[node name="Heightmap" type="ColorRect" parent="HeightMapGen"]
+[node name="HeightMap" type="ColorRect" parent="HeightMapGen"]
 material = SubResource("ShaderMaterial_8usiv")
 anchors_preset = 15
 anchor_right = 1.0

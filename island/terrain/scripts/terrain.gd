@@ -16,7 +16,8 @@ extends MeshInstance3D
 		if Engine.is_editor_hint():
 			_regenerate_demo()
 
-@export var cell_side: float = 10:
+
+@export var cell_side: float = 10.0:
 	set(new_cell_side):
 		cell_side = new_cell_side
 		if Engine.is_editor_hint():
@@ -33,17 +34,18 @@ func _ready():
 		_regenerate_demo()
 
 func _regenerate_demo(): # Ignoring errors as this is an internal tool
-	var game_reader: GameReader  = Settings.game_reader()
+	print("_regenerate_demo ", my_seed, " ", cell_side, " ", steepness)
+	var game_reader: GameReader = Setting.game_reader()
 	var first_round: GameState   = game_reader.parse_next_state()
-	var island: Island = first_round.island(false)
-	generate(island)
+	generate(first_round)
 
 
-func generate(island: Island):
-	var heightmap_info: Array = await $HeightMapGen.generate_heightmap(island, my_seed)
-	var heightmap: Array = heightmap_info[0]
-	var heightmap_samples: Vector2 = heightmap_info[1]
-	var sample_factor: Vector2 = Vector2(island.size()) / heightmap_samples 
-	mesh = MeshGen.from_heightmap(heightmap, Vector3(cell_side, steepness, cell_side) * 
-		Vector3(sample_factor.x, cell_side, sample_factor.y))
+func generate(game: GameState):
+	var heightmap_info    : Array = await $HeightMapGen.generate_heightmap(game, my_seed)
+	var heightmap         : Array = heightmap_info[0]
+	var heightmap_samples : Vector2 = heightmap_info[1]
+	var xz_step           := Vector2(cell_side, cell_side) * Vector2(game.island().size()) / heightmap_samples
+	var y_step            := steepness * cell_side / 2
+	# heightmap = [heightmap[0]] # Fast CPU side for testing!
+	mesh = MeshGen.from_heightmap(heightmap, Vector3(xz_step.x, y_step, xz_step.y))
 

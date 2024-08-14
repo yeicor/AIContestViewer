@@ -1,14 +1,19 @@
+@tool
 extends Node
+class_name Setting
 
+static var _instance: Setting       = null
+static var _game_reader: GameReader = null
 const _project_settings_root: String = "ai_contest_viewer"
 var _invalid_env_regex: RegEx        = _invalid_env_regex_fn()
 # Internals of the loader
 var _loaded: bool             = false
-var _game_reader: GameReader  = null
 var _all_settings: Dictionary = {}
 
 
 func _init() -> void:
+	assert(_instance == null, "Only 1 settings instance at a time!")
+	_instance = self
 	# HACK: Allow special env overrides before ini (like changing the file path)
 	_load_custom_settings_env()
 	_load_custom_settings_web()
@@ -55,7 +60,7 @@ func _load_custom_settings_ini() -> void: # Will enter first in the scene tree (
 	# Fill project config from config.ini file
 	var settings_path   = _val("settings/path", true)
 	var create_defaults = _val("settings/create_defaults", true)
-	create_defaults = create_defaults if create_defaults != null else not Engine.is_editor_hint()
+	create_defaults = create_defaults if create_defaults != null else OS.has_feature("standalone")
 
 	var config: ConfigFile = ConfigFile.new()
 	if FileAccess.file_exists(settings_path):
@@ -72,14 +77,8 @@ func _load_custom_settings_ini() -> void: # Will enter first in the scene tree (
 
 	# Save the default settings file if it doesn't exist and the user wants it
 	if create_defaults and not FileAccess.file_exists(settings_path):
+		print("[settings] Saving all settings to " + ProjectSettings.globalize_path(settings_path))
 		FileAccess.open(settings_path, FileAccess.WRITE).store_string(generate_ini(true))
-
-
-#for setting_name: String in _all_settings_info.keys():
-#var section: String = setting_name.substr(0, setting_name.rfind("/"))
-#var key: String     = setting_name.substr(setting_name.rfind("/") + 1)
-#config.set_value(section, key, _val(setting_name, true))
-#config.save(settings_path)
 
 
 func generate_ini(skip_check: bool = false) -> String:
@@ -140,9 +139,18 @@ func _val(path: String, skip_check: bool = false) -> Variant:
 	assert(_loaded or skip_check, "Settings must be loaded before they can be accessed.")
 	return _all_settings.get(path, _all_settings_info[path]["default"])
 
+
+
+## Supports @tool by using default values if no instance is available
+static func _s_val(path: String) -> Variant:
+	if _instance != null && _instance._loaded:
+		return _instance._val(path)
+	else:
+		return _all_settings_info[path]["default"]
+
 # ========== ALL SETTINGS ==========
 
-var _all_settings_info: Dictionary = \
+static var _all_settings_info: Dictionary = \
 	{
 		"settings/path": {
 			"default": "user://settings.ini",
@@ -169,8 +177,18 @@ var _all_settings_info: Dictionary = \
 			"type": TYPE_STRING,
 			"info": "The game path to load. It may be a tcp:// for a tcp server or simply a Godot data path.",
 		},
+		"terrain/cell_side": {
+			"default": 10.0,
+			"type": TYPE_FLOAT,
+			"info": "The side of a cell in the terrain grid, in meters. Will scale/redistribute vegetations, players, etc.",
+		},
+		"terrain/max_steepness": {
+			"default": 1.0,
+			"type": TYPE_FLOAT,
+			"info": "The maximum steepness of the terrain use 1.0 for 45 degrees (+ noise)",
+		},
 		"terrain/vertex_count": {
-			"default": 100000,
+			"default": 1000,
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the terrain (can affect performance and initial load time).",
 		},
@@ -178,16 +196,21 @@ var _all_settings_info: Dictionary = \
 
 
 # ========== ALL SETTINGS ACCESSORS ==========
-func common_seed() -> int: return _val("common/seed")
+static func common_seed() -> int: return _s_val("common/seed")
 
 
-func game_path() -> String: return _val("game/path")
+static func game_path() -> String: return _s_val("game/path")
 
 
-func game_reader() -> GameReader:
+static func game_reader() -> GameReader:
 	if _game_reader == null:
-		_game_reader = GameReader.open(_val("game/path"))
+		_game_reader = GameReader.open(_s_val("game/path"))
 	return _game_reader
 
 
-func terrain_vertex_count() -> int: return _val("terrain/vertex_count")
+
+static func terrain_cell_side() -> float: return _s_val("terrain/cell_side")
+
+static func terrain_max_steepness() -> float: return _s_val("terrain/max_steepness")
+
+static func terrain_vertex_count() -> int: return _s_val("terrain/vertex_count")

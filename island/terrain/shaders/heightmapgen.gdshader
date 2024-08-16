@@ -10,6 +10,7 @@ uniform int my_seed = 42;
 uniform sampler2D distance_to_water_level : hint_roughness_gray;
 uniform float water_level_at: hint_range(0.0, 1.0) = 0.44;
 uniform float y_level_step: hint_range(0.0, 1.0) = 0.1;
+uniform vec2 min_precipice_range = vec2(0.005, 0.2);
 
 #include "FastNoiseLite.gdshaderinc"
 
@@ -43,72 +44,95 @@ highp float noise01(highp vec2 uv) {
 #include "lanczos.gdshaderinc"
 #define LANCZOS_SIZE 5
 
+// Gets the custom non-smooth ramp-like max height. Useful for a proper blocky coastline!
+highp float max_height_ramp(highp vec2 uv, highp sampler2D distance_to_water_level_, highp ivec2 distance_to_water_level_size, highp ivec2 block_sample, highp vec2 floating_sample) {
+	// Use mh_block to create mh_ramp, which help create perfectly square cells along the coast ;)
+	highp float mh_block_tl = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(-1, -1), 0, distance_to_water_level_size).r;
+	highp float mh_block_tc = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(0, -1), 0, distance_to_water_level_size).r;
+	highp float mh_block_tr = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(1, -1), 0, distance_to_water_level_size).r;
+	highp float mh_block_cl = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(-1, 0), 0, distance_to_water_level_size).r;
+	highp float mh_block_cc = texelFetchClamp(distance_to_water_level_, block_sample, 0, distance_to_water_level_size).r;
+	highp float mh_block_cr = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(1, 0), 0, distance_to_water_level_size).r;
+	highp float mh_block_bl = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(-1, 1), 0, distance_to_water_level_size).r;
+	highp float mh_block_bc = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(0, 1), 0, distance_to_water_level_size).r;
+	highp float mh_block_br = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(1, 1), 0, distance_to_water_level_size).r;
+	// Gather the shared 2x2 heights with neighboring cells, forcing water_level!
+	highp float min_precipice = y_level_step / 25.0; // To clearly differenciate above and below water, at the cost of "realism"
+	highp float mh_ramp_tl = (mh_block_tl + mh_block_tc + mh_block_cl + mh_block_cc) / 4.0;
+	if (sign(mh_block_tl - water_level_at) != sign(mh_block_tc - water_level_at) ||
+		sign(mh_block_tl - water_level_at) != sign(mh_block_cl - water_level_at) ||
+		sign(mh_block_tl - water_level_at) != sign(mh_block_cc - water_level_at)) {
+		mh_ramp_tl = water_level_at + min_precipice * sign(mh_block_cc - water_level_at);
+	}
+	highp float mh_ramp_tr = (mh_block_tr + mh_block_tc + mh_block_cr + mh_block_cc) / 4.0;
+	if (sign(mh_block_tr - water_level_at) != sign(mh_block_tc - water_level_at) ||
+		sign(mh_block_tr - water_level_at) != sign(mh_block_cr - water_level_at) ||
+		sign(mh_block_tr - water_level_at) != sign(mh_block_cc - water_level_at)) {
+		mh_ramp_tr = water_level_at + min_precipice * sign(mh_block_cc - water_level_at);
+	}
+	highp float mh_ramp_bl = (mh_block_bl + mh_block_bc + mh_block_cl + mh_block_cc) / 4.0;
+	if (sign(mh_block_bl - water_level_at) != sign(mh_block_bc - water_level_at) ||
+		sign(mh_block_bl - water_level_at) != sign(mh_block_cl - water_level_at) ||
+		sign(mh_block_bl - water_level_at) != sign(mh_block_cc - water_level_at)) {
+		mh_ramp_bl = water_level_at + min_precipice * sign(mh_block_cc - water_level_at);
+	}
+	highp float mh_ramp_br = (mh_block_br + mh_block_bc + mh_block_cr + mh_block_cc) / 4.0;
+	if (sign(mh_block_br - water_level_at) != sign(mh_block_bc - water_level_at) ||
+		sign(mh_block_br - water_level_at) != sign(mh_block_cr - water_level_at) ||
+		sign(mh_block_br - water_level_at) != sign(mh_block_cc - water_level_at)) {
+		mh_ramp_br = water_level_at + min_precipice * sign(mh_block_cc - water_level_at);
+	}
+	// Now just mix the 4 corners to get the final mh_ramp
+	highp float mh_ramp = mix(
+		mix(mh_ramp_tl, mh_ramp_tr, fract(floating_sample.x)),
+		mix(mh_ramp_bl, mh_ramp_br, fract(floating_sample.x)),
+		fract(floating_sample.y)
+	);
+	// Edge case: raise centers by a bit on some close to surface cells (including islands)
+	if (mh_block_cc - water_level_at > 0.0 &&
+		(int(sign(mh_block_tc - water_level_at) != sign(mh_block_cc - water_level_at)) +
+		int(sign(mh_block_bc - water_level_at) != sign(mh_block_cc - water_level_at)) +
+		int(sign(mh_block_cl - water_level_at) != sign(mh_block_cc - water_level_at)) +
+		int(sign(mh_block_cr - water_level_at) != sign(mh_block_cc - water_level_at)) >= 2)) {
+		highp float raise_x = 1.0 - pow(2.0 * abs(0.5 - fract(floating_sample.x)), 1.5);
+		highp float raise_y = 1.0 - pow(2.0 * abs(0.5 - fract(floating_sample.y)), 1.5);
+		mh_ramp += mix(0.0, y_level_step / 2.0, min(raise_x, raise_y));
+	}
+	return mh_ramp;
+}
+
 // Takes the noisy heightmap and makes sure it matches the input distance to surface constraints
 highp float heightmap_island(highp vec2 uv) {
 	// This smooth noise will define the shape of the terrain
     highp float terrain_noise = noise01(uv);
 
-	// Retrieve height levels (blocky and smooth versions, to ensure cells are respected
+	// Basics about the 
     highp ivec2 distance_to_water_level_size = textureSize(distance_to_water_level, 0);
 	highp vec2 floating_sample = uv * vec2(distance_to_water_level_size);
 	highp ivec2 block_sample = ivec2(floating_sample);
-	highp float hl_block = texelFetchClamp(distance_to_water_level, block_sample, 0, distance_to_water_level_size).r;
-	highp float hl = lanczos(distance_to_water_level, uv, LANCZOS_SIZE).r;
-	hl = min(hl, 1.0); // Lanczos can exagerate peaks while smoothing...
+
+	// Retrieve height levels (blocky and smooth versions, to ensure cells are respected
+	highp float mh = lanczos(distance_to_water_level, uv, LANCZOS_SIZE).r;
+	mh = min(mh, 1.0); // Lanczos can exagerate peaks while smoothing...
+	highp float mh_ramp = max_height_ramp(uv, distance_to_water_level, distance_to_water_level_size, block_sample, floating_sample);
 	
-	// Use hl_block to create hl_ramp, which help create perfectly square cells along the coast ;)
-	highp float hl_block_tl = texelFetchClamp(distance_to_water_level, block_sample + ivec2(-1, -1), 0, distance_to_water_level_size).r;
-	highp float hl_block_tc = texelFetchClamp(distance_to_water_level, block_sample + ivec2(0, -1), 0, distance_to_water_level_size).r;
-	highp float hl_block_tr = texelFetchClamp(distance_to_water_level, block_sample + ivec2(1, -1), 0, distance_to_water_level_size).r;
-	highp float hl_block_cl = texelFetchClamp(distance_to_water_level, block_sample + ivec2(-1, 0), 0, distance_to_water_level_size).r;
-	highp float hl_block_cc = hl_block;
-	highp float hl_block_cr = texelFetchClamp(distance_to_water_level, block_sample + ivec2(1, 0), 0, distance_to_water_level_size).r;
-	highp float hl_block_bl = texelFetchClamp(distance_to_water_level, block_sample + ivec2(-1, 1), 0, distance_to_water_level_size).r;
-	highp float hl_block_bc = texelFetchClamp(distance_to_water_level, block_sample + ivec2(0, 1), 0, distance_to_water_level_size).r;
-	highp float hl_block_br = texelFetchClamp(distance_to_water_level, block_sample + ivec2(1, 1), 0, distance_to_water_level_size).r;
-	// Gather the shared 2x2 heights with neighboring cells, forcing water_level!
-	highp float min_precipice = y_level_step / 25.0; // To clearly differenciate above and below water, at the cost of "realism"
-	highp float hl_ramp_tl = (hl_block_tl + hl_block_tc + hl_block_cl + hl_block_cc) / 4.0;
-	if (sign(hl_block_tl - water_level_at) != sign(hl_block_tc - water_level_at) ||
-		sign(hl_block_tl - water_level_at) != sign(hl_block_cl - water_level_at) ||
-		sign(hl_block_tl - water_level_at) != sign(hl_block_cc - water_level_at)) {
-		hl_ramp_tl = water_level_at + min_precipice * sign(hl_block_cc - water_level_at);
-	}
-	highp float hl_ramp_tr = (hl_block_tr + hl_block_tc + hl_block_cr + hl_block_cc) / 4.0;
-	if (sign(hl_block_tr - water_level_at) != sign(hl_block_tc - water_level_at) ||
-		sign(hl_block_tr - water_level_at) != sign(hl_block_cr - water_level_at) ||
-		sign(hl_block_tr - water_level_at) != sign(hl_block_cc - water_level_at)) {
-		hl_ramp_tr = water_level_at + min_precipice * sign(hl_block_cc - water_level_at);
-	}
-	highp float hl_ramp_bl = (hl_block_bl + hl_block_bc + hl_block_cl + hl_block_cc) / 4.0;
-	if (sign(hl_block_bl - water_level_at) != sign(hl_block_bc - water_level_at) ||
-		sign(hl_block_bl - water_level_at) != sign(hl_block_cl - water_level_at) ||
-		sign(hl_block_bl - water_level_at) != sign(hl_block_cc - water_level_at)) {
-		hl_ramp_bl = water_level_at + min_precipice * sign(hl_block_cc - water_level_at);
-	}
-	highp float hl_ramp_br = (hl_block_br + hl_block_bc + hl_block_cr + hl_block_cc) / 4.0;
-	if (sign(hl_block_br - water_level_at) != sign(hl_block_bc - water_level_at) ||
-		sign(hl_block_br - water_level_at) != sign(hl_block_cr - water_level_at) ||
-		sign(hl_block_br - water_level_at) != sign(hl_block_cc - water_level_at)) {
-		hl_ramp_br = water_level_at + min_precipice * sign(hl_block_cc - water_level_at);
-	}
-	// Now just mix the 4 corners to get the final hl_ramp
-	highp float hl_ramp = mix(
-		mix(hl_ramp_tl, hl_ramp_tr, fract(floating_sample.x)),
-		mix(hl_ramp_bl, hl_ramp_br, fract(floating_sample.x)),
-		fract(floating_sample.y)
-	);
-	// Finally perfectly square cells along the coast!
-	highp float smooth_y_level = y_level_step / 3.0;
-	highp float smooth_strength = max(0.0, 1.0 - (abs(hl_ramp - water_level_at) - min_precipice) / smooth_y_level);
-	hl = mix(hl, hl_ramp, pow(smooth_strength, 0.75));
+	// Perfectly square cells along the coast thanks to mh_ramp!
+	highp float smooth_y_level = y_level_step / 2.0;
+	highp float smooth_strength = max(0.0, 1.0 - (abs(mh_ramp - water_level_at) - min_precipice_range.x) / smooth_y_level);
+	mh = mix(mh, mh_ramp, pow(smooth_strength, 0.75));
 	
-	// TODO: Add noise to create some precipices for a more interesting coast, specially for flat areas.
+	// Add noise to create some precipices for a more interesting coast, specially for flat areas.
+	highp float precipice_noise = noise01(uv + vec2(16.4, -45.2)); // Different noise
+	const highp float precipice_min_noise_value = 0.6; // Avoid constant precipices
+	precipice_noise = max(precipice_noise - precipice_min_noise_value, 0.0) / (1.0 - precipice_min_noise_value);
+	highp float minh = water_level_at + 
+	(precipice_noise * (min_precipice_range.y - min_precipice_range.x) + min_precipice_range.x) 
+	* sign(mh_ramp - water_level_at);
+	//mh = clamp(minh + mh * sign(mh_ramp - water_level_at), 0.0, 1.0);
 
 	// Now we must ensure the actual height respects the maximum distance to water level!
-	highp float from = water_level_at + min_precipice * sign(hl - water_level_at);
-    highp float height = mix(from, hl, terrain_noise);
-	//height = terrain_noise;
+    highp float height = mix(minh, mh, terrain_noise);
+	//height = precipice_noise;
 
 	return height;
 }

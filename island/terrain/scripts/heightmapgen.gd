@@ -29,7 +29,7 @@ func generate_heightmap(game: GameState, mseed: int, target_vertices: int = Sett
 				texture_data.append(0)
 	var height_bounds_img: Image = Image.create_from_data(height_bounds[0].size(), height_bounds.size(), false,
 	Image.FORMAT_RG8, texture_data)
-	#height_bounds_img.save_png("res://island/terrain/max_heights.png")  # Debug
+	#height_bounds_img.save_png("res://island/terrain/scripts/max_heights.png")  # Debug
 	var height_bounds_tex: ImageTexture = ImageTexture.create_from_image(height_bounds_img)
 	print("[timing] HeightmapGen: Created max heights texture in " + str(Time.get_ticks_msec() - start_time) + "ms  (excluding distance to water level)")
 
@@ -50,7 +50,7 @@ func generate_heightmap(game: GameState, mseed: int, target_vertices: int = Sett
 	self.set_update_mode(SubViewport.UPDATE_ONCE) # Render once!
 	await RenderingServer.frame_post_draw
 	var img: Image = get_texture().get_image()
-	#img.save_png("res://island/terrain/heightmap.png")
+	#img.save_png("res://island/terrain/scripts/heightmap.png")
 	self.set_update_mode(SubViewport.UPDATE_DISABLED)
 	print("[timing] HeightmapGen: GPU-generated " + str(size) + " heightmap in " + str(Time.get_ticks_msec() - start_time) + "ms")
 

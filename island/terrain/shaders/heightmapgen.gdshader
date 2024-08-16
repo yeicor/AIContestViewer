@@ -10,7 +10,7 @@ uniform int my_seed = 42;
 uniform sampler2D distance_to_water_level : hint_roughness_gray;
 uniform float water_level_at: hint_range(0.0, 1.0) = 0.44;
 uniform float y_level_step: hint_range(0.0, 1.0) = 0.1;
-uniform vec2 min_precipice_range = vec2(0.005, 0.2);
+uniform vec2 min_precipice_range = vec2(0.01, 0.2);
 
 #include "FastNoiseLite.gdshaderinc"
 
@@ -132,16 +132,18 @@ highp float heightmap_island(highp vec2 uv) {
 
 	// Now we must ensure the actual height respects the maximum distance to water level!
     highp float height = mix(minh, mh, terrain_noise);
-	//height = precipice_noise;
+	height = mod(max(uv.x * 21.0, uv.y * 18.0), 1.0)*y_level_step;
 
 	return height;
 }
 
 // Generates the output texture, that defines the heightmap for the terrain
 void fragment() {
+	// Displace the island based on the screen pixel size...
+	highp vec2 uv = UV;// - vec2(SCREEN_PIXEL_SIZE.x/2.0, SCREEN_PIXEL_SIZE.y/4.0);
 	//highp float height = noise01(UV);
 	//float height = warped_noise01(UV);
-	highp float height = heightmap_island(UV);
+	highp float height = heightmap_island(uv);
 	
 	if (debug_height) {
 		COLOR = vec4(height, height, height, 1.0);

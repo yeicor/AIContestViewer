@@ -188,7 +188,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The maximum steepness of the terrain use 1.0 for 45 degrees (+ noise)",
 		},
 		"terrain/vertex_count": {
-			"default": 1000,
+			"default": 10000 * (1 if OS.has_feature("web") else 10),
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the terrain (can affect performance and initial load time).",
 		},

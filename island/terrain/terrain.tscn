@@ -1,20 +1,26 @@
-[gd_scene load_steps=9 format=3 uid="uid://cjklklxubiss0"]
+[gd_scene load_steps=11 format=3 uid="uid://cjklklxubiss0"]
 
 [ext_resource type="Script" path="res://island/terrain/scripts/terrain.gd" id="1_blkia"]
+[ext_resource type="Shader" path="res://island/terrain/shaders/cells.gdshader" id="1_hpv7u"]
 [ext_resource type="Shader" path="res://island/terrain/shaders/terrain.gdshader" id="1_pas75"]
-[ext_resource type="Shader" path="res://island/terrain/shaders/heightmapgen.gdshader" id="3_hlvgl"]
-[ext_resource type="Script" path="res://island/terrain/scripts/heightmapgen.gd" id="3_lm46a"]
+[ext_resource type="Shader" path="res://island/terrain/shaders/heightmap.gdshader" id="3_hlvgl"]
+[ext_resource type="Script" path="res://island/terrain/scripts/heightmap.gd" id="3_lm46a"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xoty1"]
+render_priority = 0
+shader = ExtResource("1_hpv7u")
+shader_parameter/cells = Vector2i(21, 18)
+shader_parameter/cell_size = Vector2(10, 10)
+shader_parameter/cell_border = 0.1
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ngnwd"]
 render_priority = 0
+next_pass = SubResource("ShaderMaterial_xoty1")
 shader = ExtResource("1_pas75")
 shader_parameter/grass = Color(0, 0.257812, 0, 1)
 shader_parameter/sand = Color(0.180392, 0.156863, 0, 1)
-shader_parameter/cells = Vector2i(21, 18)
-shader_parameter/cell_size = Vector2(10, 10)
-shader_parameter/cell_border = 0.02
 
-[sub_resource type="Image" id="Image_2e717"]
+[sub_resource type="Image" id="Image_ovf6y"]
 data = {
 "data": PackedByteArray(102, 0, 127, 0, 102, 0, 102, 0, 76, 0, 51, 0, 51, 0, 51, 0, 76, 0, 76, 0, 76, 0, 102, 0, 102, 0, 102, 0, 102, 0, 127, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 127, 0, 153, 0, 127, 0, 127, 0, 102, 0, 76, 0, 76, 0, 76, 0, 102, 0, 102, 0, 102, 0, 127, 0, 127, 0, 127, 0, 127, 0, 153, 0, 153, 255, 127, 0, 102, 0, 76, 0, 51, 0, 102, 0, 127, 0, 153, 0, 153, 0, 127, 0, 102, 0, 102, 0, 102, 0, 127, 255, 127, 0, 127, 0, 153, 0, 153, 0, 153, 0, 153, 0, 179, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 76, 0, 102, 0, 127, 0, 127, 0, 153, 0, 127, 0, 127, 0, 127, 0, 153, 0, 153, 0, 153, 0, 179, 0, 179, 0, 179, 0, 179, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 0, 153, 0, 153, 255, 179, 0, 153, 0, 153, 0, 153, 0, 179, 0, 179, 0, 179, 0, 204, 255, 204, 0, 204, 0, 204, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 255, 153, 0, 179, 0, 179, 0, 179, 0, 179, 0, 179, 0, 204, 0, 204, 0, 204, 0, 230, 0, 230, 0, 230, 0, 230, 0, 230, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 127, 0, 153, 0, 153, 0, 153, 0, 153, 0, 179, 0, 204, 0, 204, 0, 230, 0, 230, 0, 230, 0, 255, 0, 255, 0, 255, 0, 255, 0, 230, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 102, 0, 127, 0, 127, 0, 127, 0, 127, 0, 153, 0, 179, 0, 204, 0, 230, 0, 230, 0, 230, 0, 255, 0, 255, 0, 230, 0, 230, 0, 230, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 0, 127, 0, 153, 0, 179, 0, 204, 0, 230, 0, 230, 0, 204, 255, 204, 0, 230, 0, 230, 0, 204, 0, 204, 0, 204, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 0, 153, 0, 153, 0, 179, 0, 204, 0, 230, 0, 230, 0, 204, 0, 179, 0, 179, 0, 204, 0, 204, 0, 179, 0, 179, 0, 179, 0, 179, 0, 153, 0, 127, 0, 102, 0, 76, 0, 102, 0, 127, 0, 153, 0, 179, 0, 179, 0, 204, 0, 204, 0, 204, 0, 179, 0, 153, 0, 153, 0, 179, 0, 179, 0, 153, 0, 153, 255, 153, 0, 153, 0, 127, 0, 102, 0, 76, 0, 51, 0, 102, 0, 127, 0, 153, 0, 179, 0, 153, 0, 179, 0, 179, 255, 179, 0, 153, 0, 127, 0, 127, 0, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 153, 0, 127, 0, 102, 0, 76, 0, 51, 0, 102, 0, 127, 0, 153, 0, 153, 0, 127, 0, 153, 0, 153, 0, 179, 0, 179, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 127, 0, 102, 0, 76, 0, 51, 0, 102, 0, 127, 0, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 153, 0, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 102, 0, 127, 0, 153, 0, 153, 0, 153, 0, 127, 0, 102, 0, 127, 0, 127, 0, 153, 255, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 0, 0, 76, 0, 102, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 153, 0, 179, 0, 179, 0, 153, 0, 153, 0, 153, 0, 153, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 51, 0, 76, 255, 102, 0, 102, 0, 127, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 153, 0, 127, 0, 127, 0, 127, 0, 153, 0, 153, 255, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0, 51, 0, 76, 0, 76, 0, 102, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 127, 0, 102, 0, 102, 0, 102, 0, 127, 0, 127, 0, 102, 0, 76, 0, 51, 0, 25, 0),
 "format": "RedGreen",
@@ -23,8 +29,8 @@ data = {
 "width": 21
 }
 
-[sub_resource type="ImageTexture" id="ImageTexture_urhdm"]
-image = SubResource("Image_2e717")
+[sub_resource type="ImageTexture" id="ImageTexture_hfck7"]
+image = SubResource("Image_ovf6y")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8usiv"]
 shader = ExtResource("3_hlvgl")
@@ -33,13 +39,17 @@ shader_parameter/my_seed = 42
 shader_parameter/water_level_at = 0.55
 shader_parameter/y_level_step = 0.1
 shader_parameter/min_precipice_range = Vector2(0.001, 0.1)
-shader_parameter/distance_to_water_level = SubResource("ImageTexture_urhdm")
+shader_parameter/distance_to_water_level = SubResource("ImageTexture_hfck7")
 
 [node name="Terrain" type="MeshInstance3D"]
 material_override = SubResource("ShaderMaterial_ngnwd")
 script = ExtResource("1_blkia")
+my_seed = 42
+vertex_count = 100000.0
+cell_side = 10.0
+steepness = 1.0
 
-[node name="HeightMapGen" type="SubViewport" parent="."]
+[node name="HeightMap" type="SubViewport" parent="."]
 disable_3d = true
 handle_input_locally = false
 use_hdr_2d = true
@@ -49,7 +59,7 @@ render_target_clear_mode = 1
 render_target_update_mode = 0
 script = ExtResource("3_lm46a")
 
-[node name="HeightMap" type="ColorRect" parent="HeightMapGen"]
+[node name="HeightMap" type="ColorRect" parent="HeightMap"]
 material = SubResource("ShaderMaterial_8usiv")
 anchors_preset = 15
 anchor_right = 1.0

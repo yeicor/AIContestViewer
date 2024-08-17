@@ -1,12 +1,12 @@
 @tool
-class_name HeightMapGen
+class_name HeightMap
 extends SubViewport
 
 func _init():
 	self.set_update_mode(SubViewport.UPDATE_DISABLED)
 
 
-func generate_heightmap(game: GameState, mseed: int, target_vertices: int = Setting.terrain_vertex_count()) -> Array:
+func generate(game: GameState, mseed: int, target_vertices: int = Setting.terrain_vertex_count()) -> Array:
 	# Create the max heights texture for the shader
 	var height_bounds: Array  = game.island(false).distance_to_water_level()
 	var start_time: float     = Time.get_ticks_msec()
@@ -35,7 +35,6 @@ func generate_heightmap(game: GameState, mseed: int, target_vertices: int = Sett
 
 	# Figure out the number of pixels to generate based on the target vertices
 	var gen_ratio_xz: float = float(height_bounds[0].size()) / float(height_bounds.size())
-	target_vertices *= 100;
 	var gen_width: int  = int(sqrt(target_vertices) * gen_ratio_xz)
 	var gen_height: int = int(sqrt(target_vertices) / gen_ratio_xz)
 

@@ -10,20 +10,26 @@ extends MeshInstance3D
 		if Engine.is_editor_hint():
 			_regenerate_demo()
 
-@export var my_seed: int = 42:
+@export var my_seed: int = Setting.common_seed():
 	set(new_seed):
 		my_seed = new_seed
 		if Engine.is_editor_hint():
 			_regenerate_demo()
 
+@export var vertex_count: float = Setting.terrain_vertex_count(): # 1 -> 45º
+	set(new_vertex_count):
+		vertex_count = new_vertex_count
+		if Engine.is_editor_hint():
+			_regenerate_demo()
 
-@export var cell_side: float = 10.0:
+
+@export var cell_side: float = Setting.terrain_cell_side():
 	set(new_cell_side):
 		cell_side = new_cell_side
 		if Engine.is_editor_hint():
 			_regenerate_demo()
 
-@export var steepness: float = 1: # 1 -> 45º
+@export var steepness: float = Setting.terrain_max_steepness(): # 1 -> 45º
 	set(new_steepness):
 		steepness = new_steepness
 		if Engine.is_editor_hint():
@@ -41,7 +47,7 @@ func _regenerate_demo(): # Ignoring errors as this is an internal tool
 
 
 func generate(game: GameState):
-	var heightmap_info    : Array = await $HeightMapGen.generate_heightmap(game, my_seed)
+	var heightmap_info    : Array = await $HeightMap.generate(game, my_seed, vertex_count)
 	var heightmap         : Array = heightmap_info[0]
 	var heightmap_samples : Vector2 = heightmap_info[1]
 	var xz_step           := Vector2(cell_side, cell_side) * Vector2(game.island().size()) / heightmap_samples

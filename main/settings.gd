@@ -192,6 +192,11 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the terrain (can affect performance and initial load time).",
 		},
+		"terrain/cell_border": {
+			"default": 0.01,
+			"type": TYPE_FLOAT,
+			"info": "How wide to draw the border of the cells, in percentage of the cell side.",
+		},
 	}
 
 
@@ -214,3 +219,5 @@ static func terrain_cell_side() -> float: return _s_val("terrain/cell_side")
 static func terrain_max_steepness() -> float: return _s_val("terrain/max_steepness")
 
 static func terrain_vertex_count() -> int: return _s_val("terrain/vertex_count")
+
+static func terrain_cell_border() -> float: return _s_val("terrain/cell_border")

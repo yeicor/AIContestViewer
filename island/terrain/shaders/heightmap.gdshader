@@ -45,13 +45,13 @@ highp float noise01(highp vec2 uv) {
 #define LANCZOS_SIZE 5
 
 // Gets the custom non-smooth ramp-like max height. Useful for a proper blocky coastline!
-highp float max_height_ramp(highp vec2 uv, highp sampler2D distance_to_water_level_, highp ivec2 distance_to_water_level_size, highp ivec2 block_sample, highp vec2 floating_sample) {
+highp float max_height_ramp(highp vec2 uv, highp sampler2D distance_to_water_level_, highp ivec2 distance_to_water_level_size, highp ivec2 block_sample, highp vec2 floating_sample, highp float mh_block) {
 	// Use mh_block to create mh_ramp, which help create perfectly square cells along the coast ;)
 	highp float mh_block_tl = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(-1, -1), 0, distance_to_water_level_size).r;
 	highp float mh_block_tc = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(0, -1), 0, distance_to_water_level_size).r;
 	highp float mh_block_tr = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(1, -1), 0, distance_to_water_level_size).r;
 	highp float mh_block_cl = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(-1, 0), 0, distance_to_water_level_size).r;
-	highp float mh_block_cc = texelFetchClamp(distance_to_water_level_, block_sample, 0, distance_to_water_level_size).r;
+	highp float mh_block_cc = mh_block;
 	highp float mh_block_cr = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(1, 0), 0, distance_to_water_level_size).r;
 	highp float mh_block_bl = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(-1, 1), 0, distance_to_water_level_size).r;
 	highp float mh_block_bc = texelFetchClamp(distance_to_water_level_, block_sample + ivec2(0, 1), 0, distance_to_water_level_size).r;
@@ -103,18 +103,35 @@ highp float max_height_ramp(highp vec2 uv, highp sampler2D distance_to_water_lev
 
 // Takes the noisy heightmap and makes sure it matches the input distance to surface constraints
 highp float heightmap_island(highp vec2 uv) {
-	// This smooth noise will define the shape of the terrain
-    highp float terrain_noise = noise01(uv);
-
-	// Basics about the 
+	// Basics about the island
     highp ivec2 distance_to_water_level_size = textureSize(distance_to_water_level, 0);
-	highp vec2 floating_sample = uv * vec2(distance_to_water_level_size);
-	highp ivec2 block_sample = ivec2(floating_sample);
+	highp vec2 floating_sample;
+	highp ivec2 block_sample;
+	highp vec4 block_sample_val;
+	
+	int restart = 0; // GLSL does not allow recursion, so it's hacking time!
+	while (restart < 2) {
+		floating_sample = uv * vec2(distance_to_water_level_size);
+		block_sample = ivec2(floating_sample);
+		
+		// Generate flat terrain for lighthouses by sampling nearby values instead
+		block_sample_val = texelFetchClamp(distance_to_water_level, block_sample, 0, distance_to_water_level_size);
+		if (block_sample_val.g > 0.5) { // Has a lighthouse
+			highp vec2 target = (vec2(block_sample) + 0.5) / vec2(distance_to_water_level_size);
+			// It's coordinate distortion time!
+			highp float displacement_inside_cell = length(abs(target - uv) * vec2(distance_to_water_level_size));
+			highp float flattening_force = 1.0 - smoothstep(0, 1, displacement_inside_cell);
+			uv = mix(uv, target, flattening_force);
+			restart++;
+		} else {
+			restart += 2;
+		}
+	}
 
 	// Retrieve height levels (blocky and smooth versions, to ensure cells are respected
 	highp float mh = lanczos(distance_to_water_level, uv, LANCZOS_SIZE).r;
 	mh = min(mh, 1.0); // Lanczos can exagerate peaks while smoothing...
-	highp float mh_ramp = max_height_ramp(uv, distance_to_water_level, distance_to_water_level_size, block_sample, floating_sample);
+	highp float mh_ramp = max_height_ramp(uv, distance_to_water_level, distance_to_water_level_size, block_sample, floating_sample, block_sample_val.r);
 	
 	// Perfectly square cells along the coast thanks to mh_ramp!
 	highp float smooth_y_level = y_level_step / 2.0;
@@ -130,7 +147,8 @@ highp float heightmap_island(highp vec2 uv) {
 	* sign(mh_ramp - water_level_at);
 	mh = clamp(minh + max(abs(mh - water_level_at), min_precipice_range.x) * sign(mh_ramp - water_level_at), 0.0, 1.0);
 
-	// Now we must ensure the actual height respects the maximum distance to water level!
+	// This smooth noise will define the shape of the terrain (constrained to minh and mh)
+    highp float terrain_noise = noise01(uv);
     highp float height = mix(minh, mh, terrain_noise); // Note: "flips" noise for below_water
 	//height = mh_ramp;
 

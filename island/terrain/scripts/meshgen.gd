@@ -32,7 +32,7 @@ static func from_heightmap(grid: Array, quad_size: Vector3 = Vector3.ONE, extend
 			var x_inf := x < 0 or x >= quad_counts.x
 			var v_x   =  x * quad_size.x * (1 + 1.0 / quad_counts.x) - v_off.x
 			var v_z   =  z * quad_size.z * (1 + 1.0 / quad_counts.y) - v_off.y
-			var v_y   := -extend_to_bottom
+			var v_y   := -extend_to_bottom * 0.5
 			if z_inf or x_inf:
 				v_x += extend_to_bottom * 2 * (x - quad_counts.x / 2) / quad_counts.x
 				v_z += extend_to_bottom * 2 * (z - quad_counts.y / 2) / quad_counts.y

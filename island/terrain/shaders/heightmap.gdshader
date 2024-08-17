@@ -120,8 +120,9 @@ highp float heightmap_island(highp vec2 uv) {
 			highp vec2 target = (vec2(block_sample) + 0.5) / vec2(distance_to_water_level_size);
 			// It's coordinate distortion time!
 			highp float displacement_inside_cell = length(abs(target - uv) * vec2(distance_to_water_level_size));
-			highp float flattening_force = 1.0 - smoothstep(0, 1, displacement_inside_cell);
+			highp float flattening_force = clamp(1.0 - displacement_inside_cell * 2.0, 0.0, 0.75); // More than this goes crazy
 			uv = mix(uv, target, flattening_force);
+			//uv = mix(uv, target, flattening_force);
 			restart++;
 		} else {
 			restart += 2;

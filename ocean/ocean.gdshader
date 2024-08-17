@@ -20,7 +20,7 @@ uniform float	wave_speed		 = 0.15; // Speed scale for the waves
 uniform vec4	wave_a			 = vec4(1.0, 1.0, 0.35, 3.0); 	// xy = Direction, z = Steepness, w = Length
 uniform	vec4	wave_b			 = vec4(1.0, 0.6, 0.30, 1.55);	// xy = Direction, z = Steepness, w = Length
 uniform	vec4	wave_c			 = vec4(1.0, 1.3, 0.25, 0.9); 	// xy = Direction, z = Steepness, w = Length
-
+ 
 // Surface settings:
 uniform vec2 	sampler_scale 	 = vec2(0.25, 0.25); 			// Scale for the sampler
 uniform vec2	sampler_direction= vec2(0.05, 0.04); 			// Direction and speed for the sampler offset
@@ -109,12 +109,12 @@ void vertex()
 	//vertex.x = (pow(1.0 + abs(vertex.x), 1.8) - pow(1.0, 1.8)) * sign(vertex.x);
 	//vertex.z = (pow(1.0 + abs(vertex.z), 1.8) - pow(1.0, 1.8)) * sign(vertex.z);
 
-	if (abs(vertex.x) < 485.0 && abs(vertex.z) < 485.0) { // Disable most water features at long distances
-		TANGENT			 = vertex_tangent;
-		BINORMAL		 = vertex_binormal;
-		vertex_normal	 = normalize(cross(vertex_binormal, vertex_tangent));
-		NORMAL			 = vertex_normal;
-	}
+	//if (abs(vertex.x) < 485.0 && abs(vertex.z) < 485.0) { // Disable most water features at long distances
+		//TANGENT			 = vertex_tangent;
+		//BINORMAL		 = vertex_binormal;
+		//vertex_normal	 = normalize(cross(vertex_binormal, vertex_tangent));
+		//NORMAL			 = vertex_normal;
+	//}
 
 	UV				 = vertex.xz * sampler_scale;
 
@@ -147,7 +147,7 @@ void fragment()
 	float	depth						 = PROJECTION_MATRIX[3][2] / (depth_raw + PROJECTION_MATRIX[2][2]);
 			
 	float 	depth_blend 				 = exp((depth+VERTEX.z + depth_offset) * -beers_law);
-			depth_blend 				 = clamp(1.0-depth_blend, 0.0, 1.0);	
+			depth_blend 				 = clamp(1.0-depth_blend, 0.0, 1.0);
 	float	depth_blend_pow				 = clamp(pow(depth_blend, 2.5), 0.0, 1.0);
 
 	// Ground color:
@@ -179,7 +179,7 @@ void fragment()
 	
 	// Set all values:
 	ALBEDO = color;
-	ALPHA = 0.8;
+	//ALPHA = 0.8;
 	METALLIC = 0.1;
 	ROUGHNESS = 0.2;
 	SPECULAR = 0.2 + depth_blend_pow * 0.4;

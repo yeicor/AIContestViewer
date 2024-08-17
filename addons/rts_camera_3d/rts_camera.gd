@@ -80,7 +80,6 @@ func _unhandled_input(event):
 			# to create a proper orbit effect. In order to do this, we need to remember the target position
 			# and calculate the new target position based on the current zoom level
 			var target_position = position + global_transform.basis.z * _target_zoom
-			print("_target_zoom  ", _target_zoom)
 
 			# Calculate Y (yaw) and X (pitch)
 			var new_rotation_y = deg_to_rad(-mouse_delta.x * orbit_speed)

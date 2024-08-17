@@ -1,17 +1,16 @@
 extends Node3D
 
 func _ready() -> void:
-	print("Main is ready with seed " + str(Setting.common_seed()))
+	pass
+	
 	#
 	#var game_reader: GameReader = Setting.game_reader()
 	#if game_reader == null:
 		#print("Failed to create game reader")
-#
 	#var first_round: GameState = game_reader.parse_next_round()
 	#if first_round == null:
 		#print("Failed to parse round / EOF")
 		#return
-#
 	#for player: Player in first_round.players():
 		#print(player.to_ascii_string())
 	#var island: Island = first_round.island(false)

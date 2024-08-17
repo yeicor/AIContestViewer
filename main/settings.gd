@@ -188,7 +188,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The maximum steepness of the terrain use 1.0 for 45 degrees (+ noise)",
 		},
 		"terrain/vertex_count": {
-			"default": 10000 * (1 if OS.has_feature("web") else 10),
+			"default": 10000 * (10 if OS.has_feature("pc") else 1),
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the terrain (can affect performance and initial load time).",
 		},
@@ -196,6 +196,11 @@ static var _all_settings_info: Dictionary = \
 			"default": 0.01,
 			"type": TYPE_FLOAT,
 			"info": "How wide to draw the border of the cells, in percentage of the cell side.",
+		},
+		"ocean/vertex_count": {
+			"default": 10000 * (10 if OS.has_feature("pc") else 1),
+			"type": TYPE_INT,
+			"info": "The number of vertices to use when generating the ocean, a value > 0 enables waves."
 		},
 	}
 
@@ -221,3 +226,5 @@ static func terrain_max_steepness() -> float: return _s_val("terrain/max_steepne
 static func terrain_vertex_count() -> int: return _s_val("terrain/vertex_count")
 
 static func terrain_cell_border() -> float: return _s_val("terrain/cell_border")
+
+static func ocean_vertex_count() -> int: return _s_val("ocean/vertex_count")

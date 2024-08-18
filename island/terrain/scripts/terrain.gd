@@ -39,6 +39,7 @@ func _ready():
 	if not Engine.is_editor_hint():
 		_regenerate_demo()
 
+
 func _regenerate_demo(): # Ignoring errors as this is an internal tool
 	print("_regenerate_demo ", my_seed, " ", cell_side, " ", steepness)
 	var game_reader: GameReader = Setting.game_reader()
@@ -46,12 +47,22 @@ func _regenerate_demo(): # Ignoring errors as this is an internal tool
 	generate(first_round)
 
 
+var _generate_thread: Thread
+
+func _enter_tree():
+	_generate_thread = Thread.new()
+
+func _exit_tree():
+	_generate_thread.wait_to_finish() # Should already be called.
+
 func generate(game: GameState):
-	var heightmap_info    : Array = await $HeightMap.generate(game, my_seed, vertex_count)
-	var heightmap         : Array = heightmap_info[0]
-	var heightmap_samples : Vector2 = heightmap_info[1]
-	var xz_step           := Vector2(cell_side, cell_side) * Vector2(game.island().size()) / heightmap_samples
-	var y_step            := steepness * cell_side / 2
-	# heightmap = [heightmap[0]] # Fast CPU side for testing!
-	mesh = MeshGen.from_heightmap(heightmap, Vector3(xz_step.x, y_step, xz_step.y))
+	var start_time: float = Time.get_ticks_msec()
+	var heightmap := $HeightMap
+	_generate_thread.start(func():
+		var hmesh: Mesh = heightmap.generate(game, my_seed, cell_side, steepness, vertex_count)
+		(func():
+			mesh = hmesh
+			print("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
+			_generate_thread.wait_to_finish()).call_deferred())
+
 

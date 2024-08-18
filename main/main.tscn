@@ -35,6 +35,7 @@ max_zoom_height = 2000.0
 [node name="Ocean" parent="World" instance=ExtResource("6_gowfy")]
 
 [node name="Terrain" parent="World" instance=ExtResource("3_wln4f")]
+mesh = null
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3

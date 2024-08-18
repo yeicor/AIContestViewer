@@ -7,8 +7,6 @@ var _last_heightmap: Image  # Don't call too fast, not properly synchronized
 func _init():
 	self.set_update_mode(SubViewport.UPDATE_DISABLED)
 
-
-
 func generate(game: GameState, mseed: int, cell_side: float, steepness: float, target_vertices: int) -> Mesh:
 	# Create the max heights texture for the shader
 	var island               := game.island(false)
@@ -69,12 +67,10 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 		return null
 	print("[timing] Created MeshDataTool from plane in " + str(Time.get_ticks_msec() - start_time) + "ms")
 
-	# Ensure the GPU-generated heightmap is ready before proceeding
+	# Ensure the GPU-generated heightmap is ready before proceeding to read it
 	start_time = Time.get_ticks_msec()
 	gpu_semaphore.wait()
 	print("[timing] CPU was waiting for GPU to generate heightmap for " + str(Time.get_ticks_msec() - start_time) + "ms")
-	var start_time_cpu := Time.get_ticks_msec()
-	PackedFloat32Array()
 
 	start_time = Time.get_ticks_msec()
 	var v_off = plane_mesh.size / 2;
@@ -87,7 +83,7 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 			var x_inf := x < 0 or x >= xz_counts.x
 			var v_x   =  x * xz_step.x * (1 + 1.0 / xz_counts.x) - v_off.x
 			var v_z   =  z * xz_step.y * (1 + 1.0 / xz_counts.y) - v_off.y
-			var v_y   := -extend_to_bottom * 0.5
+			var v_y   := 25 * min_height
 			if z_inf or x_inf:
 				v_x += extend_to_bottom * 2 * (x - xz_counts.x / 2) / xz_counts.x
 				v_z += extend_to_bottom * 2 * (z - xz_counts.y / 2) / xz_counts.y
@@ -143,8 +139,13 @@ func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float
 	#img.save_png("res://island/terrain/scripts/heightmap.png")
 	self.set_update_mode(SubViewport.UPDATE_DISABLED)
 	print("[timing] HeightMap: GPU-generated " + str(size) + " heightmap in " + str(Time.get_ticks_msec() - start_time) + "ms. Format: " + str(img.get_format()))
-	start_time = Time.get_ticks_msec()
-	print("Test time: " + str(Time.get_ticks_msec() - start_time) + "ms.")
+	#start_time = Time.get_ticks_msec()
+	#var data = img.get_data() # FORMAT_RGBH on PC, FORMAT_RGBA8 on Web...
+	#for i in range(data.size() / 2):
+		#var t = data.decode_half(2 * i)
+		#if i < 10:
+			#print(t)
+	#print("Test time: " + str(Time.get_ticks_msec() - start_time) + "ms.")
 	_last_heightmap = img
 	semaphore.post()
 	

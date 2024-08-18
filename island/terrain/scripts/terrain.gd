@@ -10,26 +10,26 @@ extends MeshInstance3D
 		if Engine.is_editor_hint():
 			_regenerate_demo()
 
-@export var my_seed: int = Setting.common_seed():
+@export var my_seed: int:
 	set(new_seed):
 		my_seed = new_seed
 		if Engine.is_editor_hint():
 			_regenerate_demo()
 
-@export var vertex_count: float = Setting.terrain_vertex_count(): # 1 -> 45º
+@export var vertex_count: float: # 1 -> 45º
 	set(new_vertex_count):
 		vertex_count = new_vertex_count
 		if Engine.is_editor_hint():
 			_regenerate_demo()
 
 
-@export var cell_side: float = Setting.terrain_cell_side():
+@export var cell_side: float:
 	set(new_cell_side):
 		cell_side = new_cell_side
 		if Engine.is_editor_hint():
 			_regenerate_demo()
 
-@export var steepness: float = Setting.terrain_max_steepness(): # 1 -> 45º
+@export var steepness: float: # 1 -> 45º
 	set(new_steepness):
 		steepness = new_steepness
 		if Engine.is_editor_hint():
@@ -37,15 +37,18 @@ extends MeshInstance3D
 
 func _ready():
 	if not Engine.is_editor_hint():
+		my_seed = Setting.common_seed()
+		vertex_count = Setting.terrain_vertex_count()
+		cell_side = Setting.terrain_cell_side()
+		steepness = Setting.terrain_max_steepness()
 		_regenerate_demo()
 
 
-func _regenerate_demo(): # Ignoring errors as this is an internal tool
+func _regenerate_demo():
 	print("_regenerate_demo ", my_seed, " ", cell_side, " ", steepness)
 	var game_reader: GameReader = Setting.game_reader()
 	var first_round: GameState   = game_reader.parse_next_state()
 	generate(first_round)
-
 
 var _generate_thread: Thread
 

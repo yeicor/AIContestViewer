@@ -23,6 +23,13 @@ func _init() -> void:
 	_load_custom_settings_env()
 	_load_custom_settings_web()
 	_loaded = true
+	if _val("settings/print_custom", true):
+		print(" === LOADED SETTINGS ===")
+		var all_keys = _all_settings_info.keys()
+		all_keys.sort()
+		for setting_name: String in all_keys:
+			print(" - " + setting_name + " = " + str(_val(setting_name)))
+		print(" === END OF LOADED SETTINGS ===")
 
 
 func _load_parse_and_set(setting_name: String, raw: String, from: String):
@@ -188,7 +195,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The maximum steepness of the terrain use 1.0 for 45 degrees (+ noise)",
 		},
 		"terrain/vertex_count": {
-			"default": 10000 * (10 if OS.has_feature("pc") else 1),
+			"default": 1000 * (100 if OS.has_feature("pc") else 1),
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the terrain (can affect performance and initial load time).",
 		},
@@ -198,7 +205,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "How wide to draw the border of the cells, in percentage of the cell side.",
 		},
 		"ocean/vertex_count": {
-			"default": 10000 * (10 if OS.has_feature("pc") else 1),
+			"default": 1000 * (100 if OS.has_feature("pc") else 1),
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the ocean, a value > 0 enables waves."
 		},

@@ -1,20 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://ordobflcpuj4"]
+[gd_scene load_steps=6 format=3 uid="uid://ordobflcpuj4"]
 
 [ext_resource type="Script" path="res://main/main.gd" id="1_rrmnf"]
 [ext_resource type="Script" path="res://addons/rts_camera_3d/rts_camera.gd" id="2_tsys7"]
 [ext_resource type="Environment" uid="uid://4g5i147j1mn3" path="res://main/environment.tres" id="3_3dq86"]
 [ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="3_wln4f"]
 [ext_resource type="PackedScene" uid="uid://bbvx0y3ablhoa" path="res://ocean/ocean.tscn" id="6_gowfy"]
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_qcvpl"]
-_surfaces = [{
-"aabb": AABB(0, 0, 0, 1, 1.00001, 1),
-"format": 34359738369,
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 3,
-"vertex_data": PackedByteArray(0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63)
-}]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_rrmnf")
@@ -42,10 +32,9 @@ max_zoom_height = 2000.0
 
 [node name="World" type="Node3D" parent="."]
 
-[node name="Ocean" parent="World" instance=ExtResource("6_gowfy")]
-
 [node name="Terrain" parent="World" instance=ExtResource("3_wln4f")]
-mesh = SubResource("ArrayMesh_qcvpl")
+
+[node name="Ocean" parent="World" instance=ExtResource("6_gowfy")]
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3
@@ -55,7 +44,6 @@ offset_bottom = 40.0
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.807959, 0.524667, -0.268191, -0.00894496, 0.466018, 0.88473, 0.58917, -0.712427, 0.381217, 0, 0, 0)
-light_color = Color(0.74, 0.604087, 0.5254, 1)
 shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]

@@ -1,1 +1,1 @@
-# AIContestRenderer (WIP)
+# AIContest Viewer (WIP)

@@ -83,7 +83,7 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 			var x_inf := x < 0 or x >= xz_counts.x
 			var v_x   =  x * xz_step.x * (1 + 1.0 / xz_counts.x) - v_off.x
 			var v_z   =  z * xz_step.y * (1 + 1.0 / xz_counts.y) - v_off.y
-			var v_y   := 25 * min_height
+			var v_y   := -extend_to_bottom * 0.3
 			if z_inf or x_inf:
 				v_x += extend_to_bottom * 2 * (x - xz_counts.x / 2) / xz_counts.x
 				v_z += extend_to_bottom * 2 * (z - xz_counts.y / 2) / xz_counts.y

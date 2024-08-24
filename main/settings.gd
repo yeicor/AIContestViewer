@@ -3,9 +3,8 @@ extends Node
 class_name Settings
 
 static var _instance: Settings       = null
-static var _game_reader: GameReader  = null
 const _project_settings_root: String = "ai_contest_viewer"
-var _invalid_env_regex: RegEx        = _invalid_env_regex_fn()
+static var _invalid_env_regex: RegEx = _invalid_env_regex_fn()
 # Internals of the loader
 var _loaded: bool             = false
 var _all_settings: Dictionary = {} # Keys are paths, and values are raw setting values
@@ -35,7 +34,7 @@ func _init() -> void: # This runs before any _init() of the main scene (autoload
 	if _val("settings/print", true):
 		print("[settings] Publishing global shader parameters...")
 	for setting_name: String in _all_settings_info.keys():
-		SettingsEditor.setting_global_shader_set(setting_name)
+		setting_global_shader_set(setting_name)
 
 	_loaded = true
 
@@ -84,9 +83,9 @@ func _load_custom_settings_ini() -> void: # Will enter first in the scene tree (
 	# Fill project config from config.ini file
 	var settings_path   = _val("settings/path", true)
 	var create_defaults = _val("settings/create_defaults", true)
-	
+
 	if _val("settings/print", true):
-		print("[settings] Loading setting overrides from ini file (", settings_path ,")...")
+		print("[settings] Loading setting overrides from ini file (", settings_path, ")...")
 
 	var config: ConfigFile = ConfigFile.new()
 	if FileAccess.file_exists(settings_path):
@@ -154,7 +153,7 @@ func _parse_string(_value: String, setting: Dictionary) -> Variant:
 			return _value
 
 
-func _invalid_env_regex_fn() -> RegEx:
+static func _invalid_env_regex_fn() -> RegEx:
 	var regex = RegEx.new()
 	regex.compile("[^a-zA-Z0-9_]")
 	return regex
@@ -186,6 +185,27 @@ static func _apply_presets(path: String) -> Variant:
 		_:
 			return _all_settings_info[path]["default"]
 
+
+static func setting_global_shader_name(setting_name: String) -> String:
+	return "setting_" + _invalid_env_regex.sub(setting_name, "_")
+
+
+static var _project_godot: ConfigFile
+
+
+static func project_godot() -> ConfigFile:
+	# HACK: In order to ensure persistence, the project.godot file must be edited directly
+	if _project_godot == null:
+		_project_godot = ConfigFile.new()
+		assert(_project_godot.load("res://project.godot") == OK)
+	return _project_godot
+
+
+func setting_global_shader_set(setting_name: String):
+	var safe_name := setting_global_shader_name(setting_name)
+	if project_godot().has_section_key("shader_globals", safe_name):
+		RenderingServer.global_shader_parameter_set(safe_name, Settings._s_val(setting_name))
+
 # ========== ALL SETTINGS ==========
 
 static var _all_settings_info: Dictionary = \
@@ -196,7 +216,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The path to the settings file.",
 		},
 		"settings/create_defaults": {
-			"default": OS.has_feature("template"),
+			"default": OS.has_feature("template") and not OS.has_feature("web"), # Harder to reset/edit on web
 			"type": TYPE_BOOL,
 			"info": "Whether to create the default settings file if it does not exist (default is false in editor, true in export).",
 		},
@@ -240,6 +260,21 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_FLOAT,
 			"info": "How wide to draw the border of the cells, in percentage of the cell side.",
 		},
+		"island/water_level_distance": {
+			"default": "",
+			"type": -RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D,
+			"info": "Internal texture representing distance to the water level for the shaders.",
+		},
+		"island/water_level_at": {
+			"default": 0.44,
+			"type": TYPE_FLOAT,
+			"info": "Internal value representing the water level for the shaders (see island/water_level_distance).",
+		},
+		"island/water_level_step": {
+			"default": 0.1,
+			"type": TYPE_FLOAT,
+			"info": "Internal value representing the step between water levels for the shaders (see island/water_level_distance).",
+		},
 		"ocean/vertex_count": {
 			"default": null, # A quality preset will always override this
 			"type": TYPE_INT,
@@ -260,14 +295,6 @@ static func common_seed() -> int: return _s_val("common/seed")
 static func game_path() -> String: return _s_val("game/path")
 
 
-# TODO: Instead spawn a common thread for the game reader and use signals to publish game states!
-# TODO: Also publish a global signal when the island has been initially loaded and the extra global shader params are ready
-static func game_reader() -> GameReader:
-	if _game_reader == null:
-		_game_reader = GameReader.open(_s_val("game/path"))
-	return _game_reader
-
-
 static var _preset_quality_values: Array = ["lowest", "low", "medium", "high", "highest"]
 
 
@@ -280,7 +307,7 @@ static func preset_quality() -> String:
 @warning_ignore("integer_division") static func preset_quality_linear() -> int: return _preset_quality_values.find(preset_quality()) - _preset_quality_values.size() / 2
 
 
-static func preset_quality_quadratic() -> int: return preset_quality_linear() ** 2 * sign(preset_quality_linear())
+#static func preset_quality_quadratic() -> int: return preset_quality_linear() ** 2 * sign(preset_quality_linear())
 
 
 static func terrain_cell_side() -> float: return _s_val("terrain/cell_side")
@@ -292,7 +319,31 @@ static func terrain_max_steepness() -> float: return _s_val("terrain/max_steepne
 static func terrain_vertex_count() -> int: return _s_val("terrain/vertex_count")
 
 
-static func terrain_cell_border() -> float: return _s_val("terrain/cell_border")
+static func island_water_level_distance_set(texture: ImageTexture) -> void:
+	assert(_instance != null)
+	_instance._all_settings["island/water_level_distance"] = texture
+	RenderingServer.global_shader_parameter_set("setting_island_water_level_distance", texture)
+
+
+static  func island_water_level_distance() -> ImageTexture: return _s_val("island/water_level_distance")
+
+
+static func island_water_level_set(value: float) -> void:
+	assert(_instance != null)
+	_instance._all_settings["island/water_level_at"] = value
+	RenderingServer.global_shader_parameter_set("setting_island_water_level_at", value)
+
+
+static func island_water_level() -> float: return _s_val("island/water_level_at")
+
+
+static func island_water_level_step_set(value: float) -> void:
+	assert(_instance != null)
+	_instance._all_settings["island/water_level_step"] = value
+	RenderingServer.global_shader_parameter_set("setting_island_water_level_step", value)
+
+
+static func island_water_level_step() -> float: return _s_val("island/water_level_step")
 
 
 static func ocean_vertex_count() -> int: return _s_val("ocean/vertex_count")

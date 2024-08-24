@@ -23,6 +23,7 @@ driver/mix_rate.web=44100
 [autoload]
 
 SettingsAutoloaded="*res://main/settings.gd"
+SignalBus="*res://main/signalbus.gd"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
 [editor_plugins]
@@ -85,10 +86,6 @@ environment/defaults/default_environment="res://main/environment.tres"
 
 [shader_globals]
 
-testing={
-"type": "int",
-"value": 0
-}
 setting_settings_create_defaults={
 "type": "bool",
 "value": false
@@ -116,6 +113,18 @@ setting_terrain_vertex_count={
 setting_terrain_cell_border={
 "type": "float",
 "value": 0.01
+}
+setting_island_water_level_distance={
+"type": "sampler2D",
+"value": ""
+}
+setting_island_water_level_at={
+"type": "float",
+"value": 0.0
+}
+setting_island_water_level_step={
+"type": "float",
+"value": 0.1
 }
 setting_ocean_vertex_count={
 "type": "int",

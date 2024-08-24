@@ -1,21 +1,51 @@
 @tool
-extends MeshInstance3D
+extends Node3D
+class_name Ocean
 
-func _init():
-	if Settings.ocean_screen_and_depth():
-		var mat := self.material_override as ShaderMaterial
-		mat.shader.code = "#define depth_and_screen\n" + mat.shader.code
+@warning_ignore("unused_private_class_variable")
+@export var generate_in_editor: bool = false:
+	set(new_val):
+		generate_in_editor = new_val
+		if generate_in_editor and Engine.is_editor_hint():
+			build(Vector2(210, 180))
+		else:
+			var node := get_node_or_null("Ocean")
+			if node != null:
+				node.queue_free()
 
-func _ready():
-	if not Engine.is_editor_hint() and (mesh as PlaneMesh).subdivide_width != 0 and OS.has_feature("standalone"):
-		print("[ocean] WARNING: This build has subdivide_width != 0. This should have been changed before exporting...")
-		set_map_size(0, 0); # Leave basic quad until it is configured in case of runtime.
+var material: ShaderMaterial         = preload("res://ocean/material.tres")
 
-func set_map_size(width: float, depth: float):
-	var pmesh := mesh as PlaneMesh
-	var extra: float = 1.2;
-	pmesh.size = Vector2(width, depth) * extra
-	self.material_override.set_shader_parameter("far_away", pmesh.size / 2.0 - Vector2(1.0, 1.0))
+
+func _ready() -> void:
+	if not Engine.is_editor_hint():
+		# Automatically build the island once we know the size
+		SignalBus.island_global_shader_parameters_ready.connect(func(): build(Settings.island_water_level_distance().get_size() * Settings.terrain_cell_side()), CONNECT_ONE_SHOT)
+
+
+func build(size: Vector2):
+	# Create or reuse the existing child node
+	var oceanMeshNode: MeshInstance3D
+	if not has_node("Ocean"):
+		oceanMeshNode = MeshInstance3D.new()
+		oceanMeshNode.name = "Ocean"
+		add_child(oceanMeshNode)
+	else:
+		oceanMeshNode = get_node("Ocean")
+	if oceanMeshNode.mesh == null:
+		oceanMeshNode.mesh = PlaneMesh.new()
+
+	# Update the plane mesh's size and material
+	var pmesh        := oceanMeshNode.mesh as PlaneMesh
+	var extra: float =  1.2
+	pmesh.size = size * extra
 	pmesh.subdivide_depth = int(sqrt(Settings.ocean_vertex_count()))
 	pmesh.subdivide_width = pmesh.subdivide_depth
+	if Settings.ocean_screen_and_depth():
+		print("Enabling screen and depth textures for ocean!")
+		var mat := material.duplicate()
+		mat.shader.code = material.shader.code.replace("//#define depth_and_screen", "#define depth_and_screen")
+		print(mat.shader.code)
+	pmesh.material = material
 	print("Ocean has ", pmesh.subdivide_width, "x", pmesh.subdivide_depth, " cells")
+
+	# oceanMeshNode.owner = self # For debugging (remove to avoid serializing and preloading the mesh!)

@@ -128,11 +128,15 @@ func _read_height(x: int, z: int, min_height: float, max_height: float) -> float
 func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float, y_level_step: float, semaphore: Semaphore, xz_counts: Vector2i):
 	var start_time    := Time.get_ticks_msec()
 	self.size = xz_counts
+	
 	var mat: Material =  $HeightMap.material
 	mat.set_shader_parameter("my_seed", mseed)
-	mat.set_shader_parameter("distance_to_water_level", height_bounds_tex)
-	mat.set_shader_parameter("water_level_at", water_level_at)
-	mat.set_shader_parameter("y_level_step", y_level_step)
+	Settings.island_water_level_distance_set(height_bounds_tex)
+	Settings.island_water_level_set(water_level_at)
+	Settings.island_water_level_step_set(y_level_step)
+	if not Engine.is_editor_hint():
+		SignalBus.island_global_shader_parameters_ready.emit()
+	
 	self.set_update_mode(SubViewport.UPDATE_ONCE) # Render once!
 	await RenderingServer.frame_post_draw
 	var img: Image = get_texture().get_image()

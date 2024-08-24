@@ -34,7 +34,6 @@ var _stream_peer_eof: bool = false
 ## Create a game state reader from a raw stream (JSONL)
 func _init(stream_peer: StreamPeer):
 	self._stream_peer = stream_peer
-	print("Game stream ready to decode!")
 
 
 ## Parse the complete next round state, including moves from all bots
@@ -42,24 +41,42 @@ func parse_next_round() -> GameState:
 	if self.cur_state == null:
 		# Figure out how many players are there in the first round
 		parse_next_state()
-	var num_players: int = cur_state.players().size()
-	# Read the state for each player action, leaving the final state as cur_state
+		# First state is a new round!
+		return self.cur_state
+		
+	var num_updates_per_round: int = cur_state.players().size() + 1 # Pre-init state
 	var _expected_round: int = cur_state.round()
-	for i in range(num_players):
-		parse_next_state()
-		if cur_state.round() != _expected_round:
-			print("ERROR: Unexpected round, too few/many player moves??")
-	return cur_state
+	if _expected_round == 0:
+		num_updates_per_round += 1
+	for i in range(num_updates_per_round):
+		if parse_next_state() == null:
+			return null  # EOF
+			
+		if i == num_updates_per_round - 1: # Last player action should change the expected state
+			break
+		
+		if self.cur_state.round() != _expected_round:
+			print("[gamereader] Error: Unexpected round number: " + str(cur_state.round()) + " (expected " + str(_expected_round) + ")")
+	
+	_expected_round+=1
+	if self.cur_state.round() != _expected_round:
+		print("[gamereader] Error: (2) Unexpected round number : " + str(cur_state.round()) + " (expected " + str(_expected_round) + ")")
+	
+	return self.cur_state
 
 ## Returns the current state
 var cur_state: GameState = null
 
+
 ## Parse the next state, updated after any bot makes a move in their turn (see parse_next_round)
+
+
 func parse_next_state() -> GameState:
 	var raw_state: Dictionary = _read_json_line()
 	# print("Raw state: " + JSON.stringify(raw_state))
 	if raw_state == { }:
 		return null # EOF
+	# print("Read state round: " + str(raw_state["round"]))
 	cur_state = GameState.new(raw_state)
 	return cur_state
 

@@ -1,49 +1,6 @@
-[gd_scene load_steps=16 format=3 uid="uid://bbvx0y3ablhoa"]
+[gd_scene load_steps=9 format=3 uid="uid://bbvx0y3ablhoa"]
 
-[ext_resource type="Shader" path="res://ocean/ocean.gdshader" id="1_4o0j8"]
-[ext_resource type="Texture2D" uid="uid://bduktpovmijlj" path="res://ocean/textures/water_normal.png" id="3_7bdgj"]
-[ext_resource type="Texture2D" uid="uid://7oakr7mj5tvk" path="res://ocean/textures/water_uv.png" id="3_u8f0a"]
 [ext_resource type="Script" path="res://ocean/ocean.gd" id="4_j2nh8"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_s8lg6"]
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_e0aly"]
-noise = SubResource("FastNoiseLite_s8lg6")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_f18fu"]
-render_priority = 0
-shader = ExtResource("1_4o0j8")
-shader_parameter/albedo = Color(0.02, 0.45, 0.8, 1)
-shader_parameter/transparency = 0.75
-shader_parameter/metallic = 0.0
-shader_parameter/roughness = 0.5
-shader_parameter/surface_normals_move_direction_a = Vector2(-1, 0)
-shader_parameter/surface_normals_move_direction_b = Vector2(0, 1)
-shader_parameter/surface_texture_roughness = 0.6
-shader_parameter/surface_texture_scale = 0.1
-shader_parameter/surface_texture_time_scale = 0.06
-shader_parameter/ssr_resolution = 2.0
-shader_parameter/ssr_max_travel = 30.0
-shader_parameter/ssr_max_diff = 4.0
-shader_parameter/ssr_mix_strength = 0.7
-shader_parameter/wave_uv_scale = 30.0
-shader_parameter/wave_height_scale = 0.25
-shader_parameter/wave_time_scale = 1.0
-shader_parameter/wave_normal_flatness = 30.0
-shader_parameter/wave_noise_strength = 0.1
-shader_parameter/border_color = Color(1, 1, 1, 1)
-shader_parameter/border_scale = 0.5
-shader_parameter/border_near = 0.5
-shader_parameter/border_far = 3000.0
-shader_parameter/refraction_intensity = 0.4
-shader_parameter/max_visible_depth = 10.0
-shader_parameter/color_deep = Color(0, 0.1, 0.4, 1)
-shader_parameter/wave_noise = SubResource("NoiseTexture2D_e0aly")
-shader_parameter/surface_normals_a = ExtResource("3_u8f0a")
-shader_parameter/surface_normals_b = ExtResource("3_7bdgj")
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_mghyu"]
-size = Vector2(252, 216)
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_ewnyi"]
 input_name = "normal"
@@ -104,9 +61,7 @@ shader = SubResource("VisualShader_1yk1o")
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_wogi5"]
 
-[node name="Ocean" type="MeshInstance3D"]
-material_override = SubResource("ShaderMaterial_f18fu")
-mesh = SubResource("PlaneMesh_mghyu")
+[node name="Ocean" type="Node3D"]
 script = ExtResource("4_j2nh8")
 
 [node name="TestObject" type="MeshInstance3D" parent="."]

@@ -3,7 +3,7 @@ shader_type spatial;
 // Originally based on (marcelb, MIT License):
 // https://godotshaders.com/shader/transparent-water-shader-supporting-ssr/
 
-#define depth_and_screen
+//#define depth_and_screen
 
 #define PI 3.14159265359
 #define PI_2 6.28318530718
@@ -197,13 +197,14 @@ void fragment() {
 
 #ifdef depth_and_screen
 	float screen_depth_refraction = texture(DEPTH_TEXTURE, refraction_uv).x;
-#else
-	float screen_depth_refraction = 1.;
-#endif
     vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, screen_depth_refraction);
     vec4 view = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
     view.xyz /= view.w;
     float water_depth = -view.z + VERTEX.z;
+#else
+	float screen_depth_refraction = 1.;
+    float water_depth = 9999.0;
+#endif
 	float surface_depth = FRAGCOORD.z;
 
 	vec2 time_vector = (TIME * surface_normals_move_direction_a) * surface_texture_time_scale;
@@ -229,6 +230,9 @@ void fragment() {
 	vec3 final_color				= mix(water_color, border_color, 1.0 - min(water_depth/border_scale, 1.0));
 
 	ALBEDO.rgb = final_color;
+#ifndef depth_and_screen // Force basic transparency without refraction when screen can't be read.
+	ALPHA = transparency;
+#endif
 	METALLIC = metallic;
 	ROUGHNESS = roughness;
 	NORMAL_MAP = normal_blend;

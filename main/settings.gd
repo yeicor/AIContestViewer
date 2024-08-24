@@ -1,49 +1,66 @@
 @tool
 extends Node
-class_name Setting
+class_name Settings
 
-static var _instance: Setting       = null
-static var _game_reader: GameReader = null
+static var _instance: Settings       = null
+static var _game_reader: GameReader  = null
 const _project_settings_root: String = "ai_contest_viewer"
 var _invalid_env_regex: RegEx        = _invalid_env_regex_fn()
 # Internals of the loader
 var _loaded: bool             = false
-var _all_settings: Dictionary = {}
+var _all_settings: Dictionary = {} # Keys are paths, and values are raw setting values
 
 
-func _init() -> void:
+func _init() -> void: # This runs before any _init() of the main scene (autoloaded)
 	assert(_instance == null, "Only 1 settings instance at a time!")
 	_instance = self
-	# HACK: Allow special env overrides before ini (like changing the file path)
-	_load_custom_settings_env()
+
+	# HACK: Allow special env overrides before ini (like changing the settings file path or the presets)
 	_load_custom_settings_web()
-	# Load all custom settings...
+	_load_custom_settings_env()
 	_load_custom_settings_ini()
-	# Reload overrides giving more priority to env and web...
+
+	# Apply presets before the final pass to override some settings...
+	if _val("settings/print", true):
+		print("[settings] Applying presets...")
+	for setting_name: String in _all_settings_info.keys():
+		_all_settings[setting_name] = _apply_presets(setting_name)
+
+	# Reload overrides after presets are applied, and giving more priority to env and web...
+	_load_custom_settings_ini()
 	_load_custom_settings_env()
 	_load_custom_settings_web()
+
+	# Override all global parameters as required
+	if _val("settings/print", true):
+		print("[settings] Publishing global shader parameters...")
+	for setting_name: String in _all_settings_info.keys():
+		SettingsEditor.setting_global_shader_set(setting_name)
+
 	_loaded = true
-	if _val("settings/print_custom", true):
+
+	# Print all settings if required
+	if _val("settings/print", true):
 		print(" === LOADED SETTINGS ===")
 		var all_keys = _all_settings_info.keys()
 		all_keys.sort()
 		for setting_name: String in all_keys:
-			print(" - " + setting_name + " = " + str(_val(setting_name)))
+			print(" - ", setting_name, " = ", _val(setting_name))
 		print(" === END OF LOADED SETTINGS ===")
 
 
 func _load_parse_and_set(setting_name: String, raw: String, from: String):
 	var setting = _all_settings_info[setting_name]
 	var val     = _parse_string(raw, setting)
-	if _val("settings/print_custom", true):
+	if _val("settings/print", true):
 		print("[settings > " + from + "] Custom setting: " + setting_name + " -> " + str(val))
 	_all_settings[setting_name] = val
 
 
 func _load_custom_settings_env() -> void:
 	# Fill project config from environment variables
-	if _val("settings/print_custom", true):
-		print("[settings] Loading setting overrides from environment variables")
+	if _val("settings/print", true):
+		print("[settings] Loading setting overrides from environment variables...")
 	for setting_name: String in _all_settings.keys():
 		# Replace all invalid characters in the environment variable name regex
 		var env_name: String = _invalid_env_regex.sub(setting_name, "_", true)
@@ -54,8 +71,8 @@ func _load_custom_settings_env() -> void:
 func _load_custom_settings_web() -> void:
 	# Fill project config from query parameters on web export
 	if OS.has_feature("web"):
-		if _val("settings/print_custom", true):
-			print("[settings] Loading setting overrides from query parameters")
+		if _val("settings/print", true):
+			print("[settings] Loading setting overrides from query parameters...")
 		var queryParams = JSON.parse_string(JavaScriptBridge.eval("JSON.stringify(new URLSearchParams(window.location.search))"))
 		for setting_name: String in _all_settings.keys():
 			var query_name: String = _invalid_env_regex.sub(setting_name, "_", true)
@@ -67,11 +84,13 @@ func _load_custom_settings_ini() -> void: # Will enter first in the scene tree (
 	# Fill project config from config.ini file
 	var settings_path   = _val("settings/path", true)
 	var create_defaults = _val("settings/create_defaults", true)
-	create_defaults = create_defaults if create_defaults != null else OS.has_feature("standalone")
+	
+	if _val("settings/print", true):
+		print("[settings] Loading setting overrides from ini file (", settings_path ,")...")
 
 	var config: ConfigFile = ConfigFile.new()
 	if FileAccess.file_exists(settings_path):
-		if _val("settings/print_custom", true):
+		if _val("settings/print", true):
 			print("[settings] Loading setting overrides from " + str(settings_path))
 		config.load(settings_path)
 
@@ -147,13 +166,25 @@ func _val(path: String, skip_check: bool = false) -> Variant:
 	return _all_settings.get(path, _all_settings_info[path]["default"])
 
 
-
 ## Supports @tool by using default values if no instance is available
 static func _s_val(path: String) -> Variant:
 	if _instance != null && _instance._loaded:
 		return _instance._val(path)
-	else:
-		return _all_settings_info[path]["default"]
+	else: # Also apply proper presets in the case of the static editor-only version.
+		return _apply_presets(path)
+
+
+## Applies the preset quality to the individual settings, returning the new value (or default if not affected)
+static func _apply_presets(path: String) -> Variant:
+	match path:
+		"terrain/vertex_count":
+			return int(10000 * 10 ** preset_quality_linear())
+		"ocean/vertex_count":
+			return int(10000 * 10 ** preset_quality_linear())
+		"ocean/screen_and_depth":
+			return preset_quality_linear() >= 0 and not OS.has_feature("web") # Web crashes for now
+		_:
+			return _all_settings_info[path]["default"]
 
 # ========== ALL SETTINGS ==========
 
@@ -165,14 +196,14 @@ static var _all_settings_info: Dictionary = \
 			"info": "The path to the settings file.",
 		},
 		"settings/create_defaults": {
-			"default": null,
+			"default": OS.has_feature("template"),
 			"type": TYPE_BOOL,
 			"info": "Whether to create the default settings file if it does not exist (default is false in editor, true in export).",
 		},
-		"settings/print_custom": {
+		"settings/print": {
 			"default": true,
 			"type": TYPE_BOOL,
-			"info": "Whether to print out all custom settings that are loaded.",
+			"info": "Whether to print out all loaded settings, helping the user to customize them.",
 		},
 		"common/seed": {
 			"default": 42,
@@ -183,6 +214,11 @@ static var _all_settings_info: Dictionary = \
 			"default": "res://testdata/game.jsonl.gz",
 			"type": TYPE_STRING,
 			"info": "The game path to load. It may be a tcp:// for a tcp server or simply a Godot data path.",
+		},
+		"preset/quality": {
+			"default": "high" if OS.has_feature("pc") else "medium" if OS.has_feature("mobile") else "low",
+			"type": TYPE_STRING,
+			"info": "The quality preset to use " + str(_preset_quality_values) + ". Overrides some settings BEFORE loading other custom overrides.",
 		},
 		"terrain/cell_side": {
 			"default": 10.0,
@@ -195,7 +231,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The maximum steepness of the terrain use 1.0 for 45 degrees (+ noise)",
 		},
 		"terrain/vertex_count": {
-			"default": 1000 * (100 if OS.has_feature("pc") else 1),
+			"default": null, # A quality preset will always override this
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the terrain (can affect performance and initial load time).",
 		},
@@ -205,9 +241,14 @@ static var _all_settings_info: Dictionary = \
 			"info": "How wide to draw the border of the cells, in percentage of the cell side.",
 		},
 		"ocean/vertex_count": {
-			"default": 1000 * (100 if OS.has_feature("pc") else 1),
+			"default": null, # A quality preset will always override this
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the ocean, a value > 0 enables waves."
+		},
+		"ocean/screen_and_depth": {
+			"default": null, # A quality preset will always override this
+			"type": TYPE_BOOL,
+			"info": "Allow access to the special screen and depth textures for a better ocean (crashes on web)",
 		},
 	}
 
@@ -219,19 +260,42 @@ static func common_seed() -> int: return _s_val("common/seed")
 static func game_path() -> String: return _s_val("game/path")
 
 
+# TODO: Instead spawn a common thread for the game reader and use signals to publish game states!
+# TODO: Also publish a global signal when the island has been initially loaded and the extra global shader params are ready
 static func game_reader() -> GameReader:
 	if _game_reader == null:
 		_game_reader = GameReader.open(_s_val("game/path"))
 	return _game_reader
 
 
+static var _preset_quality_values: Array = ["lowest", "low", "medium", "high", "highest"]
+
+
+static func preset_quality() -> String:
+	var preset = _s_val("preset/quality")
+	assert(_preset_quality_values.has(preset), "Invalid quality preset: " + preset)
+	return preset
+
+
+@warning_ignore("integer_division") static func preset_quality_linear() -> int: return _preset_quality_values.find(preset_quality()) - _preset_quality_values.size() / 2
+
+
+static func preset_quality_quadratic() -> int: return preset_quality_linear() ** 2 * sign(preset_quality_linear())
+
 
 static func terrain_cell_side() -> float: return _s_val("terrain/cell_side")
 
+
 static func terrain_max_steepness() -> float: return _s_val("terrain/max_steepness")
+
 
 static func terrain_vertex_count() -> int: return _s_val("terrain/vertex_count")
 
+
 static func terrain_cell_border() -> float: return _s_val("terrain/cell_border")
 
+
 static func ocean_vertex_count() -> int: return _s_val("ocean/vertex_count")
+
+
+static func ocean_screen_and_depth() -> bool: return _s_val("ocean/screen_and_depth")

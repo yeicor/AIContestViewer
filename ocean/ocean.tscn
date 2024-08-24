@@ -44,8 +44,6 @@ shader_parameter/surface_normals_b = ExtResource("3_7bdgj")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_mghyu"]
 size = Vector2(252, 216)
-subdivide_width = 316
-subdivide_depth = 316
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_ewnyi"]
 input_name = "normal"
@@ -113,5 +111,6 @@ script = ExtResource("4_j2nh8")
 
 [node name="TestObject" type="MeshInstance3D" parent="."]
 transform = Transform3D(24.4825, 0, 0, 0, 15.2301, -12.3379, 0, -20.8758, -9.00126, 0, 0, 0)
+visible = false
 material_override = SubResource("ShaderMaterial_3kxsf")
 mesh = SubResource("CapsuleMesh_wogi5")

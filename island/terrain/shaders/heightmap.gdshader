@@ -108,12 +108,12 @@ highp float heightmap_island(highp vec2 uv) {
 	highp vec2 floating_sample;
 	highp ivec2 block_sample;
 	highp vec4 block_sample_val;
-	
+
 	int restart = 0; // GLSL does not allow recursion, so it's hacking time!
 	while (restart < 2) {
 		floating_sample = uv * vec2(distance_to_water_level_size);
 		block_sample = ivec2(floating_sample);
-		
+
 		// Generate flat terrain for lighthouses by sampling nearby values instead
 		block_sample_val = texelFetchClamp(distance_to_water_level, block_sample, 0, distance_to_water_level_size);
 		if (block_sample_val.g > 0.5) { // Has a lighthouse
@@ -132,18 +132,18 @@ highp float heightmap_island(highp vec2 uv) {
 	highp float mh = lanczos(distance_to_water_level, uv, LANCZOS_SIZE).r;
 	mh = min(mh, 1.0); // Lanczos can exagerate peaks while smoothing...
 	highp float mh_ramp = max_height_ramp(uv, distance_to_water_level, distance_to_water_level_size, block_sample, floating_sample, block_sample_val.r);
-	
+
 	// Perfectly square cells along the coast thanks to mh_ramp!
 	highp float smooth_y_level = y_level_step / 2.0;
 	highp float smooth_strength = max(0.0, 1.0 - (abs(mh_ramp - water_level_at) - min_precipice_range.x) / smooth_y_level);
 	mh = mix(mh, mh_ramp, pow(smooth_strength, 0.75));
-	
+
 	// Add noise to create some precipices for a more interesting coast, specially for flat areas.
 	highp float precipice_noise = noise01(uv + vec2(16.4, -45.2)); // Different noise
 	const highp float precipice_min_noise_value = 0.6; // Avoid constant precipices
 	precipice_noise = max(precipice_noise - precipice_min_noise_value, 0.0) / (1.0 - precipice_min_noise_value);
-	highp float minh = water_level_at + 
-	(precipice_noise * (min_precipice_range.y - min_precipice_range.x) + min_precipice_range.x) 
+	highp float minh = water_level_at +
+	(precipice_noise * (min_precipice_range.y - min_precipice_range.x) + min_precipice_range.x)
 	* sign(mh_ramp - water_level_at);
 	mh = clamp(minh + max(abs(mh - water_level_at), min_precipice_range.x) * sign(mh_ramp - water_level_at), 0.0, 1.0);
 
@@ -158,11 +158,11 @@ highp float heightmap_island(highp vec2 uv) {
 // Generates the output texture, that defines the heightmap for the terrain
 void fragment() {
 	highp vec2 uv = UV; // - SCREEN_PIXEL_SIZE / 2.0; // Offset for more centered cells?
-	
+
 	//highp float height = noise01(uv);
 	//float height = warped_noise01(uv);
 	highp float height = heightmap_island(uv);
-	
+
 	if (debug_height) {
 		COLOR = vec4(height, height, height, 1.0);
 		// Notify of any errors (compatible with only reading the red channel for heightmap)
@@ -182,7 +182,7 @@ void fragment() {
 		// This is a hack to get higher-precision height values (avoid stairs when using lots of vertices)
 		const highp float precision = 256.0;
 		COLOR.xy = vec2(
-			fract(floor(height * precision) / precision), 
+			fract(floor(height * precision) / precision),
 			fract(floor(height * precision * precision) / precision)
 		);
 	}

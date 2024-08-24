@@ -1,6 +1,6 @@
 @tool
 class_name Terrain
-extends MeshInstance3D
+extends Node3D
 
 ## TerrainTool organizes the code to be able to generate islands on demand and even test them in the editor.
 
@@ -16,7 +16,7 @@ extends MeshInstance3D
 		if Engine.is_editor_hint() and is_node_ready():
 			_regenerate_demo()
 
-@export var vertex_count: float = 10:
+@export var vertex_count: float = 100000:
 	set(new_vertex_count):
 		vertex_count = new_vertex_count
 		if Engine.is_editor_hint() and is_node_ready():
@@ -37,10 +37,10 @@ extends MeshInstance3D
 
 func _ready():
 	if not Engine.is_editor_hint():
-		my_seed = Setting.common_seed()
-		vertex_count = Setting.terrain_vertex_count()
-		cell_side = Setting.terrain_cell_side()
-		steepness = Setting.terrain_max_steepness()
+		my_seed = Settings.common_seed()
+		vertex_count = Settings.terrain_vertex_count()
+		cell_side = Settings.terrain_cell_side()
+		steepness = Settings.terrain_max_steepness()
 		_regenerate_demo()
 
 func _notification(what):
@@ -54,8 +54,8 @@ func _regenerate_demo():
 		return # Ignore multiple request on the same frame like while setting all properties at start.
 	_last_regeneration_frame = Engine.get_frames_drawn()
 	print("_regenerate_demo ", my_seed, " ", cell_side, " ", steepness)
-	var game_reader: GameReader = Setting.game_reader()
-	var first_round: GameState   = game_reader.parse_next_state()
+	var game_reader: GameReader = Settings.game_reader()
+	var first_round: GameState  = game_reader.parse_next_state()
 	generate(first_round)
 
 var _generate_thread: Thread = null
@@ -75,6 +75,9 @@ func generate(game: GameState):
 	_generate_thread.start(func():
 		var hmesh: Mesh = heightmap.generate(game, my_seed, cell_side, steepness, vertex_count)
 		(func():
-			mesh = hmesh
+			var meshNode = MeshInstance3D.new()
+			meshNode.mesh = hmesh
+			meshNode.material_override = preload("res://island/terrain/material.tres")
+			add_child(meshNode)
 			print("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
 			_generate_thread.wait_to_finish()).call_deferred())

@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://c2nfyav24pgv8"]
+
+[ext_resource type="Shader" path="res://island/terrain/shaders/cells.gdshader" id="1_hut0j"]
+[ext_resource type="Shader" path="res://island/terrain/shaders/terrain.gdshader" id="2_vg0pr"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xoty1"]
+render_priority = 0
+shader = ExtResource("1_hut0j")
+shader_parameter/cells = Vector2i(21, 18)
+shader_parameter/cell_border = 0.01
+shader_parameter/above_water_color = Color(0.75, 0.75, 0.75, 1)
+shader_parameter/below_water_color = Color(0, 0, 0, 1)
+
+[resource]
+render_priority = 0
+next_pass = SubResource("ShaderMaterial_xoty1")
+shader = ExtResource("2_vg0pr")
+shader_parameter/grass = Color(0, 0.257812, 0, 1)
+shader_parameter/sand = Color(0.180392, 0.156863, 0, 1)

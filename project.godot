@@ -22,7 +22,7 @@ driver/mix_rate.web=44100
 
 [autoload]
 
-Settings="*res://main/settings.gd"
+SettingsAutoloaded="*res://main/settings.gd"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
 [editor_plugins]
@@ -82,3 +82,46 @@ sprint={
 
 textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_environment="res://main/environment.tres"
+
+[shader_globals]
+
+testing={
+"type": "int",
+"value": 0
+}
+setting_settings_create_defaults={
+"type": "bool",
+"value": false
+}
+setting_settings_print={
+"type": "bool",
+"value": true
+}
+setting_common_seed={
+"type": "int",
+"value": 42
+}
+setting_terrain_cell_side={
+"type": "float",
+"value": 10.0
+}
+setting_terrain_max_steepness={
+"type": "float",
+"value": 1.0
+}
+setting_terrain_vertex_count={
+"type": "int",
+"value": 100000
+}
+setting_terrain_cell_border={
+"type": "float",
+"value": 0.01
+}
+setting_ocean_vertex_count={
+"type": "int",
+"value": 100000
+}
+setting_ocean_screen_and_depth={
+"type": "bool",
+"value": true
+}

@@ -63,6 +63,7 @@ shader = SubResource("VisualShader_1yk1o")
 
 [node name="Ocean" type="Node3D"]
 script = ExtResource("4_j2nh8")
+generate_in_editor = true
 
 [node name="TestObject" type="MeshInstance3D" parent="."]
 transform = Transform3D(24.4825, 0, 0, 0, 15.2301, -12.3379, 0, -20.8758, -9.00126, 0, 0, 0)

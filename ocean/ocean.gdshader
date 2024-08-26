@@ -31,6 +31,15 @@ uniform float ssr_max_diff     : hint_range(0.1, 10.0, 0.1) 	= 4.0;
 #endif
 uniform float ssr_mix_strength : hint_range(0.0, 1.0, 0.01) 	= 0.7;
 
+// Global uniforms that help couple ocean and terrain
+#include "res://island/terrain/shaders/lanczos.gdshaderinc"
+#include "res://island/terrain/shaders/cells.gdshaderinc"
+global uniform float setting_island_water_level_at;
+global uniform float setting_island_water_level_step;
+uniform float wave_water_level_step_effect = 0.3;
+
+uniform float wave_step_height = 2.0;
+uniform float wave_fade_size_multiplier = 2.0;
 const vec4 wave_dir_amp_period[4] = {
     vec4(1.0, 0.05, 0.2, 1.0),
     vec4(1.0, -0.2, 0.25, 2.0),
@@ -38,7 +47,6 @@ const vec4 wave_dir_amp_period[4] = {
     vec4(1.0, 0.4, 0.5, 8.0)
 };
 uniform float wave_uv_scale = 30.0;
-uniform float wave_height_scale = 1.0;
 uniform float wave_time_scale = 1.0;
 uniform float wave_normal_flatness : hint_range(0.1, 100.0, 0.1) = 30.0;
 uniform sampler2D wave_noise;
@@ -89,11 +97,11 @@ void vertex() {
 	// TODO: Read global shader parameters for island and settings!
     // Get the vertex position in world space
 	vertex_uv = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
-	if (abs(VERTEX.x) >= 100.0 || abs(VERTEX.z) > 100.0) {
+	ivec2 terrain_cell_count = textureSize(setting_island_water_level_distance, 0);
+	vec2 terrain_half_size = vec2(terrain_cell_count) * setting_terrain_cell_side / 2.0;
+	if (abs(VERTEX.x) + 0.001 >= terrain_half_size.x * wave_fade_size_multiplier || abs(VERTEX.z) + 0.001 > terrain_half_size.y * wave_fade_size_multiplier) {
 		VERTEX.xz *= 100.0;
 		vertex_uv *= 100.0;
-		NORMAL = vec3(0.0, 1.0, 0.0);
-	} else if (abs(VERTEX.x) >= 90.0 || abs(VERTEX.z) > 90.0) {
 		NORMAL = vec3(0.0, 1.0, 0.0);
 	} else {
 		// Waves go from right to left, so hack the uv coordinates to make them circular towards the middle
@@ -107,16 +115,29 @@ void vertex() {
 		uv = vec2(radius, angle_tileable);
 
 		// Move the vertex along the normal to simulate waves
-		VERTEX.y += get_wave_height(uv) * wave_height_scale;
+		// - Multiply by the distance to land for cooler waves "far" away that don't mess with the scene
+		vec2 terrain_uv = terrain_uv(VERTEX.xz);
+		vec2 terrain_uv_clamp = clamp(terrain_uv, vec2(0.0), vec2(1.0));
+		float land_dist_smooth = -min(0.0, lanczos(setting_island_water_level_distance, terrain_uv, 5).r - setting_island_water_level_at);
+		float num_steps_away_from_land = (land_dist_smooth + setting_island_water_level_step / 2.0) / setting_island_water_level_step;
+		float wave_height_mult = num_steps_away_from_land * wave_water_level_step_effect;
+		// - Also fade out when going out of reach
+        vec2 wave_fade_factor_v = abs(terrain_uv - terrain_uv_clamp);
+		float wave_fade_factor = max(wave_fade_factor_v.x, wave_fade_factor_v.y) * setting_terrain_cell_side;
+		wave_fade_factor = clamp(wave_fade_factor, 0.0, 1.0);
+        wave_height_mult = mix(wave_height_mult, 0.0, wave_fade_factor);
+		// - Actual computations
+		VERTEX.y += get_wave_height(uv) * wave_step_height * wave_height_mult;
 
-		float normal_height_scale = wave_height_scale / wave_normal_flatness;
+		float normal_height_scale = wave_step_height * wave_height_mult / wave_normal_flatness;
 		vec2 e = vec2(0.01, 0.0);
 		vec3 normal = normalize(vec3(
 			get_wave_height(uv - e) * normal_height_scale - get_wave_height(uv + e) * normal_height_scale,
 			2.0 * e.x,
 			get_wave_height(uv - e.yx) * normal_height_scale - get_wave_height(uv + e.yx) * normal_height_scale
 			));
-		NORMAL = normal;
+		NORMAL = mix(normal, vec3(0.0, 1.0, 0.0), wave_fade_factor);
+		//COLOR = vec4(vec3(wave_fade_factor), 1.0);
 	}
 }
 

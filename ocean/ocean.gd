@@ -6,7 +6,7 @@ class_name Ocean
 @export var generate_in_editor: bool = false:
 	set(new_val):
 		generate_in_editor = new_val
-		if generate_in_editor and Engine.is_editor_hint():
+		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
 			build(Vector2(210, 180))
 		else:
 			var node := get_node_or_null("Ocean")
@@ -36,7 +36,7 @@ func build(size: Vector2):
 
 	# Update the plane mesh's size and material
 	var pmesh        := oceanMeshNode.mesh as PlaneMesh
-	var extra: float =  1.2
+	var extra: float =  material.get_shader_parameter("wave_fade_size_multiplier")
 	pmesh.size = size * extra
 	pmesh.subdivide_depth = int(sqrt(Settings.ocean_vertex_count()))
 	pmesh.subdivide_width = pmesh.subdivide_depth

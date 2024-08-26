@@ -8,7 +8,7 @@ extends Node3D
 @export var generate_in_editor: bool = false:
 	set(new_val):
 		generate_in_editor = new_val
-		if generate_in_editor and Engine.is_editor_hint():
+		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
 			_regenerate_demo()
 		else:
 			var terrain_node := get_node_or_null("TerrainGen")
@@ -18,26 +18,26 @@ extends Node3D
 @export var my_seed: int = 42:
 	set(new_seed):
 		my_seed = new_seed
-		if generate_in_editor and Engine.is_editor_hint():
+		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
 			_regenerate_demo()
 
 @export var vertex_count: float = 100000:
 	set(new_vertex_count):
 		vertex_count = new_vertex_count
-		if generate_in_editor and Engine.is_editor_hint():
+		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
 			_regenerate_demo()
 
 
 @export var cell_side: float = 10:
 	set(new_cell_side):
 		cell_side = new_cell_side
-		if generate_in_editor and Engine.is_editor_hint():
+		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
 			_regenerate_demo()
 
 @export var steepness: float = 1: # 1 -> 45º
 	set(new_steepness):
 		steepness = new_steepness
-		if generate_in_editor and Engine.is_editor_hint():
+		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
 			_regenerate_demo()
 
 func _ready():

@@ -23,7 +23,9 @@ func _init() -> void: # This runs before any _init() of the main scene (autoload
 	if _val("settings/print", true):
 		print("[settings] Applying presets...")
 	for setting_name: String in _all_settings_info.keys():
-		_all_settings[setting_name] = _apply_presets(setting_name)
+		var mod_preset = _apply_presets(setting_name)
+		if mod_preset != null:
+			_all_settings[setting_name] = mod_preset
 
 	# Reload overrides after presets are applied, and giving more priority to env and web...
 	_load_custom_settings_ini()
@@ -170,20 +172,24 @@ static func _s_val(path: String) -> Variant:
 	if _instance != null && _instance._loaded:
 		return _instance._val(path)
 	else: # Also apply proper presets in the case of the static editor-only version.
-		return _apply_presets(path)
+		var preset = _apply_presets(path)
+		if preset != null:
+			return preset
+		else:
+			return _all_settings_info[path]["default"]
 
 
 ## Applies the preset quality to the individual settings, returning the new value (or default if not affected)
 static func _apply_presets(path: String) -> Variant:
 	match path:
 		"terrain/vertex_count":
-			return int(10000 * 10 ** preset_quality_linear())
+			return int(10000.0 * 10.0 ** preset_quality_linear())
 		"ocean/vertex_count":
-			return int(10000 * 10 ** preset_quality_linear())
+			return int(10000.0 * 10.0 ** preset_quality_linear())
 		"ocean/screen_and_depth":
 			return preset_quality_linear() >= 0 and not OS.has_feature("web") # Web crashes for now
 		_:
-			return _all_settings_info[path]["default"]
+			return null
 
 
 static func setting_global_shader_name(setting_name: String) -> String:

@@ -3,7 +3,7 @@ render_mode cull_back, diffuse_burley, specular_schlick_ggx;
 
 #include "cells.gdshaderinc"
 
-uniform float cell_border = 0.01f; // Size of the border of each cell
+uniform float cell_border_scale : hint_range(0.0, 5.0, 0.1) = 1.0f; // Size of the border of each cell
 uniform vec3 above_water_color : source_color = vec3(0.75);
 uniform vec3 below_water_color : source_color = vec3(0.0);
 
@@ -15,10 +15,15 @@ void vertex() {
 void fragment() {
 	// FIXME: Automatic line width based on distance? Won't work on web, but may fix aliasing...
 	// Use the cells to override the color of the terrain and draw the square borders
-	vec2 cell_uv_fract = terrain_cell_uv(vert.xz);
-	float not_border_factor = 1.0 - step(cell_border / 2.0, cell_uv_fract.x) * step(cell_border / 2.0, cell_uv_fract.y) * step(cell_uv_fract.x, 1.0 - cell_border / 2.0) * step(cell_uv_fract.y, 1.0 - cell_border / 2.0);
+	vec4 uv_data = _terrain_uv_common(vert.xz);
+
+	// Compute anti-aliased world-space grid lines using screen-space derivatives!
+	vec2 grid = abs(fract(uv_data.xy - 0.5) - 0.5) / fwidth(uv_data.xy) / cell_border_scale;
+
+	float lines = clamp(1.0 - min(grid.x, grid.y), 0.0, 1.0);
+
     ALBEDO = step(0.0, vert.y) * above_water_color + (1.0 - step(0.0, vert.y)) * below_water_color;
-	ALPHA = not_border_factor;
+	ALPHA = lines;
 }
 
 //void light() {

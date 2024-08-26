@@ -39,6 +39,8 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 	var gen_ratio_xz: float = float(island.width()) / float(island.height())
 	var gen_width: int  = int(sqrt(target_vertices) * gen_ratio_xz)
 	var gen_height: int = int(sqrt(target_vertices) / gen_ratio_xz)
+	assert(gen_width > 0);
+	assert(gen_height > 0);
 
 	# Use the shader to render the high-res heightmap to another texture ("blocking" the main thread!)
 	var gpu_semaphore := Semaphore.new()

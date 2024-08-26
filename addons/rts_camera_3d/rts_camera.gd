@@ -161,7 +161,10 @@ func _process(delta):
 			position = position.lerp(_target_zoom_position, zoom_smoothness * delta)
 	else:
 		# Smooth zooming up and down
-		position.y = lerp(position.y, _target_zoom, zoom_smoothness * delta)
+		if projection == ProjectionType.PROJECTION_PERSPECTIVE:
+			position.y = lerp(position.y, _target_zoom, zoom_smoothness * delta)
+		elif projection == ProjectionType.PROJECTION_ORTHOGONAL:
+			size = lerp(size, _target_zoom, zoom_smoothness * delta)
 	
 	if _movement_direction != Vector3.ZERO:
 		var speed = move_speed
@@ -249,4 +252,3 @@ func _is_handle_screen_edge_panning():
 		_movement_direction += global_transform.basis.z * direction_vector.y
 	else:
 		_is_edge_panning = false
-

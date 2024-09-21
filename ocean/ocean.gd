@@ -1,51 +1,11 @@
-@tool
 extends Node3D
-class_name Ocean
 
-@warning_ignore("unused_private_class_variable")
-@export var generate_in_editor: bool = false:
-	set(new_val):
-		generate_in_editor = new_val
-		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
-			build(Vector2(210, 180))
-		else:
-			var node := get_node_or_null("Ocean")
-			if node != null:
-				node.queue_free()
-
-var material: ShaderMaterial         = preload("res://ocean/material.tres")
-
-
-func _ready() -> void:
-	if not Engine.is_editor_hint():
-		# Automatically build the island once we know the size
-		SignalBus.island_global_shader_parameters_ready.connect(func(): build(Settings.island_water_level_distance().get_size() * Settings.terrain_cell_side()), CONNECT_ONE_SHOT)
-
-
-func build(size: Vector2):
-	# Create or reuse the existing child node
-	var oceanMeshNode: MeshInstance3D
-	if not has_node("Ocean"):
-		oceanMeshNode = MeshInstance3D.new()
-		oceanMeshNode.name = "Ocean"
-		add_child(oceanMeshNode)
-	else:
-		oceanMeshNode = get_node("Ocean")
-	if oceanMeshNode.mesh == null:
-		oceanMeshNode.mesh = PlaneMesh.new()
-
-	# Update the plane mesh's size and material
-	var pmesh        := oceanMeshNode.mesh as PlaneMesh
-	var extra: float =  material.get_shader_parameter("wave_fade_size_multiplier")
-	pmesh.size = size * extra
-	pmesh.subdivide_depth = int(sqrt(Settings.ocean_vertex_count()))
-	pmesh.subdivide_width = pmesh.subdivide_depth
-	if Settings.ocean_screen_and_depth():
-		print("Enabling screen and depth textures for ocean!")
-		var mat := material.duplicate()
-		mat.shader.code = material.shader.code.replace("//#define depth_and_screen", "#define depth_and_screen")
-		print(mat.shader.code)
-	pmesh.material = material
-	print("Ocean has ", pmesh.subdivide_width, "x", pmesh.subdivide_depth, " cells")
-
-	# oceanMeshNode.owner = self # For debugging (remove to avoid serializing and preloading the mesh!)
+func _on_water_built(size: Vector2) -> void:
+	# Now trigger the placement of props in the ocean (not colliding with terrain)
+	var area := Vector3(1.2 * size.x, 0.1, 1.2 * size.y)
+	($ProtonScatter/ForbiddenBox.shape as ProtonScatterBoxShape).size = area
+	($ProtonScatter/AllowedBox.shape as ProtonScatterBoxShape).size =  Vector3(area.x * 2.0, 0.1, area.z * 2.0)
+	$ProtonScatter.global_seed = Settings.common_seed()
+	var create = $ProtonScatter.modifier_stack.stack[0]
+	create.amount = int(5.0 * Settings.common_props_multiplier())
+	$ProtonScatter.enabled = true

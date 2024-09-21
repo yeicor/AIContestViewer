@@ -1,0 +1,86 @@
+[gd_scene load_steps=18 format=3 uid="uid://0reojd5aiiqi"]
+
+[ext_resource type="Script" path="res://addons/proton_scatter/src/scatter.gd" id="1_4ecgs"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/modifier_stack.gd" id="2_k5nx6"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/base_modifier.gd" id="3_3a7fo"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/create_inside_random.gd" id="4_nkee3"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/randomize_rotation.gd" id="5_k3we1"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/relax.gd" id="6_x3mme"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/remove_outside_shapes.gd" id="7_g7fpq"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/scatter_item.gd" id="8_dleta"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/scatter_shape.gd" id="9_vscxj"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/shapes/box_shape.gd" id="10_x4opp"]
+
+[sub_resource type="Resource" id="Resource_aub7d"]
+script = ExtResource("4_nkee3")
+amount = 5
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = true
+reference_frame = 1
+
+[sub_resource type="Resource" id="Resource_jqxap"]
+script = ExtResource("5_k3we1")
+rotation = Vector3(0, 360, 0)
+snap_angle = Vector3(0, 0, 0)
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = false
+reference_frame = 2
+
+[sub_resource type="Resource" id="Resource_ivrgh"]
+script = ExtResource("6_x3mme")
+iterations = 3
+offset_step = 15.0
+consecutive_step_multiplier = 0.9
+use_computeshader = true
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = true
+reference_frame = 0
+
+[sub_resource type="Resource" id="Resource_hw01g"]
+script = ExtResource("7_g7fpq")
+negative_shapes_only = false
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = false
+reference_frame = 0
+
+[sub_resource type="Resource" id="Resource_7rq71"]
+script = ExtResource("2_k5nx6")
+stack = Array[ExtResource("3_3a7fo")]([SubResource("Resource_aub7d"), SubResource("Resource_jqxap"), SubResource("Resource_ivrgh"), SubResource("Resource_hw01g")])
+
+[sub_resource type="Resource" id="Resource_ujjuh"]
+script = ExtResource("10_x4opp")
+size = Vector3(0, 1, 1200)
+
+[sub_resource type="Resource" id="Resource_roksv"]
+script = ExtResource("10_x4opp")
+size = Vector3(0, 1, 600)
+
+[node name="ProtonScatter" type="Node3D"]
+script = ExtResource("1_4ecgs")
+enabled = false
+render_mode = 1
+modifier_stack = SubResource("Resource_7rq71")
+Performance/use_chunks = true
+Performance/chunk_dimensions = Vector3(300, 300, 300)
+
+[node name="ScatterItem" type="Node3D" parent="."]
+script = ExtResource("8_dleta")
+source_scale_multiplier = 0.01
+path = "res://ocean/props/shipfloating.tscn"
+
+[node name="AllowedBox" type="Node3D" parent="."]
+script = ExtResource("9_vscxj")
+shape = SubResource("Resource_ujjuh")
+
+[node name="ForbiddenBox" type="Node3D" parent="."]
+script = ExtResource("9_vscxj")
+negative = true
+shape = SubResource("Resource_roksv")

@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://addons/rts_camera_3d/rts_camera.gd" id="2_tsys7"]
 [ext_resource type="Environment" uid="uid://4g5i147j1mn3" path="res://main/environment.tres" id="3_3dq86"]
 [ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="3_wln4f"]
-[ext_resource type="PackedScene" uid="uid://bbvx0y3ablhoa" path="res://ocean/ocean.tscn" id="6_gowfy"]
+[ext_resource type="PackedScene" uid="uid://4s5lkea8k2pu" path="res://ocean/ocean.tscn" id="6_gowfy"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_rrmnf")

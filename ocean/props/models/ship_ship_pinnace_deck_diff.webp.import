@@ -1,0 +1,39 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://bdgm0gfgr53ob"
+path.s3tc="res://.godot/imported/ship_ship_pinnace_deck_diff.webp-e59124800c5fd85060569973b88b6406.s3tc.ctex"
+path.etc2="res://.godot/imported/ship_ship_pinnace_deck_diff.webp-e59124800c5fd85060569973b88b6406.etc2.ctex"
+metadata={
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
+}
+generator_parameters={
+"md5": "4e81ff1e4c64e53123b1e8e5a858c95f"
+}
+
+[deps]
+
+source_file="res://ocean/props/models/ship_ship_pinnace_deck_diff.webp"
+dest_files=["res://.godot/imported/ship_ship_pinnace_deck_diff.webp-e59124800c5fd85060569973b88b6406.s3tc.ctex", "res://.godot/imported/ship_ship_pinnace_deck_diff.webp-e59124800c5fd85060569973b88b6406.etc2.ctex"]
+
+[params]
+
+compress/mode=2
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/hdr_compression=1
+compress/normal_map=0
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=0

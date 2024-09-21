@@ -188,6 +188,8 @@ static func _apply_presets(path: String) -> Variant:
 			return int(10000.0 * 10.0 ** preset_quality_linear())
 		"ocean/screen_and_depth":
 			return preset_quality_linear() >= 0 and not OS.has_feature("web") # Web crashes for now
+		"common/props_multiplier":
+			return 10.0 ** (preset_quality_quadratic() * 0.25) # 0.1, 0.56, 1, 1.78, 10
 		_:
 			return null
 
@@ -235,6 +237,11 @@ static var _all_settings_info: Dictionary = \
 			"default": 42,
 			"type": TYPE_INT,
 			"info": "The seed to generate the same island, camera paths, etc.",
+		},
+		"common/props_multiplier": {
+			"default": 1.0,
+			"type": TYPE_FLOAT,
+			"info": "A multiplier to apply before adding decorative props (grass, trees, rocks, ships, etc.) to the scene.",
 		},
 		"game/path": {
 			"default": "res://testdata/game.jsonl.gz",
@@ -298,6 +305,9 @@ static var _all_settings_info: Dictionary = \
 static func common_seed() -> int: return _s_val("common/seed")
 
 
+static func common_props_multiplier() -> float: return _s_val("common/props_multiplier")
+
+
 static func game_path() -> String: return _s_val("game/path")
 
 
@@ -313,7 +323,7 @@ static func preset_quality() -> String:
 @warning_ignore("integer_division") static func preset_quality_linear() -> int: return _preset_quality_values.find(preset_quality()) - _preset_quality_values.size() / 2
 
 
-#static func preset_quality_quadratic() -> int: return preset_quality_linear() ** 2 * sign(preset_quality_linear())
+static func preset_quality_quadratic() -> int: return preset_quality_linear() ** 2 * sign(preset_quality_linear())
 
 
 static func terrain_cell_side() -> float: return _s_val("terrain/cell_side")

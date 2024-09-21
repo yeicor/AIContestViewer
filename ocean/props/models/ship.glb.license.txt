@@ -1,0 +1,5 @@
+CC0 - https://polyhaven.com/a/ship_pinnace
+Model, Textures, Cleanup - James Ray Cock
+Original Model - Nicolò Zubbini
+Sails Model, Textures - Rico Cilliers
+Rigging - Yann Kervran

@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://calo0i77jtrwp"]
+
+[ext_resource type="PackedScene" uid="uid://berqtjn65kru1" path="res://ocean/props/models/ship.glb" id="1_rsbui"]
+[ext_resource type="Script" path="res://ocean/props/floating.gd" id="2_k2pha"]
+
+[node name="Floating" type="Node3D"]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, -7, 0)
+script = ExtResource("2_k2pha")
+
+[node name="ship" parent="." instance=ExtResource("1_rsbui")]

@@ -59,7 +59,7 @@ func distance_to_water_level() -> Array:
 				handle_dir.call(0, -1)
 				handle_dir.call(0, 1)
 
-	print("[timing] Distance to water level (first pass) computed in " + str(Time.get_ticks_msec() - start_time) + "ms")
+	SLog.sd("[timing] Distance to water level (first pass) computed in " + str(Time.get_ticks_msec() - start_time) + "ms")
 	start_time = Time.get_ticks_msec()
 
 	# Now propagate the distance to all cells
@@ -84,12 +84,12 @@ func distance_to_water_level() -> Array:
 				if handle_dir.call(0, 1):
 					changed += 1
 		#
-		print("[timing] Distance to water level (pass " + str(attempt + 2) + ") computed in " + str(Time.get_ticks_msec() - start_time) + "ms (" + str(changed) + " changes)")
+		SLog.sd("[timing] Distance to water level (pass " + str(attempt + 2) + ") computed in " + str(Time.get_ticks_msec() - start_time) + "ms (" + str(changed) + " changes)")
 		start_time = Time.get_ticks_msec()
 		if changed == 0:
 			break # No more iterations needed!
 
-	print("[timing] Distance to water level (total) computed in " + str(Time.get_ticks_msec() - init_time) + "ms")
+	SLog.sd("[timing] Distance to water level (total) computed in " + str(Time.get_ticks_msec() - init_time) + "ms")
 	return dist
 
 

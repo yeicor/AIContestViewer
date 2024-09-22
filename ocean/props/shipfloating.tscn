@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://ocean/props/floating.gd" id="2_k2pha"]
 
 [node name="Floating" type="Node3D"]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, -7, 0)
 script = ExtResource("2_k2pha")
 
 [node name="ship" parent="." instance=ExtResource("1_rsbui")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, -3, 0)

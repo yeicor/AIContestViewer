@@ -33,7 +33,7 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 	Image.FORMAT_RG8, texture_data)
 	#height_bounds_img.save_png("res://island/terrain/scripts/max_heights.png")  # Debug
 	var height_bounds_tex: ImageTexture = ImageTexture.create_from_image(height_bounds_img)
-	print("[timing] HeightMap: Created max heights texture in " + str(Time.get_ticks_msec() - start_time) + "ms  (excluding distance to water level)")
+	SLog.sd("[timing] HeightMap: Created max heights texture in " + str(Time.get_ticks_msec() - start_time) + "ms  (excluding distance to water level)")
 
 	# Figure out the number of pixels to generate based on the target vertices
 	var gen_ratio_xz: float = float(island.width()) / float(island.height())
@@ -58,7 +58,7 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 	var st         =  SurfaceTool.new()
 	st.create_from(plane_mesh, 0)
 	var mesh = st.commit()
-	print("[timing] Generated plane for heightmap of size " + str(xz_counts) +
+	SLog.sd("[timing] Generated plane for heightmap of size " + str(xz_counts) +
 	" in " + str(Time.get_ticks_msec() - start_time) + "ms")
 
 	start_time = Time.get_ticks_msec()
@@ -67,12 +67,12 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 	if error != OK:
 		print("Error creating MeshDataTool from plane: " + str(error))
 		return null
-	print("[timing] Created MeshDataTool from plane in " + str(Time.get_ticks_msec() - start_time) + "ms")
+	SLog.sd("[timing] Created MeshDataTool from plane in " + str(Time.get_ticks_msec() - start_time) + "ms")
 
 	# Ensure the GPU-generated heightmap is ready before proceeding to read it
 	start_time = Time.get_ticks_msec()
 	gpu_semaphore.wait()
-	print("[timing] CPU was waiting for GPU to generate heightmap for " + str(Time.get_ticks_msec() - start_time) + "ms")
+	SLog.sd("[timing] CPU was waiting for GPU to generate heightmap for " + str(Time.get_ticks_msec() - start_time) + "ms")
 
 	start_time = Time.get_ticks_msec()
 	var v_off = plane_mesh.size / 2;
@@ -110,12 +110,12 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 				var vt := Plane(vn.cross(Vector3.FORWARD).normalized())
 				mdt.set_vertex_tangent(v_id, vt)
 			mdt.set_vertex(v_id, Vector3(v_x, v_y, v_z))
-	print("[timing] Set heights in " + str(Time.get_ticks_msec() - start_time) + "ms")
+	SLog.sd("[timing] Set heights in " + str(Time.get_ticks_msec() - start_time) + "ms")
 
 	start_time = Time.get_ticks_msec()
 	mesh.clear_surfaces()
 	mdt.commit_to_surface(mesh)
-	print("[timing] Committed heights in " + str(Time.get_ticks_msec() - start_time) + "ms")
+	SLog.sd("[timing] Committed heights in " + str(Time.get_ticks_msec() - start_time) + "ms")
 
 	return mesh
 
@@ -144,7 +144,7 @@ func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float
 	var img: Image = get_texture().get_image()
 	#img.save_png("res://island/terrain/scripts/heightmap.png")
 	self.set_update_mode(SubViewport.UPDATE_DISABLED)
-	print("[timing] HeightMap: GPU-generated " + str(size) + " heightmap in " + str(Time.get_ticks_msec() - start_time) + "ms. Format: " + str(img.get_format()))
+	SLog.sd("[timing] HeightMap: GPU-generated " + str(size) + " heightmap in " + str(Time.get_ticks_msec() - start_time) + "ms. Format: " + str(img.get_format()))
 	#start_time = Time.get_ticks_msec()
 	#var data = img.get_data() # FORMAT_RGBH on PC, FORMAT_RGBA8 on Web...
 	#for i in range(data.size() / 2):

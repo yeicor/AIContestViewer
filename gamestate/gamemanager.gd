@@ -7,22 +7,22 @@ static var game_manager_thread := Thread.new()
 ## Starts the game manager thread to read and publish game states
 static func start() -> void:
 	if _running:
-		print("[gamemanager] Error: game manager thread already running!")
+		Log.e("Game manager thread already running!")
 		return
 	_running = true
-	print("[gamemanager] Starting game manager thread...")
+	Log.d("Starting game manager thread...")
 	assert(OS.has_feature("threads")) # Enable thread support for web!
 	game_manager_thread.start(_thread)
 
 
 static func stop() -> void:
 	if not _running:
-		print("[gamemanager] Error: game manager thread not running!")
+		Log.e("Game manager thread not running!")
 		return
-	print("[gamemanager] Stopping game manager thread...")
+	Log.d("Stopping game manager thread...")
 	# Wait for the game manager thread to finish
 	game_manager_thread.wait_to_finish()
-	print("[gamemanager] Game manager thread stopped.")
+	Log.d("Game manager thread stopped.")
 	_running = false
 
 

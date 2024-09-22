@@ -21,7 +21,7 @@ func _init() -> void: # This runs before any _init() of the main scene (autoload
 
 	# Apply presets before the final pass to override some settings...
 	if _val("settings/print", true):
-		print("[settings] Applying presets...")
+		print("[before-logging] (SettingsAutoloaded) Applying presets...")
 	for setting_name: String in _all_settings_info.keys():
 		var mod_preset = _apply_presets(setting_name)
 		if mod_preset != null:
@@ -34,34 +34,37 @@ func _init() -> void: # This runs before any _init() of the main scene (autoload
 
 	# Override all global parameters as required
 	if _val("settings/print", true):
-		print("[settings] Publishing global shader parameters...")
+		print("[before-logging] (SettingsAutoloaded) Publishing global shader parameters...")
 	for setting_name: String in _all_settings_info.keys():
 		setting_global_shader_set(setting_name)
 
 	_loaded = true
+	
+	# Set global seed for unreachable internal randf calls (best effort!)
+	seed(common_seed())
 
+func _ready():
 	# Print all settings if required
 	if _val("settings/print", true):
-		print(" === LOADED SETTINGS ===")
+		SLog.sd(" === LOADED SETTINGS ===")
 		var all_keys = _all_settings_info.keys()
 		all_keys.sort()
 		for setting_name: String in all_keys:
-			print(" - ", setting_name, " = ", _val(setting_name))
-		print(" === END OF LOADED SETTINGS ===")
-
+			SLog.sd(setting_name + " = " + str(_val(setting_name)))
+		SLog.sd(" === END OF LOADED SETTINGS ===")
 
 func _load_parse_and_set(setting_name: String, raw: String, from: String):
 	var setting = _all_settings_info[setting_name]
 	var val     = _parse_string(raw, setting)
 	if _val("settings/print", true):
-		print("[settings > " + from + "] Custom setting: " + setting_name + " -> " + str(val))
+		print("[before-logging] (SettingsAutoloaded) [" + from + "] Custom setting: " + setting_name + " -> " + str(val))
 	_all_settings[setting_name] = val
 
 
 func _load_custom_settings_env() -> void:
 	# Fill project config from environment variables
 	if _val("settings/print", true):
-		print("[settings] Loading setting overrides from environment variables...")
+		print("[before-logging] (SettingsAutoloaded) Loading setting overrides from environment variables...")
 	for setting_name: String in _all_settings.keys():
 		# Replace all invalid characters in the environment variable name regex
 		var env_name: String = _invalid_env_regex.sub(setting_name, "_", true)
@@ -73,7 +76,7 @@ func _load_custom_settings_web() -> void:
 	# Fill project config from query parameters on web export
 	if OS.has_feature("web"):
 		if _val("settings/print", true):
-			print("[settings] Loading setting overrides from query parameters...")
+			print("[before-logging] (SettingsAutoloaded) Loading setting overrides from query parameters...")
 		var queryParams = JSON.parse_string(JavaScriptBridge.eval("JSON.stringify(new URLSearchParams(window.location.search))"))
 		for setting_name: String in _all_settings.keys():
 			var query_name: String = _invalid_env_regex.sub(setting_name, "_", true)
@@ -87,12 +90,12 @@ func _load_custom_settings_ini() -> void: # Will enter first in the scene tree (
 	var create_defaults = _val("settings/create_defaults", true)
 
 	if _val("settings/print", true):
-		print("[settings] Loading setting overrides from ini file (", settings_path, ")...")
+		print("[before-logging] (SettingsAutoloaded) Loading setting overrides from ini file (", settings_path, ")...")
 
 	var config: ConfigFile = ConfigFile.new()
 	if FileAccess.file_exists(settings_path):
 		if _val("settings/print", true):
-			print("[settings] Loading setting overrides from " + str(settings_path))
+			print("[before-logging] (SettingsAutoloaded) Loading setting overrides from " + str(settings_path))
 		config.load(settings_path)
 
 	for setting_name: String in _all_settings_info.keys():
@@ -104,7 +107,7 @@ func _load_custom_settings_ini() -> void: # Will enter first in the scene tree (
 
 	# Save the default settings file if it doesn't exist and the user wants it
 	if create_defaults and not FileAccess.file_exists(settings_path):
-		print("[settings] Saving all settings to " + ProjectSettings.globalize_path(settings_path))
+		print("[before-logging] (SettingsAutoloaded) Saving all settings to " + ProjectSettings.globalize_path(settings_path))
 		FileAccess.open(settings_path, FileAccess.WRITE).store_string(generate_ini(true))
 
 
@@ -151,7 +154,7 @@ func _parse_string(_value: String, setting: Dictionary) -> Variant:
 			var split: PackedStringArray = _value.split(",")
 			return Color(float(split[0]), float(split[1]), float(split[2]), float(split[3]))
 		_:
-			print("[warning] Unsupported type for setting " + setting["name"] + ": " + str(setting["type"]))
+			print("[before-logging?] (SettingsAutoloaded) Unsupported type for setting " + setting["name"] + ": " + str(setting["type"]))
 			return _value
 
 
@@ -327,6 +330,9 @@ static func preset_quality_quadratic() -> int: return preset_quality_linear() **
 
 
 static func terrain_cell_side() -> float: return _s_val("terrain/cell_side")
+
+
+static func terrain_cell_side_mult() -> float: return _s_val("terrain/cell_side") / _all_settings_info["terrain/cell_side"]["default"]
 
 
 static func terrain_max_steepness() -> float: return _s_val("terrain/max_steepness")

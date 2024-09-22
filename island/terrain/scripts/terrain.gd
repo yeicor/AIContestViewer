@@ -74,13 +74,13 @@ func generate(game: GameState):
 	assert(vertex_count >= 0)
 	assert(steepness > 0.0)
 	if not has_node("HeightMap"):
-		print("Note: ignoring generate() before HeightMap node exists...")
+		SLog.sw("Note: ignoring generate() before HeightMap node exists...")
 		return
 	if _generate_thread == null:
 		_generate_thread = Thread.new()
 	if _generate_thread.is_alive():
-		print("Note: ignoring generate() while another generate() is running in a separate thread")
-		return
+		SLog.sw("Note: another generate() is running in a separate thread, waiting for it to finish and regenerating!")
+		_generate_thread.wait_to_finish()
 	var start_time: float = Time.get_ticks_msec()
 	var heightmap := $HeightMap
 	_generate_thread.start(func():
@@ -91,5 +91,5 @@ func generate(game: GameState):
 			meshNode.name = "TerrainGen"
 			meshNode.mesh = hmesh
 			add_child(meshNode)
-			print("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
+			SLog.sd("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
 			_generate_thread.wait_to_finish()).call_deferred())

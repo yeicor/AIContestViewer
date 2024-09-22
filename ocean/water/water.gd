@@ -43,12 +43,12 @@ func build(size: Vector2):
 	pmesh.subdivide_depth = int(sqrt(Settings.ocean_vertex_count()))
 	pmesh.subdivide_width = pmesh.subdivide_depth
 	if Settings.ocean_screen_and_depth():
-		print("Enabling screen and depth textures for ocean!")
+		Log.d("Enabling screen and depth textures for ocean!")
 		var mat := material.duplicate()
 		mat.shader.code = material.shader.code.replace("//#define depth_and_screen", "#define depth_and_screen")
 		#print(mat.shader.code)
 	pmesh.material = material
-	print("Ocean has ", pmesh.subdivide_width, "x", pmesh.subdivide_depth, " cells")
+	Log.d("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells")
 	
 	# oceanMeshNode.owner = self # For debugging (remove to avoid serializing and preloading the mesh!)
 	

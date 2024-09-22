@@ -49,9 +49,3 @@ shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_3dq86")
-
-[node name="LoadingLabel" type="Label3D" parent="."]
-transform = Transform3D(100, 0, 0, 0, -4.37114e-06, 100, 0, -100, -4.37114e-06, 0, -100, 0)
-text = "Loading..."
-font_size = 128
-outline_size = 32

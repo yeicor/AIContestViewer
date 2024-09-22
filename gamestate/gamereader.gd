@@ -10,12 +10,12 @@ static func open(path: String) -> GameReader:
 		var host: String      = host_port.split(":")[0]
 		var port: int         = int(host_port.split(":")[1])
 		srv.listen(port, host)
-		print("Listening on " + host + ":" + str(port) + " for game data")
+		Log.d("Listening on " + host + ":" + str(port) + " for game data")
 		stream = srv.take_connection()
 	else: # Buffer the whole file in memory (for now)
 		var file_contents: PackedByteArray = FileAccess.get_file_as_bytes(path)
 		if FileAccess.get_open_error() != Error.OK:
-			print("Failed to open game file: " + path)
+			Log.d("Failed to open game file: " + path)
 			return null
 		var buf: StreamPeerBuffer = StreamPeerBuffer.new()
 		var is_gzip: bool         = path.ends_with(".gz")
@@ -56,11 +56,11 @@ func parse_next_round() -> GameState:
 			break
 		
 		if self.cur_state.round() != _expected_round:
-			print("[gamereader] Error: Unexpected round number: " + str(cur_state.round()) + " (expected " + str(_expected_round) + ")")
+			Log.d("[gamereader] Error: Unexpected round number: " + str(cur_state.round()) + " (expected " + str(_expected_round) + ")")
 	
 	_expected_round+=1
 	if self.cur_state.round() != _expected_round:
-		print("[gamereader] Error: (2) Unexpected round number : " + str(cur_state.round()) + " (expected " + str(_expected_round) + ")")
+		Log.d("[gamereader] Error: (2) Unexpected round number : " + str(cur_state.round()) + " (expected " + str(_expected_round) + ")")
 	
 	return self.cur_state
 
@@ -73,10 +73,10 @@ var cur_state: GameState = null
 
 func parse_next_state() -> GameState:
 	var raw_state: Dictionary = _read_json_line()
-	# print("Raw state: " + JSON.stringify(raw_state))
+	# Log.d"Raw state: " + JSON.stringify(raw_state))
 	if raw_state == { }:
 		return null # EOF
-	# print("Read state round: " + str(raw_state["round"]))
+	# Log.d"Read state round: " + str(raw_state["round"]))
 	cur_state = GameState.new(raw_state)
 	return cur_state
 

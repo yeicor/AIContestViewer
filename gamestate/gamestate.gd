@@ -34,7 +34,7 @@ static func array_2d_to_ascii_string(arr: Array, blank: int = 1) -> String:
 	var column_cell_size: Array = []
 	for coli in range(len(arr[0])): # Assume same length rows.
 		column_cell_size.append(arr.map(func(row: Array) -> int: return row[coli].length()).max() + blank)
-	#print("column_cell_size: " + str(column_cell_size))
+	#Log.d("column_cell_size: " + str(column_cell_size))
 	for z in range(len(arr)):
 		for x in range(len(arr[z])):
 			var cell = arr[z][x]

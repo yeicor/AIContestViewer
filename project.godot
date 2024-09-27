@@ -27,7 +27,7 @@ SignalBus="*res://main/signalbus.gd"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 LimboConsole="*res://addons/limbo_console/limbo_console.gd"
 Log="*res://main/Log.gd"
-LogDuck="*res://addons/LogDuck/LogDuck.gd"
+LogDuck="res://addons/LogDuck/LogDuck.gd"
 
 [editor_plugins]
 

@@ -38,6 +38,8 @@ global uniform float setting_island_water_level_at;
 global uniform float setting_island_water_level_step;
 uniform float wave_water_level_step_effect = 0.3;
 
+#include "res://island/terrain/shaders/textureStochastic.gdshaderinc"
+
 uniform float wave_step_height = 2.0;
 uniform float wave_fade_size_multiplier = 2.0;
 const vec4 wave_dir_amp_period[4] = {
@@ -231,7 +233,7 @@ void fragment() {
 	vec2 time_vector = (TIME * surface_normals_move_direction_a) * surface_texture_time_scale;
 	vec2 time_vector2 = (TIME * surface_normals_move_direction_b) * surface_texture_time_scale;
 
-	vec3 normal_texture_blend 	= mix(texture(surface_normals_a, vertex_uv * surface_texture_scale + time_vector).xyz, texture(surface_normals_b, vertex_uv * surface_texture_scale + time_vector2).xyz, 0.5);
+	vec3 normal_texture_blend 	= mix(textureStochastic(surface_normals_a, vertex_uv * surface_texture_scale + time_vector).xyz, textureStochastic(surface_normals_b, vertex_uv * surface_texture_scale + time_vector2).xyz, 0.5);
 	vec3 normal_blend 			= mix(NORMAL, normal_texture_blend, surface_texture_roughness);
 
 	vec3 surface_color 				= albedo;

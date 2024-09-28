@@ -193,6 +193,8 @@ static func _apply_presets(path: String) -> Variant:
 			return preset_quality_linear() >= 0 and not OS.has_feature("web") # Web crashes for now
 		"common/props_multiplier":
 			return 10.0 ** (preset_quality_quadratic() * 0.25) # 0.1, 0.56, 1, 1.78, 10
+		"common/stochastic_textures":
+			return preset_quality_linear() >= 0
 		_:
 			return null
 
@@ -274,6 +276,11 @@ static var _all_settings_info: Dictionary = \
 			"default": 1.0,
 			"type": TYPE_FLOAT,
 			"info": "A multiplier to apply before adding decorative props (grass, trees, rocks, ships, etc.) to the scene.",
+		},
+		"common/stochastic_textures": {
+			"default": true,
+			"type": TYPE_BOOL,
+			"info": "Enable to hide obvious tiling when repeating textures (terrain, ocean...), at the cost of some performance.",
 		},
 		"game/path": {
 			"default": "res://testdata/game.jsonl.gz",

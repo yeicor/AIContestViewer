@@ -6,7 +6,10 @@ shader_type spatial;
 #define PI 3.14159265359
 #define PI_2 6.28318530718
 
-#ifdef s_ocean_screen_and_depth
+#ifndef s_ocean_screen_and_depth // Editor-only!
+#define s_ocean_screen_and_depth true
+#endif
+#if s_ocean_screen_and_depth
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_nearest;
 uniform sampler2D DEPTH_TEXTURE : hint_depth_texture, filter_nearest;
 #endif
@@ -36,8 +39,6 @@ global uniform float setting_island_water_level_at;
 global uniform float setting_island_water_level_step;
 uniform float wave_water_level_step_effect = 0.3;
 
-// TODO: #include "res://island/terrain/shaders/textureStochastic.gdshaderinc"
-
 global uniform sampler2D setting_island_heightmap;
 uniform float wave_step_height = 2.0;
 uniform float wave_fade_size_multiplier = 2.0;
@@ -49,12 +50,12 @@ const vec4 wave_dir_amp_period[4] = {
 };
 uniform float wave_uv_scale = 30.0;
 uniform float wave_time_scale = 1.0;
-uniform float wave_normal_flatness : hint_range(0.1, 100.0, 0.1) = 30.0;
+uniform float wave_normal_flatness : hint_range(0.1, 100.0, 0.1) = 15.0;
 uniform sampler2D wave_noise;
 uniform float wave_noise_strength = 0.2;
 
-uniform vec3  border_color : source_color = vec3(1.0);
-uniform float border_scale : hint_range(0.0, 5.0, 0.01) = 2.0;
+uniform vec4  border_color : source_color = vec4(vec3(1.0), 0.0);
+uniform float border_scale : hint_range(0.0, 5.0, 0.01) = 1.0;
 
 #ifdef s_ocean_screen_and_depth
 uniform float refraction_intensity : hint_range(0.0, 1.0, 0.01) = 0.4;
@@ -63,8 +64,46 @@ uniform float max_visible_depth : hint_range(0.0, 100.0, 0.1) = 10.0;
 #endif
 uniform vec3 color_deep : source_color = vec3(0.0, 0.1, 0.4);
 
+#ifndef common_stochastic_textures // Editor-only, allow setting all uniforms
 uniform sampler2D surface_normals_a;
 uniform sampler2D surface_normals_b;
+#define common_stochastic_textures true // And default to stochastic
+#endif
+#if common_stochastic_textures // Stochastic enabled
+#define texture_stochastic_enable_df
+#include "res://island/terrain/shaders/textureStochastic.gdshaderinc"
+uniform sampler2D surface_normals_a_t;
+uniform sampler2D surface_normals_a_inv_t;
+uniform vec3 surface_normals_a_color_space_origin;
+uniform vec3 surface_normals_a_color_space_vector1;
+uniform vec3 surface_normals_a_color_space_vector2;
+uniform vec3 surface_normals_a_color_space_vector3;
+vec3 texture_normals_a(vec2 uv) {
+	return textureStochastic(surface_normals_a_t, surface_normals_a_inv_t, uv,
+	surface_normals_a_color_space_origin, surface_normals_a_color_space_vector1,
+	surface_normals_a_color_space_vector2, surface_normals_a_color_space_vector3);
+}
+uniform sampler2D surface_normals_b_t;
+uniform sampler2D surface_normals_b_inv_t;
+uniform vec3 surface_normals_b_color_space_origin;
+uniform vec3 surface_normals_b_color_space_vector1;
+uniform vec3 surface_normals_b_color_space_vector2;
+uniform vec3 surface_normals_b_color_space_vector3;
+vec3 texture_normals_b(vec2 uv) {
+	return textureStochastic(surface_normals_b_t, surface_normals_b_inv_t, uv,
+	surface_normals_b_color_space_origin, surface_normals_b_color_space_vector1,
+	surface_normals_b_color_space_vector2, surface_normals_b_color_space_vector3);
+}
+#else // Stochastic disabled
+uniform sampler2D surface_normals_a;
+uniform sampler2D surface_normals_b;
+vec3 texture_normals_a(vec2 uv) {
+	return texture(surface_normals_a, uv).rgb;
+}
+vec3 texture_normals_b(vec2 uv) {
+	return texture(surface_normals_b, uv).rgb;
+}
+#endif
 
 varying vec2 vertex_uv;
 
@@ -236,19 +275,20 @@ void fragment() {
 	vec2 time_vector = (TIME * surface_normals_move_direction_a) * surface_texture_time_scale;
 	vec2 time_vector2 = (TIME * surface_normals_move_direction_b) * surface_texture_time_scale;
 
-	vec3 normal_texture_blend 	= mix(texture(surface_normals_a, vertex_uv * surface_texture_scale + time_vector).xyz, texture(surface_normals_b, vertex_uv * surface_texture_scale + time_vector2).xyz, 0.5);
+	vec3 normal_texture_blend 	= mix(texture_normals_a(vertex_uv * surface_texture_scale + time_vector), texture_normals_b(vertex_uv * surface_texture_scale + time_vector2), 0.5);
 	vec3 normal_blend 			= mix(NORMAL, normal_texture_blend, surface_texture_roughness);
 
 	vec3 surface_color 				= albedo;
 	vec3 color_with_transparency 	= mix(surface_color, screen_color, transparency);
 	vec3 depth_color 				= mix(color_deep.rgb, color_with_transparency, depth_opacity);
 	vec3 water_color 				= (ssr_color.x >= 0.0) ? mix(depth_color, ssr_color, ssr_mix_strength) : depth_color;
-	vec3 final_color				= mix(water_color, border_color, 1.0 - min(water_depth/border_scale, 1.0));
+	vec4 final_color				= mix(vec4(water_color, 1.0), border_color, 1.0 - min(water_depth/border_scale, 1.0));
 
-	ALBEDO.rgb = final_color;
+	ALBEDO = final_color.rgb;
 #ifndef s_ocean_screen_and_depth // Force basic transparency without refraction when screen can't be read.
 	ALPHA = transparency;
 #endif
+	ALPHA *= final_color.a;
 	METALLIC = metallic;
 	ROUGHNESS = roughness;
 	NORMAL_MAP = normal_blend;

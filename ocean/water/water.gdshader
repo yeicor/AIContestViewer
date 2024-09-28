@@ -33,14 +33,15 @@ uniform float ssr_max_diff     : hint_range(0.1, 10.0, 0.1) 	= 4.0;
 uniform float ssr_mix_strength : hint_range(0.0, 1.0, 0.01) 	= 0.7;
 
 // Global uniforms that help couple ocean and terrain
-//#include "res://island/terrain/shaders/lanczos.gdshaderinc"
 #include "res://island/terrain/shaders/cells.gdshaderinc"
 global uniform float setting_island_water_level_at;
 global uniform float setting_island_water_level_step;
 uniform float wave_water_level_step_effect = 0.3;
-
 global uniform sampler2D setting_island_heightmap;
+
 uniform float wave_step_height = 2.0;
+uniform float wave_extra_height_at_shore = 0.8; // Measured in level steps
+uniform float wave_extra_height_at_shore_dist = 0.3; // Measured in level steps
 uniform float wave_fade_size_multiplier = 2.0;
 const vec4 wave_dir_amp_period[4] = {
     vec4(1.0, 0.05, 0.2, 1.0),
@@ -161,9 +162,10 @@ void vertex() {
 		// TODO: land_dist_smooth directly from heightmap to avoid water under ground!
 		vec4 heightmap_sample_raw = texture(setting_island_heightmap, terrain_uv_clamp);
 		float heightmap_sample = heightmap_sample_raw.r + heightmap_sample_raw.g / 256.0;
-		float land_dist_smooth = -min(0.0, heightmap_sample - setting_island_water_level_at);
-		float wave_height_at_shore = 0.25 * setting_island_water_level_step;
-		float num_steps_away_from_land = (land_dist_smooth + wave_height_at_shore) / setting_island_water_level_step;
+		float land_dist_smooth = -min(0.0, heightmap_sample - setting_island_water_level_at) / setting_island_water_level_step;
+		// Reduce the effect of wave_height_at_shore to avoid going below the terrain away from the shore
+		float shore_closeness = max(0.0, wave_extra_height_at_shore_dist - abs(heightmap_sample - setting_island_water_level_at) / setting_island_water_level_step);
+		float num_steps_away_from_land = land_dist_smooth + shore_closeness * wave_extra_height_at_shore;
 		float wave_height_mult = num_steps_away_from_land * wave_water_level_step_effect;
 		// - Also fade out when going out of reach
         vec2 wave_fade_factor_v = abs(terrain_uv - terrain_uv_clamp) / (vec2(terrain_cell_count) / 2.0 / wave_fade_size_multiplier);

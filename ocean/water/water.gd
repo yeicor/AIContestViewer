@@ -38,13 +38,13 @@ func build(size: Vector2):
 
 	# Update the plane mesh's size and material
 	var pmesh        := oceanMeshNode.mesh as PlaneMesh
-	var extra: float =  material.get_shader_parameter("wave_fade_size_multiplier")
-	pmesh.size = size * extra
+	var size_multiplier: float = material.get_shader_parameter("wave_fade_size_multiplier")
+	pmesh.size = size * size_multiplier
 	pmesh.subdivide_depth = int(sqrt(Settings.ocean_vertex_count()))
 	pmesh.subdivide_width = pmesh.subdivide_depth
 	material.shader.code = Settings.as_defines() + material.shader.code
 	pmesh.material = material
-	Log.d("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells")
+	SLog.sd("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells")
 	
 	# oceanMeshNode.owner = self # For debugging (remove to avoid serializing and preloading the mesh!)
 	

@@ -239,7 +239,9 @@ static func as_defines() -> String:
 			TYPE_VECTOR3:
 				defines += "#define " + safe_name + " vec3(" + str(_s_val(setting_name).x) + ", " + str(_s_val(setting_name).y) + ", " + str(_s_val(setting_name).z) + ")\n"
 			TYPE_COLOR:
-				defines += "#define " + safe_name + " vec4(" + str(_s_val(setting_name).r) + ", " + str(_s_val(setting_name).g) + ", " + str(_s_val(setting_name).b) + ", " + str(_s_val(setting_name).a) + ")\n"
+				defines += "#define " + safe_name + " vec4(" + str(_s_val(setting_name).r) + ", " + str(_s_val(setting_name).g) + ", " + str(_s_val(setting_name).b) + ", " + str(_s_val(setting_name).a) + ")\n"	
+			-RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D:
+				pass # Not supported, but no need to print anything
 			_:
 				print("[before-logging?] (SettingsAutoloaded) Unsupported type for setting " + setting_name + ": " + str(_all_settings_info[setting_name]["type"]))
 	return defines

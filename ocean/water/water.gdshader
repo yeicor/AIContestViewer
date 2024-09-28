@@ -30,17 +30,17 @@ uniform float ssr_max_diff     : hint_range(0.1, 10.0, 0.1) 	= 4.0;
 uniform float ssr_mix_strength : hint_range(0.0, 1.0, 0.01) 	= 0.7;
 
 // Global uniforms that help couple ocean and terrain
-#include "res://island/terrain/shaders/lanczos.gdshaderinc"
+//#include "res://island/terrain/shaders/lanczos.gdshaderinc"
 #include "res://island/terrain/shaders/cells.gdshaderinc"
 global uniform float setting_island_water_level_at;
 global uniform float setting_island_water_level_step;
 uniform float wave_water_level_step_effect = 0.3;
 
-#include "res://island/terrain/shaders/textureStochastic.gdshaderinc"
+// TODO: #include "res://island/terrain/shaders/textureStochastic.gdshaderinc"
 
+global uniform sampler2D setting_island_heightmap;
 uniform float wave_step_height = 2.0;
 uniform float wave_fade_size_multiplier = 2.0;
-uniform float wave_fade_dist_cells = 5.0;
 const vec4 wave_dir_amp_period[4] = {
     vec4(1.0, 0.05, 0.2, 1.0),
     vec4(1.0, -0.2, 0.25, 2.0),
@@ -51,7 +51,7 @@ uniform float wave_uv_scale = 30.0;
 uniform float wave_time_scale = 1.0;
 uniform float wave_normal_flatness : hint_range(0.1, 100.0, 0.1) = 30.0;
 uniform sampler2D wave_noise;
-uniform float wave_noise_strength = 0.3;
+uniform float wave_noise_strength = 0.2;
 
 uniform vec3  border_color : source_color = vec3(1.0);
 uniform float border_scale : hint_range(0.0, 5.0, 0.01) = 2.0;
@@ -120,11 +120,14 @@ void vertex() {
 		vec2 terrain_uv = terrain_uv(VERTEX.xz);
 		vec2 terrain_uv_clamp = clamp(terrain_uv, vec2(0.0), vec2(1.0));
 		// TODO: land_dist_smooth directly from heightmap to avoid water under ground!
-		float land_dist_smooth = -min(0.0, lanczos(setting_island_water_level_distance, terrain_uv, 5).r - setting_island_water_level_at);
-		float num_steps_away_from_land = (land_dist_smooth + setting_island_water_level_step / 2.0) / setting_island_water_level_step;
+		vec4 heightmap_sample_raw = texture(setting_island_heightmap, terrain_uv_clamp);
+		float heightmap_sample = heightmap_sample_raw.r + heightmap_sample_raw.g / 256.0;
+		float land_dist_smooth = -min(0.0, heightmap_sample - setting_island_water_level_at);
+		float wave_height_at_shore = 0.25 * setting_island_water_level_step;
+		float num_steps_away_from_land = (land_dist_smooth + wave_height_at_shore) / setting_island_water_level_step;
 		float wave_height_mult = num_steps_away_from_land * wave_water_level_step_effect;
 		// - Also fade out when going out of reach
-        vec2 wave_fade_factor_v = abs(terrain_uv - terrain_uv_clamp) / wave_fade_dist_cells;
+        vec2 wave_fade_factor_v = abs(terrain_uv - terrain_uv_clamp) / (vec2(terrain_cell_count) / 2.0 / wave_fade_size_multiplier);
 		float wave_fade_factor = max(wave_fade_factor_v.x, wave_fade_factor_v.y) * setting_terrain_cell_side;
 		wave_fade_factor = clamp(wave_fade_factor, 0.0, 1.0);
         wave_height_mult = mix(wave_height_mult, 0.0, wave_fade_factor);

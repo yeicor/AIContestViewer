@@ -44,6 +44,7 @@ void fragment() {
 
 }
 "
+graph_offset = Vector2(-229.135, -43.8565)
 nodes/fragment/0/position = Vector2(680, 180)
 nodes/fragment/2/node = SubResource("VisualShaderNodeInput_ewnyi")
 nodes/fragment/2/position = Vector2(-140, 300)
@@ -63,6 +64,7 @@ shader = SubResource("VisualShader_1yk1o")
 
 [node name="Water" type="Node3D"]
 script = ExtResource("4_j2nh8")
+generate_in_editor = true
 
 [node name="TestObject" type="MeshInstance3D" parent="."]
 transform = Transform3D(24.4825, 0, 0, 0, 15.2301, -12.3379, 0, -20.8758, -9.00126, 0, 0, 0)

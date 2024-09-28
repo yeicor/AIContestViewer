@@ -25,7 +25,7 @@ uniform float surface_texture_roughness : hint_range(0.0, 1.0, 0.01) = 0.6;
 uniform float surface_texture_scale : hint_range(0.001, 2.0, 0.001) = 0.1;
 uniform float surface_texture_time_scale : hint_range(0.001, 2.0, 0.001) = 0.06;
 
-#ifdef s_ocean_screen_and_depth
+#if s_ocean_screen_and_depth
 uniform float ssr_resolution   : hint_range(0.1, 10.0, 0.1)		= 2.0;
 uniform float ssr_max_travel   : hint_range(0.1, 200.0, 0.1) 	= 30.0;
 uniform float ssr_max_diff     : hint_range(0.1, 10.0, 0.1) 	= 4.0;
@@ -58,7 +58,7 @@ uniform float wave_noise_strength = 0.2;
 uniform vec4  border_color : source_color = vec4(vec3(1.0), 0.0);
 uniform float border_scale : hint_range(0.0, 5.0, 0.01) = 1.0;
 
-#ifdef s_ocean_screen_and_depth
+#if s_ocean_screen_and_depth
 uniform float refraction_intensity : hint_range(0.0, 1.0, 0.01) = 0.4;
 
 uniform float max_visible_depth : hint_range(0.0, 100.0, 0.1) = 10.0;
@@ -187,7 +187,7 @@ void vertex() {
 	}
 }
 
-#ifdef s_ocean_screen_and_depth
+#if s_ocean_screen_and_depth
 bool is_within_screen_boundaries(vec2 position) {
 	return position.x > 0.0 && position.x < 1.0 && position.y > 0.0 && position.y < 1.0;
 }
@@ -250,7 +250,7 @@ vec2 get_refracted_uv(vec2 raw_screen_uv, float screen_depth_raw, vec3 view, vec
 #endif
 
 void fragment() {
-#ifdef s_ocean_screen_and_depth
+#if s_ocean_screen_and_depth
 	float screen_depth_raw = texture(DEPTH_TEXTURE, SCREEN_UV).x;
 	vec2 refraction_uv = refraction_intensity > 0.0 ? get_refracted_uv(SCREEN_UV, screen_depth_raw, VIEW, NORMAL, PROJECTION_MATRIX, INV_PROJECTION_MATRIX) : SCREEN_UV;
 
@@ -287,7 +287,7 @@ void fragment() {
 	vec4 final_color				= mix(vec4(water_color, 1.0), border_color, 1.0 - min(water_depth/border_scale, 1.0));
 
 	ALBEDO = final_color.rgb;
-#ifndef s_ocean_screen_and_depth // Force basic transparency without refraction when screen can't be read.
+#if !s_ocean_screen_and_depth // Force basic transparency without refraction when screen can't be read.
 	ALPHA = transparency;
 #endif
 	ALPHA *= final_color.a;

@@ -3,6 +3,8 @@ render_mode cull_back, diffuse_burley, specular_schlick_ggx;
 
 #include "cells.gdshaderinc"
 
+global uniform float setting_island_water_level_at;
+
 uniform float cell_border_scale : hint_range(0.0, 5.0, 0.1) = 1.0f; // Size of the border of each cell
 uniform vec3 above_water_color : source_color = vec3(0.75);
 uniform vec3 below_water_color : source_color = vec3(0.0);
@@ -19,10 +21,12 @@ void fragment() {
 
 	// Compute anti-aliased world-space grid lines using screen-space derivatives!
 	vec2 grid = abs(fract(uv_data.xy - 0.5) - 0.5) / fwidth(uv_data.xy) / cell_border_scale;
-
 	float lines = clamp(1.0 - min(grid.x, grid.y), 0.0, 1.0);
 
-    ALBEDO = step(0.0, vert.y) * above_water_color + (1.0 - step(0.0, vert.y)) * below_water_color;
+	// Is the line boundary above water o at water level?
+	bool cell_above_water = texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy), 0).r > setting_island_water_level_at;
+
+    ALBEDO = cell_above_water ? above_water_color : below_water_color;
 	ALPHA = lines;
 }
 

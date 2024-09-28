@@ -15,7 +15,7 @@ signal built(size: Vector2)
 			if node != null:
 				node.queue_free()
 
-var material: ShaderMaterial         = preload("res://ocean/water/material.tres")
+var material: ShaderMaterial = preload("res://ocean/water/material.tres")
 
 
 func _ready() -> void:
@@ -44,7 +44,7 @@ func build(size: Vector2):
 	pmesh.subdivide_width = pmesh.subdivide_depth
 	material.shader.code = Settings.as_defines() + material.shader.code
 	pmesh.material = material
-	SLog.sd("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells")
+	SLog.sd("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells.\n" + Settings.as_defines())
 	
 	# oceanMeshNode.owner = self # For debugging (remove to avoid serializing and preloading the mesh!)
 	

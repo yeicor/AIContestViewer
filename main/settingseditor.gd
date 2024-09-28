@@ -29,13 +29,14 @@ func _run() -> void:
 			TYPE_STRING:
 				shader_type = null  # Strings not allowed in shaders...
 			_:
-				print("[ERROR] Unsupported setting type mapping to shader: ", setting_info.type)
+				SLog.sd("[ERROR] Unsupported setting type mapping to shader: " + str(setting_info.type))
 				shader_type = null
 		if shader_type != null:
+			SLog.sd("- Saving " + setting_name_safe)
 			cfg.set_value("shader_globals", setting_name_safe, {
 				"type": shader_type,
 				"value": Settings._s_val(setting_name)
 			})
 	
 	assert(cfg.save("res://project.godot") == OK)
-	print("[settings-editor] Modified project.godot to include the latest shader_globals, you should reload the project now")
+	SLog.sd("[settings-editor] Modified project.godot to include the latest shader_globals, you should reload the project now")

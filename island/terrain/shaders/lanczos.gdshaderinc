@@ -22,17 +22,17 @@ vec3 lanczos(sampler2D sampler, vec2 coord, int r) {
     coord      += -0.5 / res;
     vec2 ccoord = floor(coord * res) / res;
 
-    vec3  total  = vec3(0);    
+    vec3  total  = vec3(0);
     for (int x = -r; x <= r; x++) {
         for (int y = -r; y <= r; y++) {
             vec2  offs = vec2(float(x), float(y));
-            
+
             vec2  sco  = (offs / res) + ccoord;
             vec2  d    = clamp((sco - coord) * res, vec2(float(-r)), vec2(float(r)));
             vec3  val  = texelFetchClamp(sampler, ivec2(sco * res), 0, size).rgb;
-            
+
             float weight = _lanczos_weight_v2(d, float(r));
-            
+
             total     += val * weight;
         }
     }

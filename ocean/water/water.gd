@@ -42,11 +42,7 @@ func build(size: Vector2):
 	pmesh.size = size * extra
 	pmesh.subdivide_depth = int(sqrt(Settings.ocean_vertex_count()))
 	pmesh.subdivide_width = pmesh.subdivide_depth
-	if Settings.ocean_screen_and_depth():
-		Log.d("Enabling screen and depth textures for ocean!")
-		var mat := material.duplicate()
-		mat.shader.code = material.shader.code.replace("//#define depth_and_screen", "#define depth_and_screen")
-		#print(mat.shader.code)
+	material.shader.code = Settings.as_defines() + material.shader.code
 	pmesh.material = material
 	Log.d("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells")
 	

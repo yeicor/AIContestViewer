@@ -3,12 +3,10 @@ shader_type spatial;
 // Originally based on (marcelb, MIT License):
 // https://godotshaders.com/shader/transparent-water-shader-supporting-ssr/
 
-//#define depth_and_screen
-
 #define PI 3.14159265359
 #define PI_2 6.28318530718
 
-#ifdef depth_and_screen
+#ifdef s_ocean_screen_and_depth
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_nearest;
 uniform sampler2D DEPTH_TEXTURE : hint_depth_texture, filter_nearest;
 #endif
@@ -24,7 +22,7 @@ uniform float surface_texture_roughness : hint_range(0.0, 1.0, 0.01) = 0.6;
 uniform float surface_texture_scale : hint_range(0.001, 2.0, 0.001) = 0.1;
 uniform float surface_texture_time_scale : hint_range(0.001, 2.0, 0.001) = 0.06;
 
-#ifdef depth_and_screen
+#ifdef s_ocean_screen_and_depth
 uniform float ssr_resolution   : hint_range(0.1, 10.0, 0.1)		= 2.0;
 uniform float ssr_max_travel   : hint_range(0.1, 200.0, 0.1) 	= 30.0;
 uniform float ssr_max_diff     : hint_range(0.1, 10.0, 0.1) 	= 4.0;
@@ -42,6 +40,7 @@ uniform float wave_water_level_step_effect = 0.3;
 
 uniform float wave_step_height = 2.0;
 uniform float wave_fade_size_multiplier = 2.0;
+uniform float wave_fade_dist_cells = 5.0;
 const vec4 wave_dir_amp_period[4] = {
     vec4(1.0, 0.05, 0.2, 1.0),
     vec4(1.0, -0.2, 0.25, 2.0),
@@ -52,12 +51,12 @@ uniform float wave_uv_scale = 30.0;
 uniform float wave_time_scale = 1.0;
 uniform float wave_normal_flatness : hint_range(0.1, 100.0, 0.1) = 30.0;
 uniform sampler2D wave_noise;
-uniform float wave_noise_strength = 0.1;
+uniform float wave_noise_strength = 0.3;
 
 uniform vec3  border_color : source_color = vec3(1.0);
 uniform float border_scale : hint_range(0.0, 5.0, 0.01) = 2.0;
 
-#ifdef depth_and_screen
+#ifdef s_ocean_screen_and_depth
 uniform float refraction_intensity : hint_range(0.0, 1.0, 0.01) = 0.4;
 
 uniform float max_visible_depth : hint_range(0.0, 100.0, 0.1) = 10.0;
@@ -120,11 +119,12 @@ void vertex() {
 		// - Multiply by the distance to land for cooler waves "far" away that don't mess with the scene
 		vec2 terrain_uv = terrain_uv(VERTEX.xz);
 		vec2 terrain_uv_clamp = clamp(terrain_uv, vec2(0.0), vec2(1.0));
+		// TODO: land_dist_smooth directly from heightmap to avoid water under ground!
 		float land_dist_smooth = -min(0.0, lanczos(setting_island_water_level_distance, terrain_uv, 5).r - setting_island_water_level_at);
 		float num_steps_away_from_land = (land_dist_smooth + setting_island_water_level_step / 2.0) / setting_island_water_level_step;
 		float wave_height_mult = num_steps_away_from_land * wave_water_level_step_effect;
 		// - Also fade out when going out of reach
-        vec2 wave_fade_factor_v = abs(terrain_uv - terrain_uv_clamp);
+        vec2 wave_fade_factor_v = abs(terrain_uv - terrain_uv_clamp) / wave_fade_dist_cells;
 		float wave_fade_factor = max(wave_fade_factor_v.x, wave_fade_factor_v.y) * setting_terrain_cell_side;
 		wave_fade_factor = clamp(wave_fade_factor, 0.0, 1.0);
         wave_height_mult = mix(wave_height_mult, 0.0, wave_fade_factor);
@@ -143,7 +143,7 @@ void vertex() {
 	}
 }
 
-#ifdef depth_and_screen
+#ifdef s_ocean_screen_and_depth
 bool is_within_screen_boundaries(vec2 position) {
 	return position.x > 0.0 && position.x < 1.0 && position.y > 0.0 && position.y < 1.0;
 }
@@ -206,7 +206,7 @@ vec2 get_refracted_uv(vec2 raw_screen_uv, float screen_depth_raw, vec3 view, vec
 #endif
 
 void fragment() {
-#ifdef depth_and_screen
+#ifdef s_ocean_screen_and_depth
 	float screen_depth_raw = texture(DEPTH_TEXTURE, SCREEN_UV).x;
 	vec2 refraction_uv = refraction_intensity > 0.0 ? get_refracted_uv(SCREEN_UV, screen_depth_raw, VIEW, NORMAL, PROJECTION_MATRIX, INV_PROJECTION_MATRIX) : SCREEN_UV;
 
@@ -233,7 +233,7 @@ void fragment() {
 	vec2 time_vector = (TIME * surface_normals_move_direction_a) * surface_texture_time_scale;
 	vec2 time_vector2 = (TIME * surface_normals_move_direction_b) * surface_texture_time_scale;
 
-	vec3 normal_texture_blend 	= mix(textureStochastic(surface_normals_a, vertex_uv * surface_texture_scale + time_vector).xyz, textureStochastic(surface_normals_b, vertex_uv * surface_texture_scale + time_vector2).xyz, 0.5);
+	vec3 normal_texture_blend 	= mix(texture(surface_normals_a, vertex_uv * surface_texture_scale + time_vector).xyz, texture(surface_normals_b, vertex_uv * surface_texture_scale + time_vector2).xyz, 0.5);
 	vec3 normal_blend 			= mix(NORMAL, normal_texture_blend, surface_texture_roughness);
 
 	vec3 surface_color 				= albedo;
@@ -243,7 +243,7 @@ void fragment() {
 	vec3 final_color				= mix(water_color, border_color, 1.0 - min(water_depth/border_scale, 1.0));
 
 	ALBEDO.rgb = final_color;
-#ifndef depth_and_screen // Force basic transparency without refraction when screen can't be read.
+#ifndef s_ocean_screen_and_depth // Force basic transparency without refraction when screen can't be read.
 	ALPHA = transparency;
 #endif
 	METALLIC = metallic;

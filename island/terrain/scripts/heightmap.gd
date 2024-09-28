@@ -136,12 +136,14 @@ func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float
 	Settings.island_water_level_distance_set(height_bounds_tex)
 	Settings.island_water_level_set(water_level_at)
 	Settings.island_water_level_step_set(y_level_step)
-	if not Engine.is_editor_hint():
-		SignalBus.island_global_shader_parameters_ready.emit()
 	
 	self.set_update_mode(SubViewport.UPDATE_ONCE) # Render once!
 	await RenderingServer.frame_post_draw
-	var img: Image = get_texture().get_image()
+	var img_tex := get_texture()
+	Settings.island_heightmap_set(img_tex)
+	if not Engine.is_editor_hint():
+		SignalBus.island_global_shader_parameters_ready.emit()
+	var img: Image = img_tex.get_image()
 	#img.save_png("res://island/terrain/scripts/heightmap.png")
 	self.set_update_mode(SubViewport.UPDATE_DISABLED)
 	SLog.sd("[timing] HeightMap: GPU-generated " + str(size) + " heightmap in " + str(Time.get_ticks_msec() - start_time) + "ms. Format: " + str(img.get_format()))

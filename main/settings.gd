@@ -197,8 +197,8 @@ static func _apply_presets(path: String) -> Variant:
 			return null
 
 
-static func setting_global_shader_name(setting_name: String) -> String:
-	return "setting_" + _invalid_env_regex.sub(setting_name, "_")
+static func setting_global_shader_name(setting_name: String, prefix: String = "setting_") -> String:
+	return prefix + _invalid_env_regex.sub(setting_name, "_")
 
 
 static var _project_godot: ConfigFile
@@ -216,6 +216,33 @@ func setting_global_shader_set(setting_name: String):
 	var safe_name := setting_global_shader_name(setting_name)
 	if project_godot().has_section_key("shader_globals", safe_name):
 		RenderingServer.global_shader_parameter_set(safe_name, Settings._s_val(setting_name))
+
+
+## Returns a string that can be used with a c-like preprocessor to define all current settings. Useful for shaders!
+static func as_defines() -> String:
+	var all_keys = _all_settings_info.keys()
+	all_keys.sort()
+	var defines: String = ""
+	for setting_name: String in all_keys:
+		var safe_name := setting_global_shader_name(setting_name, "s_")
+		match _all_settings_info[setting_name]["type"]:
+			TYPE_BOOL:
+				defines += "#define " + safe_name + " " + str(_s_val(setting_name)).to_lower() + "\n"
+			TYPE_INT:
+				defines += "#define " + safe_name + " " + str(_s_val(setting_name)) + "\n"
+			TYPE_FLOAT:
+				defines += "#define " + safe_name + " " + str(_s_val(setting_name)) + "\n"
+			TYPE_STRING:
+				defines += "#define " + safe_name + " \"" + str(_s_val(setting_name)).replace("\"", "\\\"") + "\"\n"
+			TYPE_VECTOR2:
+				defines += "#define " + safe_name + " vec2(" + str(_s_val(setting_name).x) + ", " + str(_s_val(setting_name).y) + ")\n"
+			TYPE_VECTOR3:
+				defines += "#define " + safe_name + " vec3(" + str(_s_val(setting_name).x) + ", " + str(_s_val(setting_name).y) + ", " + str(_s_val(setting_name).z) + ")\n"
+			TYPE_COLOR:
+				defines += "#define " + safe_name + " vec4(" + str(_s_val(setting_name).r) + ", " + str(_s_val(setting_name).g) + ", " + str(_s_val(setting_name).b) + ", " + str(_s_val(setting_name).a) + ")\n"
+			_:
+				print("[before-logging?] (SettingsAutoloaded) Unsupported type for setting " + setting_name + ": " + str(_all_settings_info[setting_name]["type"]))
+	return defines
 
 # ========== ALL SETTINGS ==========
 
@@ -291,6 +318,11 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_FLOAT,
 			"info": "Internal value representing the step between water levels for the shaders (see island/water_level_distance).",
 		},
+		"island/heightmap": {
+			"default": "",
+			"type": -RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D,
+			"info": "Internal texture representing heightmap of the generated terrain for the shaders.",
+		},
 		"ocean/vertex_count": {
 			"default": null, # A quality preset will always override this
 			"type": TYPE_INT,
@@ -341,13 +373,13 @@ static func terrain_max_steepness() -> float: return _s_val("terrain/max_steepne
 static func terrain_vertex_count() -> int: return _s_val("terrain/vertex_count")
 
 
-static func island_water_level_distance_set(texture: ImageTexture) -> void:
+static func island_water_level_distance_set(texture: Texture2D) -> void:
 	assert(_instance != null)
 	_instance._all_settings["island/water_level_distance"] = texture
 	RenderingServer.global_shader_parameter_set("setting_island_water_level_distance", texture)
 
 
-static  func island_water_level_distance() -> ImageTexture: return _s_val("island/water_level_distance")
+static  func island_water_level_distance() -> Texture2D: return _s_val("island/water_level_distance")
 
 
 static func island_water_level_set(value: float) -> void:
@@ -366,6 +398,15 @@ static func island_water_level_step_set(value: float) -> void:
 
 
 static func island_water_level_step() -> float: return _s_val("island/water_level_step")
+
+
+static func island_heightmap_set(value: Texture2D) -> void:
+	assert(_instance != null)
+	_instance._all_settings["island/heightmap"] = value
+	RenderingServer.global_shader_parameter_set("setting_island_heightmap", value)
+
+
+static func island_heightmap() -> Texture2D: return _s_val("island/heightmap")
 
 
 static func ocean_vertex_count() -> int: return _s_val("ocean/vertex_count")

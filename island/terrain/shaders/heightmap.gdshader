@@ -10,7 +10,7 @@ uniform int my_seed = 42;
 global uniform sampler2D setting_island_water_level_distance : hint_roughness_gray;
 global uniform float setting_island_water_level_at: hint_range(0.0, 1.0);
 global uniform float setting_island_water_level_step: hint_range(0.0, 1.0);
-uniform vec2 min_precipice_range = vec2(0.01, 0.2);
+uniform vec2 min_precipice_range = vec2(1e-3, 0.2);
 
 #include "FastNoiseLite.gdshaderinc"
 
@@ -57,7 +57,7 @@ highp float max_height_ramp(highp vec2 uv, highp sampler2D setting_island_water_
 	highp float mh_block_bc = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(0, 1), 0, setting_island_water_level_distance_size).r;
 	highp float mh_block_br = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(1, 1), 0, setting_island_water_level_distance_size).r;
 	// Gather the shared 2x2 heights with neighboring cells, forcing water_level!
-	highp float min_precipice = setting_island_water_level_step / 25.0; // To clearly differenciate above and below water, at the cost of "realism"
+	highp float min_precipice = min_precipice_range.x; // To clearly differenciate above and below water, at the cost of "realism"
 	highp float mh_ramp_tl = (mh_block_tl + mh_block_tc + mh_block_cl + mh_block_cc) / 4.0;
 	if (sign(mh_block_tl - setting_island_water_level_at) != sign(mh_block_tc - setting_island_water_level_at) ||
 		sign(mh_block_tl - setting_island_water_level_at) != sign(mh_block_cl - setting_island_water_level_at) ||
@@ -104,22 +104,24 @@ highp float max_height_ramp(highp vec2 uv, highp sampler2D setting_island_water_
 // Takes the noisy heightmap and makes sure it matches the input distance to surface constraints
 highp float heightmap_island(highp vec2 uv) {
 	// Basics about the island
-    highp ivec2 setting_island_water_level_distance_size = textureSize(setting_island_water_level_distance, 0);
 	highp vec2 floating_sample;
 	highp ivec2 block_sample;
 	highp vec4 block_sample_val;
 
+	// Mapping uv to cell corners
+    highp ivec2 num_cell_corners = textureSize(setting_island_water_level_distance, 0);
+
 	int restart = 0; // GLSL does not allow recursion, so it's hacking time!
 	while (restart < 2) {
-		floating_sample = uv * vec2(setting_island_water_level_distance_size);
+		floating_sample = uv * vec2(num_cell_corners);
 		block_sample = ivec2(floating_sample);
 
 		// Generate flat terrain for lighthouses by sampling nearby values instead
-		block_sample_val = texelFetchClamp(setting_island_water_level_distance, block_sample, 0, setting_island_water_level_distance_size);
+		block_sample_val = texelFetchClamp(setting_island_water_level_distance, block_sample, 0, num_cell_corners);
 		if (block_sample_val.g > 0.5) { // Has a lighthouse
-			highp vec2 target = (vec2(block_sample) + 0.5) / vec2(setting_island_water_level_distance_size);
+			highp vec2 target = (vec2(block_sample) + 0.5) / vec2(num_cell_corners);
 			// It's coordinate distortion time!
-			highp float displacement_inside_cell = length(abs(target - uv) * vec2(setting_island_water_level_distance_size));
+			highp float displacement_inside_cell = length(abs(target - uv) * vec2(num_cell_corners));
 			highp float flattening_force = clamp(1.0 - displacement_inside_cell * 2.0, 0.0, 0.75); // More than this goes crazy
 			uv = mix(uv, target, flattening_force);
 			restart++;
@@ -131,7 +133,7 @@ highp float heightmap_island(highp vec2 uv) {
 	// Retrieve height levels (blocky and smooth versions, to ensure cells are respected
 	highp float mh = lanczos(setting_island_water_level_distance, uv, LANCZOS_SIZE).r;
 	mh = min(mh, 1.0); // Lanczos can exagerate peaks while smoothing...
-	highp float mh_ramp = max_height_ramp(uv, setting_island_water_level_distance, setting_island_water_level_distance_size, block_sample, floating_sample, block_sample_val.r);
+	highp float mh_ramp = max_height_ramp(uv, setting_island_water_level_distance, num_cell_corners, block_sample, floating_sample, block_sample_val.r);
 
 	// Perfectly square cells along the coast thanks to mh_ramp!
 	highp float smooth_y_level = setting_island_water_level_step / 2.0;
@@ -150,14 +152,14 @@ highp float heightmap_island(highp vec2 uv) {
 	// This smooth noise will define the shape of the terrain (constrained to minh and mh)
     highp float terrain_noise = noise01(uv);
     highp float height = mix(minh, mh, terrain_noise); // Note: "flips" noise for below_water
-	//height = mh_ramp;
+	height = block_sample_val.r;
 
 	return height;
 }
 
 // Generates the output texture, that defines the heightmap for the terrain
 void fragment() {
-	highp vec2 uv = UV; // - SCREEN_PIXEL_SIZE / 2.0; // Offset for more centered cells?
+	highp vec2 uv = UV;
 
 	//highp float height = noise01(uv);
 	//float height = warped_noise01(uv);

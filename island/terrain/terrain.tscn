@@ -6,9 +6,9 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8usiv"]
 shader = ExtResource("3_hlvgl")
-shader_parameter/debug_height = false
+shader_parameter/debug_height = true
 shader_parameter/my_seed = 42
-shader_parameter/min_precipice_range = Vector2(0.001, 0.2)
+shader_parameter/min_precipice_range = Vector2(0.03, 0.2)
 
 [node name="Terrain" type="Node3D"]
 script = ExtResource("1_blkia")
@@ -19,7 +19,7 @@ disable_3d = true
 handle_input_locally = false
 use_hdr_2d = true
 canvas_item_default_texture_repeat = 2
-size = Vector2i(368, 271)
+size = Vector2i(337, 289)
 render_target_clear_mode = 1
 render_target_update_mode = 0
 script = ExtResource("3_lm46a")

@@ -29,50 +29,65 @@ func size() -> Vector2i:
 func energy_at(x: int, z: int) -> int:
 	return self._grid[self.height() - 1 - z][x] # Flip z axis
 
-
 func is_walkable(x: int, z: int) -> bool:
 	return self.energy_at(x, z) != -1
 
 
-## Returns the same cells of the island, but now as a distance to the closest water-level cell (negative for water).
-func distance_to_water_level() -> Array:
+## Returns an array of size 2 * cell_counts + 1, but each value of the array is the distance
+## to the closest water-level point, in cells (negative for water).
+func distance_cell_corners_to_water_level() -> Array:
 	var init_time: int = Time.get_ticks_msec()
 	var start_time: int = init_time
-	var dist: Array     = _grid.map(func(row: Array): return row.map(func(_x: int): return INF))
+	var array_size := 2 * size() + Vector2i(1, 1)  # One value for each corner and each midpoint!
+	var map_array_to_cell = func(a: Vector2i):
+		return a / Vector2i(2, 2) # Last column/row cells have an out-of-bounds point...
+	var is_corner_or_edge = func(a: Vector2i):
+		return a.x % 2 == 0 or a.y % 2 == 0
+
+	# Create the solution array as INF, of size (width + 1) x (height + 1) to include the corners
+	var dist := []
+	for z in range(array_size.y):
+		var xs := []
+		for x in range(array_size.x):
+			xs.push_back(INF)
+		dist.push_back(xs)
+
 	# Compute the distance for all cells using dynamic programming
-	# Initialize the distance to +-0.5 for boundary cells (considering outside as water)
-	for z in range(self.height()):
-		for x in range(self.width()):
-			if dist[z][x] == INF: # Previously unvisited
-				var walkable: bool       = self.is_walkable(x, z)
-				var handle_dir: Callable = func(dx: int, dz: int) -> void:
-					if x + dx >= 0 and x + dx < self.width() and z + dz >= 0 and z + dz < self.height():
-						var dir_walkable: bool = self.is_walkable(x + dx, z + dz)
-						if dir_walkable != walkable:
-							dist[z][x] = 0.5 if walkable else -0.5
-							if dist[z + dz][x + dx] == INF:
-								dist[z + dz][x + dx] = -0.5 if walkable else 0.5
-					elif walkable: # Assume edge is water
-						dist[z][x] = 0.5
-				handle_dir.call(-1, 0)
-				handle_dir.call(1, 0)
-				handle_dir.call(0, -1)
-				handle_dir.call(0, 1)
+	# Step 1: Find edges of the island and set their distance to 0
+	for ay in range(array_size.y):
+		for ax in range(array_size.x):
+			var axy := Vector2i(ax, ay)
+			var xy: Vector2i = map_array_to_cell.call(axy)
+			if (xy.x == 0 and xy.y < self.height() or xy.y == 0 and xy.x < self.height()) and self.is_walkable(xy.x, xy.y):
+				assert(false, "Unconsidered case of land on edges of map... (please add water row or column)")
+			if (xy.x == self.width() and xy.y > 0 or xy.y == self.height() and xy.x > 0) and self.is_walkable(xy.x - 1, xy.y - 1):
+				assert(false, "Unconsidered case of land on edges of map... (please add water row or column)")
+			var x1y1 = map_array_to_cell.call(axy - Vector2i(1, 1))
+			if xy.x > 0 and xy.y > 0 and xy.x < self.width() and xy.y < self.height() and \
+				is_corner_or_edge.call(axy) and (
+				self.is_walkable(x1y1.x, x1y1.y) != self.is_walkable(xy.x, x1y1.y) or
+				self.is_walkable(x1y1.x, x1y1.y) != self.is_walkable(x1y1.x, xy.y) or
+				self.is_walkable(xy.x, x1y1.y) != self.is_walkable(xy.x, xy.y) or
+				self.is_walkable(x1y1.x, xy.y) != self.is_walkable(xy.x, xy.y)):
+				dist[ay][ax] = 0.0
 
 	SLog.sd("[timing] Distance to water level (first pass) computed in " + str(Time.get_ticks_msec() - start_time) + "ms")
 	start_time = Time.get_ticks_msec()
 
 	# Now propagate the distance to all cells
-	for attempt in range(max(self.width(), self.height())):
+	for attempt in range(max(array_size.x, array_size.y)):
 		var changed: int = 0  # Stop attempts early when no more changes are detected
-		for z in range(self.height()):
-			for x in range(self.width()):
-				var handle_dir: Callable = func(dx: int, dz: int) -> bool:
-					if dist[z][x] != INF:
-						if x + dx >= 0 and x + dx < self.width() and z + dz >= 0 and z + dz < self.height():
-							var new_dist: float = dist[z][x] + 1.0 * sign(dist[z][x])
-							if abs(new_dist) < abs(dist[z + dz][x + dx]):
-								dist[z + dz][x + dx] = new_dist
+		for ay in range(array_size.y):
+			for ax in range(array_size.x):
+				var axy := Vector2i(ax, ay)
+				var handle_dir: Callable = func(dx: int, dy: int) -> bool:
+					if dist[ay][ax] != INF:
+						if ax + dx >= 0 and ax + dx < array_size.x and ay + dy >= 0 and ay + dy < array_size.y:
+							var xy_other = map_array_to_cell.call(Vector2i(ax + dx, ay + dy))
+							var is_above = xy_other.x < self.width() and xy_other.y < self.height() and self.is_walkable(xy_other.x, xy_other.y)
+							var new_dist: float = dist[ay][ax] + (0.5 if is_above else -0.5) # Higher LOD: half cell steps!
+							if abs(new_dist) < abs(dist[ay + dy][ax + dx]):
+								dist[ay + dy][ax + dx] = new_dist
 								return true
 					return false
 				if handle_dir.call(-1, 0):
@@ -83,7 +98,7 @@ func distance_to_water_level() -> Array:
 					changed += 1
 				if handle_dir.call(0, 1):
 					changed += 1
-		#
+		
 		SLog.sd("[timing] Distance to water level (pass " + str(attempt + 2) + ") computed in " + str(Time.get_ticks_msec() - start_time) + "ms (" + str(changed) + " changes)")
 		start_time = Time.get_ticks_msec()
 		if changed == 0:

@@ -7,7 +7,7 @@ global uniform float setting_island_water_level_at;
 
 uniform float cell_border_scale : hint_range(0.0, 5.0, 0.1) = 1.0f; // Size of the border of each cell
 uniform vec3 above_water_color : source_color = vec3(0.75);
-uniform vec3 below_water_color : source_color = vec3(0.0);
+uniform vec3 below_water_color : source_color = vec3(0.5, 0.0, 0.0);
 
 varying vec3 vert;
 void vertex() {
@@ -24,10 +24,17 @@ void fragment() {
 	float lines = clamp(1.0 - min(grid.x, grid.y), 0.0, 1.0);
 
 	// Is the line boundary above water o at water level?
-	bool cell_above_water = texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy), 0).r > setting_island_water_level_at;
+	bool cell_above_water =
+	texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy) + ivec2(0, 0), 0).r + 1e-3 > setting_island_water_level_at ||
+	texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy) + ivec2(1, 0), 0).r + 1e-3 > setting_island_water_level_at ||
+	texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy) + ivec2(0, 1), 0).r + 1e-3 > setting_island_water_level_at ||
+	texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy) + ivec2(1, 1), 0).r + 1e-3 > setting_island_water_level_at;
+	bool oob = uv_data.x < 0.0 || uv_data.x > uv_data.z || uv_data.y < 0.0 || uv_data.y > uv_data.w;
 
-    ALBEDO = cell_above_water ? above_water_color : below_water_color;
-	ALPHA = lines;
+	if (!oob) {
+	    ALBEDO = cell_above_water ? above_water_color : below_water_color;
+		ALPHA = lines;
+	}
 }
 
 //void light() {

@@ -78,8 +78,9 @@ func generate(game: GameState):
 		return
 	if _generate_thread == null:
 		_generate_thread = Thread.new()
-	if _generate_thread.is_alive():
-		SLog.sw("Note: another generate() is running in a separate thread, waiting for it to finish and regenerating!")
+	elif _generate_thread.is_started():
+		if _generate_thread.is_alive():
+			SLog.sw("Note: waiting for previous terrain generation to complete before starting another one...")
 		_generate_thread.wait_to_finish()
 	var start_time: float = Time.get_ticks_msec()
 	var heightmap := $HeightMap

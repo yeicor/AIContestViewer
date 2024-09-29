@@ -51,17 +51,17 @@ const vec4 wave_dir_amp_period[4] = {
 };
 uniform float wave_uv_scale = 30.0;
 uniform float wave_time_scale = 1.0;
-uniform float wave_normal_flatness : hint_range(0.1, 100.0, 0.1) = 15.0;
+uniform float wave_normal_flatness : hint_range(0.1, 100.0, 0.1) = 30.0;
 uniform sampler2D wave_noise;
 uniform float wave_noise_strength = 0.2;
 
-uniform vec4  border_color : source_color = vec4(vec3(1.0), 0.0);
+uniform vec3  border_color : source_color = vec3(1.0);
 uniform float border_scale : hint_range(0.0, 5.0, 0.01) = 1.0;
 
 #if s_ocean_screen_and_depth
 uniform float refraction_intensity : hint_range(0.0, 1.0, 0.01) = 0.4;
 
-uniform float max_visible_depth : hint_range(0.0, 100.0, 0.1) = 10.0;
+uniform float max_visible_depth : hint_range(0.0, 100.0, 0.1) = 1.0;
 #endif
 uniform vec3 color_deep : source_color = vec3(0.0, 0.1, 0.4);
 
@@ -140,7 +140,7 @@ void vertex() {
 	vertex_uv = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
 	ivec2 terrain_cell_count = textureSize(setting_island_water_level_distance, 0);
 	vec2 terrain_half_size = vec2(terrain_cell_count) * setting_terrain_cell_side / 2.0;
-	if (abs(VERTEX.x) + 0.001 >= terrain_half_size.x * wave_fade_size_multiplier || abs(VERTEX.z) + 0.001 > terrain_half_size.y * wave_fade_size_multiplier) {
+	if (abs(VERTEX.x) + 1e-2 >= terrain_half_size.x * wave_fade_size_multiplier || abs(VERTEX.z) + 1e-2 > terrain_half_size.y * wave_fade_size_multiplier) {
 		VERTEX.xz *= 100.0;
 		vertex_uv *= 100.0;
 		NORMAL = vec3(0.0, 1.0, 0.0);
@@ -284,13 +284,12 @@ void fragment() {
 	vec3 color_with_transparency 	= mix(surface_color, screen_color, transparency);
 	vec3 depth_color 				= mix(color_deep.rgb, color_with_transparency, depth_opacity);
 	vec3 water_color 				= (ssr_color.x >= 0.0) ? mix(depth_color, ssr_color, ssr_mix_strength) : depth_color;
-	vec4 final_color				= mix(vec4(water_color, 1.0), border_color, 1.0 - min(water_depth/border_scale, 1.0));
+	vec3 final_color				= mix(water_color, border_color, 1.0 - min(water_depth/border_scale, 1.0));
 
 	ALBEDO = final_color.rgb;
 #if !s_ocean_screen_and_depth // Force basic transparency without refraction when screen can't be read.
 	ALPHA = transparency;
 #endif
-	ALPHA *= final_color.a;
 	METALLIC = metallic;
 	ROUGHNESS = roughness;
 	NORMAL_MAP = normal_blend;

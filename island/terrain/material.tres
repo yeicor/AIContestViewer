@@ -6,9 +6,9 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xoty1"]
 render_priority = 0
 shader = ExtResource("1_hut0j")
-shader_parameter/cell_border_scale = 0.7
-shader_parameter/above_water_color = Color(0.75, 0.75, 0.75, 1)
-shader_parameter/below_water_color = Color(0, 0, 0, 1)
+shader_parameter/cell_border_scale = 5.0
+shader_parameter/above_water_color = Color(0.44071, 0.887259, 1, 1)
+shader_parameter/below_water_color = Color(0.5, 0, 0, 1)
 
 [resource]
 render_priority = 0

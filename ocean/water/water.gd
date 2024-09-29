@@ -44,7 +44,7 @@ func build(size: Vector2):
 	pmesh.subdivide_width = pmesh.subdivide_depth
 	material.shader.code = Settings.as_defines() + material.shader.code
 	pmesh.material = material
-	SLog.sd("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells.\n" + Settings.as_defines())
+	SLog.sd("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells.")
 	
 	# oceanMeshNode.owner = self # For debugging (remove to avoid serializing and preloading the mesh!)
 	

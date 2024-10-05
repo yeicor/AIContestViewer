@@ -6,6 +6,15 @@ uniform vec3 sand : source_color;
 #include "cells.gdshaderinc"
 global uniform float setting_island_water_level_at;
 
+#include "res://island/terrain/shaders/textureStochasticHelper.gdshaderinc"
+group_uniforms Grass;
+uniform vec2 grass1_scale = vec2(1.0, 1.0);
+textureStochasticDefine(grass1_albedo)
+textureStochasticDefine(grass1_normal)
+textureStochasticDefine(grass1_ao)
+textureStochasticDefine(grass1_roughness)
+//textureStochasticDefine(grass1_displacement) // Not enough vertices for this to be worth it
+
 varying vec3 vert;
 
 void vertex() {
@@ -13,21 +22,8 @@ void vertex() {
 }
 
 void fragment() {
-	ALBEDO = vec3(mod((vert.y) / 40.0, 1.0));
-#ifdef real
-	vec4 uv_data = _terrain_uv_common(vert.xz);
-	float cell_above_water_by = texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy), 0).r - setting_island_water_level_at;
-
-	// Called for every pixel the material is visible on.
-	if (cell_above_water_by >= 0.0) {
-	    ALBEDO = grass;
-	} else {
-		ALBEDO = sand;
-	}
-#endif
+	ALBEDO = texture_grass1_albedo(vert.xz * grass1_scale);
+	NORMAL_MAP = texture_grass1_normal(vert.xz * grass1_scale);
+	AO = texture_grass1_ao(vert.xz * grass1_scale).r;
+	ROUGHNESS = texture_grass1_roughness(vert.xz * grass1_scale).r;
 }
-
-//void light() {
-	// Called for every pixel for every light affecting the material.
-	// Uncomment to replace the default light processing function with this one.
-//}

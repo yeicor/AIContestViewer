@@ -65,46 +65,9 @@ uniform float max_visible_depth : hint_range(0.0, 100.0, 0.1) = 1.0;
 #endif
 uniform vec3 color_deep : source_color = vec3(0.0, 0.1, 0.4);
 
-#ifndef common_stochastic_textures // Editor-only, allow setting all uniforms
-uniform sampler2D surface_normals_a;
-uniform sampler2D surface_normals_b;
-#define common_stochastic_textures true // And default to stochastic
-#endif
-#if common_stochastic_textures // Stochastic enabled
-#define texture_stochastic_enable_df
-#include "res://island/terrain/shaders/textureStochastic.gdshaderinc"
-uniform sampler2D surface_normals_a_t;
-uniform sampler2D surface_normals_a_inv_t;
-uniform vec3 surface_normals_a_color_space_origin;
-uniform vec3 surface_normals_a_color_space_vector1;
-uniform vec3 surface_normals_a_color_space_vector2;
-uniform vec3 surface_normals_a_color_space_vector3;
-vec3 texture_normals_a(vec2 uv) {
-	return textureStochastic(surface_normals_a_t, surface_normals_a_inv_t, uv,
-	surface_normals_a_color_space_origin, surface_normals_a_color_space_vector1,
-	surface_normals_a_color_space_vector2, surface_normals_a_color_space_vector3);
-}
-uniform sampler2D surface_normals_b_t;
-uniform sampler2D surface_normals_b_inv_t;
-uniform vec3 surface_normals_b_color_space_origin;
-uniform vec3 surface_normals_b_color_space_vector1;
-uniform vec3 surface_normals_b_color_space_vector2;
-uniform vec3 surface_normals_b_color_space_vector3;
-vec3 texture_normals_b(vec2 uv) {
-	return textureStochastic(surface_normals_b_t, surface_normals_b_inv_t, uv,
-	surface_normals_b_color_space_origin, surface_normals_b_color_space_vector1,
-	surface_normals_b_color_space_vector2, surface_normals_b_color_space_vector3);
-}
-#else // Stochastic disabled
-uniform sampler2D surface_normals_a;
-uniform sampler2D surface_normals_b;
-vec3 texture_normals_a(vec2 uv) {
-	return texture(surface_normals_a, uv).rgb;
-}
-vec3 texture_normals_b(vec2 uv) {
-	return texture(surface_normals_b, uv).rgb;
-}
-#endif
+#include "res://island/terrain/shaders/textureStochasticHelper.gdshaderinc"
+textureStochasticDefine(surface_normals_a)
+textureStochasticDefine(surface_normals_b)
 
 varying vec2 vertex_uv;
 
@@ -277,7 +240,7 @@ void fragment() {
 	vec2 time_vector = (TIME * surface_normals_move_direction_a) * surface_texture_time_scale;
 	vec2 time_vector2 = (TIME * surface_normals_move_direction_b) * surface_texture_time_scale;
 
-	vec3 normal_texture_blend 	= mix(texture_normals_a(vertex_uv * surface_texture_scale + time_vector), texture_normals_b(vertex_uv * surface_texture_scale + time_vector2), 0.5);
+	vec3 normal_texture_blend 	= mix(texture_surface_normals_a(vertex_uv * surface_texture_scale + time_vector), texture_surface_normals_b(vertex_uv * surface_texture_scale + time_vector2), 0.5);
 	vec3 normal_blend 			= mix(NORMAL, normal_texture_blend, surface_texture_roughness);
 
 	vec3 surface_color 				= albedo;

@@ -48,6 +48,8 @@ highp float heightmap_island(highp vec2 uv_raw, highp vec2 pixel_size) {
 	highp vec2 uv_cell_float = uv_fix * vec2(num_cell_corners);
 	highp ivec2 uv_cell = ivec2(uv_cell_float);
 
+	// TODO: Smoothly flatten the terrain around lighthouses by displacing uv_fix to the center of the cell
+
 	// Get the most extreme heights allowed for this UV (above or below water level)
 	highp float extreme_height_ramp = texture(setting_island_water_level_distance, uv_fix).r;
 	highp float extreme_height_smooth = lanczos(setting_island_water_level_distance, uv_fix, LANCZOS_SIZE).r;

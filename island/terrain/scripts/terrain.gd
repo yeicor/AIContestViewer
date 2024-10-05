@@ -4,6 +4,12 @@ extends Node3D
 
 ## TerrainTool organizes the code to be able to generate islands on demand and even test them in the editor.
 
+func clean():
+	for child in get_children():
+		if child.name.begins_with("_TerrainGen"):
+			child.queue_free()
+	
+
 @warning_ignore("unused_private_class_variable")
 @export var generate_in_editor: bool = false:
 	set(new_val):
@@ -11,20 +17,20 @@ extends Node3D
 		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
 			_regenerate_demo()
 		else:
-			var terrain_node := get_node_or_null("TerrainGen")
-			if terrain_node != null:
-				terrain_node.queue_free()
+			clean()
 
 @export var my_seed: int = 42:
 	set(new_seed):
 		my_seed = new_seed
 		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
+			clean()
 			_regenerate_demo()
 
 @export var vertex_count: float = 100000:
 	set(new_vertex_count):
 		vertex_count = new_vertex_count
 		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
+			clean()
 			_regenerate_demo()
 
 
@@ -32,12 +38,14 @@ extends Node3D
 	set(new_cell_side):
 		cell_side = new_cell_side
 		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
+			clean()
 			_regenerate_demo()
 
 @export var steepness: float = 1: # 1 -> 45º
 	set(new_steepness):
 		steepness = new_steepness
 		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
+			clean()
 			_regenerate_demo()
 
 func _ready():
@@ -89,7 +97,7 @@ func generate(game: GameState):
 		hmesh.surface_set_material(0, material)
 		(func():
 			var meshNode = MeshInstance3D.new()
-			meshNode.name = "TerrainGen"
+			meshNode.name = "_TerrainGen" + str(Time.get_ticks_usec())
 			meshNode.mesh = hmesh
 			add_child(meshNode)
 			SLog.sd("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")

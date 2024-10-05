@@ -4,31 +4,37 @@ extends SubViewport
 
 var _last_heightmap: Image  # Don't call too fast, not properly synchronized
 
+
 func _init():
 	self.set_update_mode(SubViewport.UPDATE_DISABLED)
 
+
 func generate(game: GameState, mseed: int, cell_side: float, steepness: float, target_vertices: int) -> Mesh:
 	# Create the max heights texture for the shader
-	var island               := game.island(false)
-	var height_bounds: Array =  island.distance_cell_corners_to_water_level()
-	var start_time: float     = Time.get_ticks_msec()
-	var min_height: float     = height_bounds.map(func(x): return x.min()).min()
-	var max_height: float     = height_bounds.map(func(x): return x.max()).max()
-	var water_level_at: float = (0.0 - min_height) / (max_height - min_height);
+	var island                := game.island(false)
+	var height_bounds: Array  =  island.distance_cell_corners_to_water_level()
+	var start_time: float     =  Time.get_ticks_msec()
+	var min_height: float     =  height_bounds.map(func(x): return x.min()).min()
+	var max_height: float     =  height_bounds.map(func(x): return x.max()).max()
+	var water_level_at: float =  (0.0 - min_height) / (max_height - min_height);
 	var y_level_step := 1.0 / float(max_height - min_height)
 	#print("MAX HEIGHTS:\n" + GameState.array_2d_to_ascii_string(
 	#height_bounds.map(func(r): return r.map(func(x): return str(x)))))
 	var texture_data: Array = []
-	var lh_positions: Array = game.lighthouses().map(func(lh): return lh.pos())
-	for x in range(height_bounds.size()): # Equal sizes
-		for z in range(height_bounds[x].size()):
+	var lh_positions: Array = game.lighthouses().map(func(lh): 
+		var scaled_pos = lh.pos() * 2 + Vector2i(1, 1)
+		return Vector2i(scaled_pos.x, height_bounds.size() - 1 - scaled_pos.y))
+	for z in range(height_bounds.size()): # Equal sizes
+		for x in range(height_bounds[z].size()):
 			# Red channel: distance to water level
-			texture_data.append((height_bounds[x][z] - min_height) * 255.99999 / (max_height - min_height))
-			# Blue channel: lighthouse presence
-			if Vector2i(x, z) in lh_positions:
-				texture_data.append(255)
-			else:
-				texture_data.append(0)
+			texture_data.append((height_bounds[z][x] - min_height) * 255.99999 / (max_height - min_height))
+			# Blue channel: lighthouse presence (255) or nearby-ness (>0, <255, assuming search range <255)
+			var search_range := 5
+			var lh_closeness := 0.0
+			for lh_pos in lh_positions:
+				var this_lh_closeness = 1.0 - lh_pos.distance_to(Vector2(x, z)) / search_range
+				lh_closeness = max(lh_closeness, this_lh_closeness) # Don't add, as 255 is reserved for presence.
+			texture_data.append(lh_closeness * 255.99999)
 	var height_bounds_img: Image = Image.create_from_data(height_bounds[0].size(), height_bounds.size(), false,
 	Image.FORMAT_RG8, texture_data)
 	#height_bounds_img.save_png("res://island/terrain/scripts/max_heights.png")  # Debug
@@ -36,7 +42,8 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 	SLog.sd("[timing] HeightMap: Created max heights texture in " + str(Time.get_ticks_msec() - start_time) + "ms  (excluding distance to water level)")
 
 	# Figure out the number of pixels to generate based on the target vertices
-	var n = closest_N(island.width(), island.height(), target_vertices)
+	var n              =  closest_N(island.width(), island.height(), target_vertices)
+	if n < 1: n = 1 # At least 1 vertex per cell...
 	var verts_per_side := Vector2(0, 0)
 	verts_per_side.x = n * island.width() + 1
 	verts_per_side.y = n * island.height() + 1
@@ -52,14 +59,14 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 	plane_mesh.subdivide_width = verts_per_side.x - 2 # 0 subdivisions = 2 vertex per sides; and 1 adds 1.
 	plane_mesh.subdivide_depth = verts_per_side.y - 2
 	plane_mesh.size = cell_side * island.size()
-	var st := SurfaceTool.new()
+	var st         := SurfaceTool.new()
 	st.create_from(plane_mesh, 0)
 	var mesh = st.commit()
 	SLog.sd("[timing] Generated plane for heightmap of size " + str(verts_per_side) +
-	" in " + str(Time.get_ticks_msec() - start_time) + "ms")
+	" (n="+str(n)+") in " + str(Time.get_ticks_msec() - start_time) + "ms")
 
 	start_time = Time.get_ticks_msec()
-	var mdt = MeshDataTool.new()
+	var mdt   = MeshDataTool.new()
 	var error = mdt.create_from_surface(mesh, 0)
 	if error != OK:
 		print("Error creating MeshDataTool from plane: " + str(error))
@@ -77,9 +84,9 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 		for x in range(0, verts_per_side.x):
 			var v_id = z_row_base_id + x;
 			var vertex_pos = mdt.get_vertex(v_id);
-			var v_x   =  -vertex_pos.x # SWAP x
-			var v_z   =  -vertex_pos.z # SWAP y
-			var v_y   := _read_height(x, z, min_height, max_height) * y_step
+			var v_x =  -vertex_pos.x # SWAP x
+			var v_z =  -vertex_pos.z # SWAP y
+			var v_y := _read_height(x, z, min_height, max_height) * y_step
 			var vn_off_x: float
 			if x + 1 < verts_per_side.x and x - 1 >= 0:
 				vn_off_x = _read_height(x + 1, z, min_height, max_height) * y_step - _read_height(x - 1, z, min_height, max_height) * y_step
@@ -107,21 +114,21 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 
 func _read_height(x: int, z: int, min_height: float, max_height: float) -> float:
 	var color              := _last_heightmap.get_pixel(x, z)
-	const precision: float =  256.0
+	const precision: float =  255.99999
 	var height: float      =  color.r + color.g / precision
 	return height * (max_height - min_height) + min_height
 
 
 func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float, y_level_step: float, semaphore: Semaphore, xz_counts: Vector2i):
-	var start_time    := Time.get_ticks_msec()
+	var start_time := Time.get_ticks_msec()
 	self.size = xz_counts
-	
-	var mat: Material =  $HeightMap.material
+
+	var mat: Material = $HeightMap.material
 	mat.set_shader_parameter("my_seed", mseed)
 	Settings.island_water_level_distance_set(height_bounds_tex)
 	Settings.island_water_level_set(water_level_at)
 	Settings.island_water_level_step_set(y_level_step)
-	
+
 	self.set_update_mode(SubViewport.UPDATE_ONCE) # Render once!
 	await RenderingServer.frame_post_draw
 	var img_tex := get_texture()
@@ -135,9 +142,9 @@ func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float
 	#start_time = Time.get_ticks_msec()
 	#var data = img.get_data() # FORMAT_RGBH on PC, FORMAT_RGBA8 on Web...
 	#for i in range(data.size() / 2):
-		#var t = data.decode_half(2 * i)
-		#if i < 10:
-			#print(t)
+	#var t = data.decode_half(2 * i)
+	#if i < 10:
+	#print(t)
 	#print("Test time: " + str(Time.get_ticks_msec() - start_time) + "ms.")
 	_last_heightmap = img
 	semaphore.post()

@@ -79,7 +79,6 @@ func distance_cell_corners_to_water_level() -> Array:
 		var changed: int = 0  # Stop attempts early when no more changes are detected
 		for ay in range(array_size.y):
 			for ax in range(array_size.x):
-				var axy := Vector2i(ax, ay)
 				var handle_dir: Callable = func(dx: int, dy: int) -> bool:
 					if dist[ay][ax] != INF:
 						if ax + dx >= 0 and ax + dx < array_size.x and ay + dy >= 0 and ay + dy < array_size.y:

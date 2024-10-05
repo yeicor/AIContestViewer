@@ -35,7 +35,7 @@ func _run() -> void:
 			SLog.sd("- Saving " + setting_name_safe)
 			cfg.set_value("shader_globals", setting_name_safe, {
 				"type": shader_type,
-				"value": Settings._s_val(setting_name)
+				"value": Settings._s_val(setting_name) if shader_type != "sampler2D" else "icon.svg"
 			})
 	
 	assert(cfg.save("res://project.godot") == OK)

@@ -31,7 +31,7 @@ LogDuck="*res://addons/LogDuck/LogDuck.gd"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/LogDuck/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/limbo_console/plugin.cfg", "res://addons/proton_scatter/plugin.cfg", "res://addons/rts_camera_3d/plugin.cfg")
+enabled=PackedStringArray("res://addons/LogDuck/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/limbo_console/plugin.cfg", "res://addons/rts_camera_3d/plugin.cfg")
 
 [filesystem]
 
@@ -110,6 +110,10 @@ setting_common_props_multiplier={
 "type": "float",
 "value": 1.77828
 }
+setting_common_stochastic_textures={
+"type": "bool",
+"value": true
+}
 setting_terrain_cell_side={
 "type": "float",
 "value": 10.0
@@ -120,7 +124,7 @@ setting_terrain_max_steepness={
 }
 setting_terrain_vertex_count={
 "type": "int",
-"value": 100000
+"value": 1000
 }
 setting_terrain_cell_border={
 "type": "float",
@@ -128,7 +132,7 @@ setting_terrain_cell_border={
 }
 setting_island_water_level_distance={
 "type": "sampler2D",
-"value": ""
+"value": "icon.svg"
 }
 setting_island_water_level_at={
 "type": "float",
@@ -140,7 +144,7 @@ setting_island_water_level_step={
 }
 setting_island_heightmap={
 "type": "sampler2D",
-"value": ""
+"value": "icon.svg"
 }
 setting_ocean_vertex_count={
 "type": "int",

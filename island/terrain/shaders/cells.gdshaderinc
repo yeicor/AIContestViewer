@@ -17,3 +17,7 @@ vec2 terrain_uv(vec2 vert_xz) {
 vec2 terrain_cell_uv(vec2 vert_xz) {
 	return fract(_terrain_uv_common(vert_xz).xy);
 }
+
+ivec2 cell_to_corner(ivec2 cell) {
+	return 2 * cell + 1;
+}

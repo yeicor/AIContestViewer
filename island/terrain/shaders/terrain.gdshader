@@ -13,7 +13,7 @@ void vertex() {
 }
 
 void fragment() {
-	ALBEDO = vec3(mod((vert.y) / 25.0 + 1e-3, 1.0));
+	ALBEDO = vec3(mod((vert.y) / 40.0, 1.0));
 #ifdef real
 	vec4 uv_data = _terrain_uv_common(vert.xz);
 	float cell_above_water_by = texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy), 0).r - setting_island_water_level_at;

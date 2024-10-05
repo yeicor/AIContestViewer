@@ -25,10 +25,7 @@ void fragment() {
 
 	// Is the line boundary above water o at water level?
 	bool cell_above_water =
-	texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy) + ivec2(0, 0), 0).r + 1e-3 > setting_island_water_level_at ||
-	texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy) + ivec2(1, 0), 0).r + 1e-3 > setting_island_water_level_at ||
-	texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy) + ivec2(0, 1), 0).r + 1e-3 > setting_island_water_level_at ||
-	texelFetch(setting_island_water_level_distance, ivec2(uv_data.xy) + ivec2(1, 1), 0).r + 1e-3 > setting_island_water_level_at;
+	texelFetch(setting_island_water_level_distance, cell_to_corner(ivec2(uv_data.xy)), 0).r > setting_island_water_level_at;
 	bool oob = uv_data.x < 0.0 || uv_data.x > uv_data.z || uv_data.y < 0.0 || uv_data.y > uv_data.w;
 
 	if (!oob) {

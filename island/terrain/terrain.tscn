@@ -11,6 +11,7 @@ shader_parameter/my_seed = 42
 shader_parameter/min_precipice_range = Vector2(0.03, 0.2)
 
 [node name="Terrain" type="Node3D"]
+transform = Transform3D(1.00043, 0, 0, 0, 1.00043, 0, 0, 0, 1.00043, 0, 0, 0)
 script = ExtResource("1_blkia")
 generate_in_editor = true
 

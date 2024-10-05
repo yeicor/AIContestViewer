@@ -20,7 +20,7 @@ highp float noise01(highp vec2 uv) {
 	fnl_state state = fnlCreateState(my_seed);
 	state.noise_type = FNL_NOISE_OPENSIMPLEX2;
 	highp ivec2 texsize = textureSize(setting_island_water_level_distance, 0);
-	state.frequency = float(texsize.x) * 0.02;
+	state.frequency = float(texsize.x) * 0.01;
 	highp float uv_y_scale = float(texsize.x) / float(texsize.y);
 	state.octaves = 15;
 	state.fractal_type = FNL_FRACTAL_PINGPONG;
@@ -33,94 +33,47 @@ highp float noise01(highp vec2 uv) {
 	return fnlGetNoise2D(state, x, y) * 0.5 + 0.5;
 }
 
-//highp float warped_noise01(highp vec2 p) { // https://iquilezles.org/articles/warp/
-//	highp vec2 q = vec2(noise01(p + vec2(0.0, 0.0)),
-//	noise01(p + vec2(5.2, 1.3)));
-//	highp vec2 r = vec2(noise01(p + 0.25* q + vec2(1.7, 9.2)),
-//	noise01(p + 0.25 * q + vec2(8.3, 2.8)));
-//	return noise01(p + 0.25 * r);
-//}
-
 #include "lanczos.gdshaderinc"
-#define LANCZOS_SIZE 5
-
-// Gets the custom non-smooth ramp-like max height. Useful for a proper blocky coastline!
-highp float max_height_ramp(highp vec2 uv, highp sampler2D setting_island_water_level_distance_, highp ivec2 setting_island_water_level_distance_size, highp ivec2 block_sample, highp vec2 floating_sample, highp float mh_block) {
-	// Use mh_block to create mh_ramp, which help create perfectly square cells along the coast ;)
-	highp float mh_block_tl = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(-1, -1), 0, setting_island_water_level_distance_size).r;
-	highp float mh_block_tc = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(0, -1), 0, setting_island_water_level_distance_size).r;
-	highp float mh_block_tr = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(1, -1), 0, setting_island_water_level_distance_size).r;
-	highp float mh_block_cl = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(-1, 0), 0, setting_island_water_level_distance_size).r;
-	highp float mh_block_cc = mh_block;
-	highp float mh_block_cr = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(1, 0), 0, setting_island_water_level_distance_size).r;
-	highp float mh_block_bl = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(-1, 1), 0, setting_island_water_level_distance_size).r;
-	highp float mh_block_bc = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(0, 1), 0, setting_island_water_level_distance_size).r;
-	highp float mh_block_br = texelFetchClamp(setting_island_water_level_distance_, block_sample + ivec2(1, 1), 0, setting_island_water_level_distance_size).r;
-	// Gather the shared 2x2 heights with neighboring cells, forcing water_level!
-	highp float min_precipice = min_precipice_range.x; // To clearly differenciate above and below water, at the cost of "realism"
-	highp float mh_ramp_tl = (mh_block_tl + mh_block_tc + mh_block_cl + mh_block_cc) / 4.0;
-	if (sign(mh_block_tl - setting_island_water_level_at) != sign(mh_block_tc - setting_island_water_level_at) ||
-		sign(mh_block_tl - setting_island_water_level_at) != sign(mh_block_cl - setting_island_water_level_at) ||
-		sign(mh_block_tl - setting_island_water_level_at) != sign(mh_block_cc - setting_island_water_level_at)) {
-		mh_ramp_tl = setting_island_water_level_at + min_precipice * sign(mh_block_cc - setting_island_water_level_at);
-	}
-	highp float mh_ramp_tr = (mh_block_tr + mh_block_tc + mh_block_cr + mh_block_cc) / 4.0;
-	if (sign(mh_block_tr - setting_island_water_level_at) != sign(mh_block_tc - setting_island_water_level_at) ||
-		sign(mh_block_tr - setting_island_water_level_at) != sign(mh_block_cr - setting_island_water_level_at) ||
-		sign(mh_block_tr - setting_island_water_level_at) != sign(mh_block_cc - setting_island_water_level_at)) {
-		mh_ramp_tr = setting_island_water_level_at + min_precipice * sign(mh_block_cc - setting_island_water_level_at);
-	}
-	highp float mh_ramp_bl = (mh_block_bl + mh_block_bc + mh_block_cl + mh_block_cc) / 4.0;
-	if (sign(mh_block_bl - setting_island_water_level_at) != sign(mh_block_bc - setting_island_water_level_at) ||
-		sign(mh_block_bl - setting_island_water_level_at) != sign(mh_block_cl - setting_island_water_level_at) ||
-		sign(mh_block_bl - setting_island_water_level_at) != sign(mh_block_cc - setting_island_water_level_at)) {
-		mh_ramp_bl = setting_island_water_level_at + min_precipice * sign(mh_block_cc - setting_island_water_level_at);
-	}
-	highp float mh_ramp_br = (mh_block_br + mh_block_bc + mh_block_cr + mh_block_cc) / 4.0;
-	if (sign(mh_block_br - setting_island_water_level_at) != sign(mh_block_bc - setting_island_water_level_at) ||
-		sign(mh_block_br - setting_island_water_level_at) != sign(mh_block_cr - setting_island_water_level_at) ||
-		sign(mh_block_br - setting_island_water_level_at) != sign(mh_block_cc - setting_island_water_level_at)) {
-		mh_ramp_br = setting_island_water_level_at + min_precipice * sign(mh_block_cc - setting_island_water_level_at);
-	}
-	// Now just mix the 4 corners to get the final mh_ramp
-	highp float mh_ramp = mix(
-		mix(mh_ramp_tl, mh_ramp_tr, fract(floating_sample.x)),
-		mix(mh_ramp_bl, mh_ramp_br, fract(floating_sample.x)),
-		fract(floating_sample.y)
-	);
-	// Edge case: raise centers by a bit on some close to surface cells (including islands)
-	if (mh_block_cc - setting_island_water_level_at > 0.0 &&
-		(int(sign(mh_block_tc - setting_island_water_level_at) != sign(mh_block_cc - setting_island_water_level_at)) +
-		int(sign(mh_block_bc - setting_island_water_level_at) != sign(mh_block_cc - setting_island_water_level_at)) +
-		int(sign(mh_block_cl - setting_island_water_level_at) != sign(mh_block_cc - setting_island_water_level_at)) +
-		int(sign(mh_block_cr - setting_island_water_level_at) != sign(mh_block_cc - setting_island_water_level_at)) >= 2)) {
-		highp float raise_x = 1.0 - pow(2.0 * abs(0.5 - fract(floating_sample.x)), 1.5);
-		highp float raise_y = 1.0 - pow(2.0 * abs(0.5 - fract(floating_sample.y)), 1.5);
-		mh_ramp += mix(0.0, setting_island_water_level_step / 2.0, min(raise_x, raise_y));
-	}
-	return mh_ramp;
-}
+#define LANCZOS_SIZE 30
 
 // Takes the noisy heightmap and makes sure it matches the input distance to surface constraints
 highp float heightmap_island(highp vec2 uv_raw, highp vec2 pixel_size) {
 	// Working with corners, not centers: UV requires fixing
 	highp ivec2 num_cell_corners = textureSize(setting_island_water_level_distance, 0);
-	highp vec2 uv_fix = uv_raw * vec2(num_cell_corners) / (vec2(num_cell_corners + 1)) + (pixel_size / 2.0) / vec2(num_cell_corners);
+	highp vec2 uv_rescale_factor = vec2(num_cell_corners) / vec2(num_cell_corners + 1);
+	highp vec2 uv_fix = uv_raw * uv_rescale_factor + 0.5 / vec2(num_cell_corners);
+	// Displace (0,0) and the end by resolution-dependant amounts (don't ask my why)
+	uv_fix = uv_fix * (1.0 + 0.5 * pixel_size) - 0.5 * pixel_size;
+	//uv_fix = (uv_fix - vec2(0.5, 0.5)) * uv_rescale_factor + vec2(0.5, 0.5);
 	highp vec2 uv_cell_float = uv_fix * vec2(num_cell_corners);
 	highp ivec2 uv_cell = ivec2(uv_cell_float);
 
 	// Get the most extreme heights allowed for this UV (above or below water level)
 	highp float extreme_height_ramp = texture(setting_island_water_level_distance, uv_fix).r;
+	highp float extreme_height_smooth = lanczos(setting_island_water_level_distance, uv_fix, LANCZOS_SIZE).r;
 
+	// Lanczos is better at smoothing and hiding seams, but linear defines clear water-level boundaries, so mix them.
+	highp float extreme_height_ramp_factor = max(0.0, 1.0 - abs(extreme_height_ramp - setting_island_water_level_at) / (0.5 * setting_island_water_level_step));
+	highp float extreme_height = extreme_height_ramp * extreme_height_ramp_factor + extreme_height_smooth * (1.0 - extreme_height_ramp_factor);
 
-	return clamp(extreme_height_ramp, 0.0, 1.0);
+	// Apply some natural looking noise for realism, that is enforced to stay between water level and extreme_height
+	highp float noise_val = noise01(uv_fix);
+	highp float height = (extreme_height - setting_island_water_level_at) * noise_val + setting_island_water_level_at;
+
+	// Add some cliffs to break the coastline by overlapping more noise
+	highp float cliff_noise_val = noise01(uv_fix * vec2(2., 2.) + vec2(54.23491, -12.45356));
+	highp float cliff_max_height = setting_island_water_level_step;
+	highp float cliff_cutoff = 0.6;
+	height += sign(extreme_height - setting_island_water_level_at) * cliff_max_height * max(0.0, cliff_noise_val - cliff_cutoff) / (1.0 - cliff_cutoff);
+
+	return height;
 }
 
 // Generates the output texture, that defines the heightmap for the terrain
 void fragment() {
 	//highp float height = noise01(uv);
 	//float height = warped_noise01(uv);
-	highp float height = heightmap_island(UV, TEXTURE_PIXEL_SIZE);
+	highp float height = heightmap_island(UV, SCREEN_PIXEL_SIZE);
 
 	if (debug_height) {
 		COLOR = vec4(height, height, height, 1.0);

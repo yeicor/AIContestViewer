@@ -249,6 +249,8 @@ void fragment() {
 	vec3 water_color 				= (ssr_color.x >= 0.0) ? mix(depth_color, ssr_color, ssr_mix_strength) : depth_color;
 	vec3 final_color				= mix(water_color, border_color, 1.0 - min(water_depth/border_scale, 1.0));
 
+	// FIXME: transparency with refraction not working?!
+	// FIXME: not using mipmaps, causing big performance loss (change shader for this? https://godotshaders.com/shader/pixel-art-water-shader/)
 	ALBEDO = final_color.rgb;
 #if !s_ocean_screen_and_depth // Force basic transparency without refraction when screen can't be read.
 	ALPHA = transparency;

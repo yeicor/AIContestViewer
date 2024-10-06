@@ -1,12 +1,12 @@
 // Auto-include textureStochastic based on global defines
-#ifndef common_stochastic_textures // Editor-only, allow setting all uniforms
-#define common_stochastic_textures true // And default to stochastic
-#define common_stochastic_textures_editor true // Running on editor
+#ifndef s_common_stochastic_textures // Editor-only, allow setting all uniforms
+#define s_common_stochastic_textures true // And default to stochastic
+#define s_common_stochastic_textures_editor true // Running on editor
 #endif
-#ifndef common_stochastic_textures_editor
+#ifndef s_common_stochastic_textures_editor
 #define texture_stochastic_enable_df
 #endif
-#if common_stochastic_textures
+#if s_common_stochastic_textures
 #include "res://ocean/water/shaders/textureStochastic.gdshaderinc"
 #endif
 
@@ -34,9 +34,9 @@ vec3 texture_##name(vec2 uv) { \
 	return texture(name, uv).rgb; \
 }
 
-#if common_stochastic_textures_editor // Stochastic editor
+#if s_common_stochastic_textures_editor // Stochastic editor
 #define textureStochasticDefine(name) _textureStochasticDefine_editor(name)
-#elif common_stochastic_textures // Stochastic enabled
+#elif s_common_stochastic_textures // Stochastic enabled
 #define textureStochasticDefine(name) _textureStochasticDefine_enabled(name)
 #else // Stochastic disabled
 #define textureStochasticDefine(name) _textureStochasticDefine_disabled(name)

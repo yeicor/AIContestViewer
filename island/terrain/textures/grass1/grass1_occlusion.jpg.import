@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b58emp7eu2m1d"
-path.s3tc="res://.godot/imported/Grass001_1K-JPG_Roughness_t_inv.png-680ab179085932303a6f1241ea88b06e.s3tc.ctex"
-path.etc2="res://.godot/imported/Grass001_1K-JPG_Roughness_t_inv.png-680ab179085932303a6f1241ea88b06e.etc2.ctex"
+uid="uid://d3rbhvyfb0gm6"
+path.s3tc="res://.godot/imported/grass1_occlusion.jpg-2d635c38f644ce7744330ef75ef14b35.s3tc.ctex"
+path.etc2="res://.godot/imported/grass1_occlusion.jpg-2d635c38f644ce7744330ef75ef14b35.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/grass1/Grass001_1K-JPG_Roughness_t_inv.png"
-dest_files=["res://.godot/imported/Grass001_1K-JPG_Roughness_t_inv.png-680ab179085932303a6f1241ea88b06e.s3tc.ctex", "res://.godot/imported/Grass001_1K-JPG_Roughness_t_inv.png-680ab179085932303a6f1241ea88b06e.etc2.ctex"]
+source_file="res://island/terrain/textures/grass1/grass1_occlusion.jpg"
+dest_files=["res://.godot/imported/grass1_occlusion.jpg-2d635c38f644ce7744330ef75ef14b35.s3tc.ctex", "res://.godot/imported/grass1_occlusion.jpg-2d635c38f644ce7744330ef75ef14b35.etc2.ctex"]
 
 [params]
 

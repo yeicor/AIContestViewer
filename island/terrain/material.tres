@@ -2,10 +2,10 @@
 
 [ext_resource type="Shader" path="res://island/terrain/shaders/cells.gdshader" id="1_hut0j"]
 [ext_resource type="Shader" path="res://island/terrain/shaders/terrain.gdshader" id="2_vg0pr"]
-[ext_resource type="Texture2D" uid="uid://c37pr7nvkkc1x" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_Color.jpg" id="3_jb461"]
-[ext_resource type="Texture2D" uid="uid://ba04vgj7eqtvq" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_AmbientOcclusion.jpg" id="6_bg78j"]
-[ext_resource type="Texture2D" uid="uid://dsaq1sdbclktm" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_NormalGL.jpg" id="9_xahsx"]
-[ext_resource type="Texture2D" uid="uid://dsocjr3dknupt" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_Roughness.jpg" id="12_f3skf"]
+[ext_resource type="Texture2D" uid="uid://d42jolqnbuby" path="res://island/terrain/textures/grass1/grass1_albedo.jpg" id="3_p22qm"]
+[ext_resource type="Texture2D" uid="uid://d3rbhvyfb0gm6" path="res://island/terrain/textures/grass1/grass1_occlusion.jpg" id="4_3116n"]
+[ext_resource type="Texture2D" uid="uid://o8m86b1t4ai8" path="res://island/terrain/textures/grass1/grass1_normal_gl.jpg" id="5_syvat"]
+[ext_resource type="Texture2D" uid="uid://cno3bysmawipc" path="res://island/terrain/textures/grass1/grass1_roughness.jpg" id="6_up3k0"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xoty1"]
 render_priority = 0
@@ -18,10 +18,10 @@ shader_parameter/below_water_color = Color(0.5, 0, 0, 0)
 render_priority = 0
 next_pass = SubResource("ShaderMaterial_xoty1")
 shader = ExtResource("2_vg0pr")
-shader_parameter/grass = Color(0, 0.257812, 0, 1)
-shader_parameter/sand = Color(0.180392, 0.156863, 0, 1)
-shader_parameter/grass1_scale = Vector2(1, 1)
-shader_parameter/grass1_albedo = ExtResource("3_jb461")
-shader_parameter/grass1_normal = ExtResource("9_xahsx")
-shader_parameter/grass1_ao = ExtResource("6_bg78j")
-shader_parameter/grass1_roughness = ExtResource("12_f3skf")
+shader_parameter/hextiling_fallOffContrast = 0.6
+shader_parameter/hextiling_exp = 7.0
+shader_parameter/grass1_scale = Vector2(0.1, 0.1)
+shader_parameter/grass1_albedo = ExtResource("3_p22qm")
+shader_parameter/grass1_normal = ExtResource("5_syvat")
+shader_parameter/grass1_ao = ExtResource("4_3116n")
+shader_parameter/grass1_roughness = ExtResource("6_up3k0")

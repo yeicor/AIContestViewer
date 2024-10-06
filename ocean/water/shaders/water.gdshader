@@ -65,7 +65,7 @@ uniform float max_visible_depth : hint_range(0.0, 100.0, 0.1) = 1.0;
 #endif
 uniform vec3 color_deep : source_color = vec3(0.0, 0.1, 0.4);
 
-#include "res://island/terrain/shaders/textureStochasticHelper.gdshaderinc"
+#include "res://ocean/water/shaders/textureStochasticHelper.gdshaderinc"
 textureStochasticDefine(surface_normals_a)
 textureStochasticDefine(surface_normals_b)
 

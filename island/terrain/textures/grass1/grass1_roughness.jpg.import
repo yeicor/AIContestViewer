@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dgtwyv2dml0r2"
-path.s3tc="res://.godot/imported/Grass001_1K-JPG_Color_t_inv.png-9c3a35000df07514194be695253a7254.s3tc.ctex"
-path.etc2="res://.godot/imported/Grass001_1K-JPG_Color_t_inv.png-9c3a35000df07514194be695253a7254.etc2.ctex"
+uid="uid://cno3bysmawipc"
+path.s3tc="res://.godot/imported/grass1_roughness.jpg-06cd7ecb543b1445649e6a7e19493e5e.s3tc.ctex"
+path.etc2="res://.godot/imported/grass1_roughness.jpg-06cd7ecb543b1445649e6a7e19493e5e.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/grass1/Grass001_1K-JPG_Color_t_inv.png"
-dest_files=["res://.godot/imported/Grass001_1K-JPG_Color_t_inv.png-9c3a35000df07514194be695253a7254.s3tc.ctex", "res://.godot/imported/Grass001_1K-JPG_Color_t_inv.png-9c3a35000df07514194be695253a7254.etc2.ctex"]
+source_file="res://island/terrain/textures/grass1/grass1_roughness.jpg"
+dest_files=["res://.godot/imported/grass1_roughness.jpg-06cd7ecb543b1445649e6a7e19493e5e.s3tc.ctex", "res://.godot/imported/grass1_roughness.jpg-06cd7ecb543b1445649e6a7e19493e5e.etc2.ctex"]
 
 [params]
 

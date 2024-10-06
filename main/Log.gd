@@ -32,6 +32,10 @@ func output_messages(
 	full_stack_plain,
 	stack_frame_plain
 ):
+	if OS.has_feature("web"): # Does not support rich messages
+		msg_rich = msg_plain
+		full_stack_rich = full_stack_plain
+		stack_frame_rich = stack_frame_plain
 	super.output_messages(level, msg_plain, msg_rich, full_stack_rich, stack_frame_rich, full_stack_plain, stack_frame_plain)
 	# After printing to the text console as usual, also print to the embedded graphical console (F2)
 	if OS.get_thread_caller_id() == OS.get_main_thread_id():

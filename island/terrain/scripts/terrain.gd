@@ -48,7 +48,9 @@ func clean():
 			clean()
 			_regenerate_demo()
 
+static var material = preload("res://island/terrain/material.tres")
 func _ready():
+	material.shader.code = Settings.as_defines() + material.shader.code
 	if not Engine.is_editor_hint():
 		my_seed = Settings.common_seed()
 		vertex_count = Settings.terrain_vertex_count()
@@ -77,7 +79,6 @@ func _exit_tree():
 	if _generate_thread != null && _generate_thread.is_started():
 		_generate_thread.wait_to_finish() # Should already be called.
 
-static var material = preload("res://island/terrain/material.tres")
 func generate(game: GameState):
 	assert(vertex_count >= 0)
 	assert(steepness > 0.0)

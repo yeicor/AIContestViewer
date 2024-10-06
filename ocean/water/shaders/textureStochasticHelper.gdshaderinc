@@ -7,7 +7,7 @@
 #define texture_stochastic_enable_df
 #endif
 #if common_stochastic_textures
-#include "res://island/terrain/shaders/textureStochastic.gdshaderinc"
+#include "res://ocean/water/shaders/textureStochastic.gdshaderinc"
 #endif
 
 // Easy-define of optionally stochastic textures with automatic fallback if disabled!
@@ -35,9 +35,9 @@ vec3 texture_##name(vec2 uv) { \
 }
 
 #if common_stochastic_textures_editor // Stochastic editor
-#define textureStochasticDefine(name) _textureStochasticDefine_disabled(name)
+#define textureStochasticDefine(name) _textureStochasticDefine_editor(name)
 #elif common_stochastic_textures // Stochastic enabled
-#define textureStochasticDefine(name) _textureStochasticDefine_disabled(name)
+#define textureStochasticDefine(name) _textureStochasticDefine_enabled(name)
 #else // Stochastic disabled
 #define textureStochasticDefine(name) _textureStochasticDefine_disabled(name)
 #endif

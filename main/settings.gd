@@ -208,7 +208,7 @@ static var _project_godot: ConfigFile
 
 static func project_godot() -> ConfigFile:
 	# HACK: In order to ensure persistence, the project.godot file must be edited directly
-	if _project_godot == null:
+	if _project_godot == null and FileAccess.file_exists("res://project.godot"):
 		_project_godot = ConfigFile.new()
 		assert(_project_godot.load("res://project.godot") == OK)
 	return _project_godot
@@ -216,7 +216,7 @@ static func project_godot() -> ConfigFile:
 
 func setting_global_shader_set(setting_name: String):
 	var safe_name := setting_global_shader_name(setting_name)
-	if project_godot().has_section_key("shader_globals", safe_name):
+	if project_godot() != null and project_godot().has_section_key("shader_globals", safe_name):
 		RenderingServer.global_shader_parameter_set(safe_name, Settings._s_val(setting_name))
 
 
@@ -246,6 +246,8 @@ static func as_defines() -> String:
 				pass # Not supported, but no need to print anything
 			_:
 				print("[before-logging?] (SettingsAutoloaded) Unsupported type for setting " + setting_name + ": " + str(_all_settings_info[setting_name]["type"]))
+	# Also publish the rendering_method as a define to help work around incompatibilities
+	defines += "#define rendering_method \"" + ProjectSettings.get_setting_with_override("rendering/renderer/rendering_method") + "\"\n"
 	return defines
 
 # ========== ALL SETTINGS ==========

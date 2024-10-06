@@ -6,12 +6,11 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8usiv"]
 shader = ExtResource("3_hlvgl")
-shader_parameter/debug_height = true
+shader_parameter/debug_height = false
 shader_parameter/my_seed = 42
-shader_parameter/min_precipice_range = Vector2(0.03, 0.2)
+shader_parameter/min_precipice_range = Vector2(0.001, 0.2)
 
 [node name="Terrain" type="Node3D"]
-transform = Transform3D(0.99522, 0, 0, 0, 0.99522, 0, 0, 0, 0.99522, 0, 0, 0)
 script = ExtResource("1_blkia")
 generate_in_editor = true
 

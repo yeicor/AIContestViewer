@@ -6,8 +6,8 @@ render_mode cull_back, diffuse_burley, specular_schlick_ggx;
 global uniform float setting_island_water_level_at;
 
 uniform float cell_border_scale : hint_range(0.0, 5.0, 0.1) = 1.0f; // Size of the border of each cell
-uniform vec3 above_water_color : source_color = vec3(0.75);
-uniform vec3 below_water_color : source_color = vec3(0.5, 0.0, 0.0);
+uniform vec4 above_water_color : source_color = vec4(vec3(0.75), 1.0);
+uniform vec4 below_water_color : source_color = vec4(0.5, 0.0, 0.0, 0.0);
 
 varying vec3 vert;
 void vertex() {
@@ -29,8 +29,9 @@ void fragment() {
 	bool oob = uv_data.x < 0.0 || uv_data.x > uv_data.z || uv_data.y < 0.0 || uv_data.y > uv_data.w;
 
 	if (!oob) {
-	    ALBEDO = cell_above_water ? above_water_color : below_water_color;
-		ALPHA = lines;
+		vec4 full_color = cell_above_water ? above_water_color : below_water_color;
+	    ALBEDO = full_color.rgb;
+		ALPHA = lines * full_color.a;
 	}
 }
 

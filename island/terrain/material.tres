@@ -1,26 +1,18 @@
-[gd_resource type="ShaderMaterial" load_steps=16 format=3 uid="uid://c2nfyav24pgv8"]
+[gd_resource type="ShaderMaterial" load_steps=8 format=3 uid="uid://c2nfyav24pgv8"]
 
 [ext_resource type="Shader" path="res://island/terrain/shaders/cells.gdshader" id="1_hut0j"]
 [ext_resource type="Shader" path="res://island/terrain/shaders/terrain.gdshader" id="2_vg0pr"]
 [ext_resource type="Texture2D" uid="uid://c37pr7nvkkc1x" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_Color.jpg" id="3_jb461"]
-[ext_resource type="Texture2D" uid="uid://dgtwyv2dml0r2" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_Color_t_inv.png" id="4_2y5rh"]
-[ext_resource type="Texture2D" uid="uid://di1qgyx3mhapd" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_Color_t.png" id="5_ai2a0"]
 [ext_resource type="Texture2D" uid="uid://ba04vgj7eqtvq" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_AmbientOcclusion.jpg" id="6_bg78j"]
-[ext_resource type="Texture2D" uid="uid://c7x6emaoarnuv" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_AmbientOcclusion_t_inv.png" id="7_cevjk"]
-[ext_resource type="Texture2D" uid="uid://difmt88ut2buu" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_AmbientOcclusion_t.png" id="8_uc488"]
 [ext_resource type="Texture2D" uid="uid://dsaq1sdbclktm" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_NormalGL.jpg" id="9_xahsx"]
-[ext_resource type="Texture2D" uid="uid://y33ihdceeigl" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_NormalGL_t_inv.png" id="10_dfgfe"]
-[ext_resource type="Texture2D" uid="uid://bofbmo0bir7a4" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_NormalGL_t.png" id="11_fbkj6"]
 [ext_resource type="Texture2D" uid="uid://dsocjr3dknupt" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_Roughness.jpg" id="12_f3skf"]
-[ext_resource type="Texture2D" uid="uid://b58emp7eu2m1d" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_Roughness_t_inv.png" id="13_rv1er"]
-[ext_resource type="Texture2D" uid="uid://ccfkamnouy5fc" path="res://island/terrain/textures/grass1/Grass001_1K-JPG_Roughness_t.png" id="14_x85n2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xoty1"]
 render_priority = 0
 shader = ExtResource("1_hut0j")
 shader_parameter/cell_border_scale = 1.0
 shader_parameter/above_water_color = Color(0.75, 0.75, 0.75, 1)
-shader_parameter/below_water_color = Color(0.5, 0, 0, 1)
+shader_parameter/below_water_color = Color(0.5, 0, 0, 0)
 
 [resource]
 render_priority = 0
@@ -29,31 +21,7 @@ shader = ExtResource("2_vg0pr")
 shader_parameter/grass = Color(0, 0.257812, 0, 1)
 shader_parameter/sand = Color(0.180392, 0.156863, 0, 1)
 shader_parameter/grass1_scale = Vector2(1, 1)
-shader_parameter/grass1_albedo_color_space_origin = Vector3(-0.06, 0.222, -0.053)
-shader_parameter/grass1_albedo_color_space_vector1 = Vector3(0.533, 0.621, 0.285)
-shader_parameter/grass1_albedo_color_space_vector2 = Vector3(0.211, -0.138, -0.094)
-shader_parameter/grass1_albedo_color_space_vector3 = Vector3(0.021, -0.122, 0.225)
-shader_parameter/grass1_normal_color_space_origin = Vector3(-0.099, 0.464, 0.538)
-shader_parameter/grass1_normal_color_space_vector1 = Vector3(0.61, 0.614, 0.007)
-shader_parameter/grass1_normal_color_space_vector2 = Vector3(-0.017, 0.012, 0.445)
-shader_parameter/grass1_normal_color_space_vector3 = Vector3(0.589, -0.585, 0.038)
-shader_parameter/grass1_ao_color_space_origin = Vector3(0.439, 0.439, 0.439)
-shader_parameter/grass1_ao_color_space_vector1 = Vector3(0.561, 0.561, 0.561)
-shader_parameter/grass1_ao_color_space_vector2 = null
-shader_parameter/grass1_ao_color_space_vector3 = null
-shader_parameter/grass1_roughness_color_space_origin = Vector3(0.024, 0.024, 0.024)
-shader_parameter/grass1_roughness_color_space_vector1 = Vector3(0.878, 0.878, 0.878)
-shader_parameter/grass1_roughness_color_space_vector2 = null
-shader_parameter/grass1_roughness_color_space_vector3 = null
 shader_parameter/grass1_albedo = ExtResource("3_jb461")
-shader_parameter/grass1_albedo_t = ExtResource("5_ai2a0")
-shader_parameter/grass1_albedo_inv_t = ExtResource("4_2y5rh")
 shader_parameter/grass1_normal = ExtResource("9_xahsx")
-shader_parameter/grass1_normal_t = ExtResource("11_fbkj6")
-shader_parameter/grass1_normal_inv_t = ExtResource("10_dfgfe")
 shader_parameter/grass1_ao = ExtResource("6_bg78j")
-shader_parameter/grass1_ao_t = ExtResource("8_uc488")
-shader_parameter/grass1_ao_inv_t = ExtResource("7_cevjk")
 shader_parameter/grass1_roughness = ExtResource("12_f3skf")
-shader_parameter/grass1_roughness_t = ExtResource("14_x85n2")
-shader_parameter/grass1_roughness_inv_t = ExtResource("13_rv1er")

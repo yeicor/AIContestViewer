@@ -44,28 +44,43 @@ highp float heightmap_island(highp vec2 uv_raw, highp vec2 pixel_size) {
 	highp vec2 uv_fix = uv_raw * uv_rescale_factor + 0.5 / vec2(num_cell_corners);
 	// Displace (0,0) and the end by resolution-dependant amounts (don't ask my why)
 	uv_fix = uv_fix * (1.0 + 0.5 * pixel_size) - 0.5 * pixel_size;
-	//uv_fix = (uv_fix - vec2(0.5, 0.5)) * uv_rescale_factor + vec2(0.5, 0.5);
-	highp vec2 uv_cell_float = uv_fix * vec2(num_cell_corners);
-	highp ivec2 uv_cell = ivec2(uv_cell_float);
 
-	// TODO: Smoothly flatten the terrain around lighthouses by displacing uv_fix to the center of the cell
+	// Smoothly flatten the terrain around lighthouses by displacing uv_fix to the center of the cell
+	highp float lighthouse_closeness_linear = texture(setting_island_water_level_distance, uv_fix).g;
+	if (lighthouse_closeness_linear > 0.0) {
+		highp float lighthouse_closeness = lanczos(setting_island_water_level_distance, uv_fix, 3).g;
+		highp vec2 uv_cell_corner_float = uv_fix * vec2(num_cell_corners);
+		highp ivec2 uv_cell_corner = ivec2(uv_cell_corner_float);
+		highp vec2 uv_cell_corner_center = vec2(uv_cell_corner) + vec2(0.5);
+		// Migrate corners or edges to their actual center
+		if (uv_cell_corner.x % 2 == 0) {
+			uv_cell_corner_center.x += 1.0 * sign(fract(uv_cell_corner_float.x) - 0.5);
+		}
+		if (uv_cell_corner.y % 2 == 0) {
+			uv_cell_corner_center.y += 1.0 * sign(fract(uv_cell_corner_float.y) - 0.5);
+		}
+		highp float lh_nudge_strength = pow(max(lighthouse_closeness - 0.2, 0.0), 0.2);
+		highp vec2 uv_cell_corner_float_nudged = uv_cell_corner_center * lh_nudge_strength + uv_cell_corner_float * (1.0 - lh_nudge_strength);
+		uv_fix = uv_cell_corner_float_nudged / vec2(num_cell_corners);
+	}
 
 	// Get the most extreme heights allowed for this UV (above or below water level)
 	highp float extreme_height_ramp = texture(setting_island_water_level_distance, uv_fix).r;
 	highp float extreme_height_smooth = lanczos(setting_island_water_level_distance, uv_fix, LANCZOS_SIZE).r;
 
 	// Lanczos is better at smoothing and hiding seams, but linear defines clear water-level boundaries, so mix them.
-	highp float extreme_height_ramp_factor = max(0.0, 1.0 - abs(extreme_height_ramp - setting_island_water_level_at) / (0.5 * setting_island_water_level_step));
-	highp float extreme_height = extreme_height_ramp * extreme_height_ramp_factor + extreme_height_smooth * (1.0 - extreme_height_ramp_factor);
+	highp float shore_farawayness_raw = abs(extreme_height_ramp - setting_island_water_level_at);
+	highp float extreme_height_ramp_factor = max(0.0, 1.0 - shore_farawayness_raw / (1.0 * setting_island_water_level_step));
+	highp float extreme_height = extreme_height_ramp; // * extreme_height_ramp_factor + extreme_height_smooth * (1.0 - extreme_height_ramp_factor);
 
 	// Apply some natural looking noise for realism, that is enforced to stay between water level and extreme_height
 	highp float noise_val = noise01(uv_fix);
 	highp float height = (extreme_height - setting_island_water_level_at) * noise_val + setting_island_water_level_at;
 
-	// Add some cliffs to break the coastline by overlapping more noise
+	// Add some cliffs close to shore to break the coastline by overlapping more noise
 	highp float cliff_noise_val = noise01(uv_fix * vec2(2., 2.) + vec2(54.23491, -12.45356));
-	highp float cliff_max_height = setting_island_water_level_step;
-	highp float cliff_cutoff = 0.6;
+	highp float cliff_max_height = setting_island_water_level_step * extreme_height_ramp_factor;
+	highp float cliff_cutoff = 0.6; // % of flat shores...
 	height += sign(extreme_height - setting_island_water_level_at) * cliff_max_height * max(0.0, cliff_noise_val - cliff_cutoff) / (1.0 - cliff_cutoff);
 
 	return height;

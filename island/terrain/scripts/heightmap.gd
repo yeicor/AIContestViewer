@@ -29,7 +29,7 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 			# Red channel: distance to water level
 			texture_data.append((height_bounds[z][x] - min_height) * 255.99999 / (max_height - min_height))
 			# Blue channel: lighthouse presence (255) or nearby-ness (>0, <255, assuming search range <255)
-			var search_range := 5
+			var search_range := 1 # This is enough, more would need a more complex heightmap shader
 			var lh_closeness := 0.0
 			for lh_pos in lh_positions:
 				var this_lh_closeness = 1.0 - lh_pos.distance_to(Vector2(x, z)) / search_range

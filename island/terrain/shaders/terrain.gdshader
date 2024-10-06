@@ -26,4 +26,6 @@ void fragment() {
 	NORMAL_MAP = texture_grass1_normal(vert.xz * grass1_scale);
 	AO = texture_grass1_ao(vert.xz * grass1_scale).r;
 	ROUGHNESS = texture_grass1_roughness(vert.xz * grass1_scale).r;
+
+	if (vert.y < 0.0) ALBEDO *= 0.25;
 }

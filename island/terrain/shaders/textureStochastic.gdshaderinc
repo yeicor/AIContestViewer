@@ -3,7 +3,7 @@
 	Stochastic Procedural Texture Shader for Godot Engine / Ported by Yui Kinomoto @arlez80
 
 	MIT License
-	
+
 	Use https://bitbucket.org/arlez80/stochastic-procedural-texture-shader/src/master/tools/precomp_tex.py
 	to precompute the required textures and vectors.
 

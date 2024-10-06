@@ -65,9 +65,9 @@ uniform float max_visible_depth : hint_range(0.0, 100.0, 0.1) = 1.0;
 #endif
 uniform vec3 color_deep : source_color = vec3(0.0, 0.1, 0.4);
 
-#include "res://ocean/water/shaders/textureStochasticHelper.gdshaderinc"
-textureStochasticDefine(surface_normals_a)
-textureStochasticDefine(surface_normals_b)
+#include "res://island/terrain/shaders/hextilingHelper.gdshaderinc"
+textureHextileDefine(surface_normals_a)
+textureHextileDefine(surface_normals_b)
 
 varying vec2 vertex_uv;
 
@@ -249,8 +249,7 @@ void fragment() {
 	vec3 water_color 				= (ssr_color.x >= 0.0) ? mix(depth_color, ssr_color, ssr_mix_strength) : depth_color;
 	vec3 final_color				= mix(water_color, border_color, 1.0 - min(water_depth/border_scale, 1.0));
 
-	// FIXME: transparency with refraction not working?!
-	// FIXME: not using mipmaps, causing big performance loss (change shader for this? https://godotshaders.com/shader/pixel-art-water-shader/)
+	// FIXME: transparency with refraction not working?! (change shader for this? https://godotshaders.com/shader/pixel-art-water-shader/)
 	ALBEDO = final_color.rgb;
 #if !s_ocean_screen_and_depth // Force basic transparency without refraction when screen can't be read.
 	ALPHA = transparency;

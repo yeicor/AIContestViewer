@@ -21,7 +21,7 @@ static func get_singletons() -> Dictionary:
 	var config := ConfigFile.new()
 	var err := config.load("project.godot")
 	if err:
-		push_error("Error when loading project.godot")
+		#push_error("Error when loading project.godot")
 		return singletons
 
 	var autoload := "autoload"

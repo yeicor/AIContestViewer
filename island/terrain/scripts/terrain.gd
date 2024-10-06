@@ -13,11 +13,9 @@ func clean():
 @warning_ignore("unused_private_class_variable")
 @export var generate_in_editor: bool = false:
 	set(new_val):
-		generate_in_editor = new_val
-		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
-			_regenerate_demo()
-		else:
+		if Engine.is_editor_hint() and is_node_ready():
 			clean()
+			_regenerate_demo()
 
 @export var my_seed: int = 42:
 	set(new_seed):
@@ -50,8 +48,8 @@ func clean():
 
 static var material = preload("res://island/terrain/material.tres")
 func _ready():
-	material.shader.code = Settings.as_defines() + material.shader.code
 	if not Engine.is_editor_hint():
+		material.shader.code = Settings.as_defines() + material.shader.code
 		my_seed = Settings.common_seed()
 		vertex_count = Settings.terrain_vertex_count()
 		cell_side = Settings.terrain_cell_side()

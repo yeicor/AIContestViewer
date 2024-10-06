@@ -51,7 +51,7 @@ vec2 TspaceNormalToDerivative(vec3 vM)
 }
 
 // Output:\ weights associated with each hex tile and integer centers
-void TriangleGrid(out float w1, out float w2, out float w3, 
+void TriangleGrid(out float w1, out float w2, out float w3,
 				  out ivec2 vertex1, out ivec2 vertex2, out ivec2 vertex3,
 				  vec2 st)
 {
@@ -59,7 +59,7 @@ void TriangleGrid(out float w1, out float w2, out float w3,
 	st *= 2.0 * sqrt(3);
 
 	// Skew input space into simplex triangle grid
-	const mat2 gridToSkewedGrid = 
+	const mat2 gridToSkewedGrid =
 		mat2(vec2(1.0, -0.57735027), vec2( 0.0, 1.15470054));
 	vec2 skewedCoord = gridToSkewedGrid*st;
 
@@ -86,7 +86,7 @@ float fmod(float x, float y){
 vec2 hash(ivec2 p)
 {
 	vec2 r = mat2(vec2(127.1, 311.7),vec2(269.5, 183.3))*vec2(p);
-	
+
 	return frac( sin( r )*43758.5453 );
 }
 
@@ -102,7 +102,7 @@ mat2 LoadRot2x2(ivec2 idx, float rotStrength)
 	float angle = float(abs(idx.x*idx.y)) + float(abs(idx.x+idx.y)) + hextiling_M_PI;
 
 	// remap to +/-pi
-	angle = fmod(angle, 2.0*hextiling_M_PI); 
+	angle = fmod(angle, 2.0*hextiling_M_PI);
 	if(angle<0.0) angle += 2.0*hextiling_M_PI;
 	if(angle>hextiling_M_PI) angle -= 2.0*hextiling_M_PI;
 
@@ -130,7 +130,7 @@ vec3 Gain3(vec3 x, float r)
 	vec3 m = 2.0*(1.0 - s);
 
 	vec3 res = 0.5*s + 0.25*m * pow(max(vec3(0.0), s + x*m), vec3(k));
-	
+
 	return res.xyz / (res.x+res.y+res.z);
 }
 
@@ -187,11 +187,11 @@ void bumphex2derivNMap(out vec2 deriv, out vec3 weights,
 	vec2 st3 = (st - cen3)* rot3 + cen3 + hash(vertex3);
 
 	// Fetch input
-	vec2 d1 = sampleDeriv(samp, st1, 
+	vec2 d1 = sampleDeriv(samp, st1,
 							(dSTdx* rot1), (dSTdy* rot1));
-	vec2 d2 = sampleDeriv(samp, st2, 
+	vec2 d2 = sampleDeriv(samp, st2,
 							(dSTdx* rot2), (dSTdy* rot2));
-	vec2 d3 = sampleDeriv(samp, st3, 
+	vec2 d3 = sampleDeriv(samp, st3,
 							(dSTdx* rot3), (dSTdy* rot3));
 
 	d1 = (rot1* d1); d2 = (rot2* d2); d3 = (rot3* d3);
@@ -200,7 +200,7 @@ void bumphex2derivNMap(out vec2 deriv, out vec3 weights,
 	// in tangent space and the Z-axis
 	vec3 D = vec3( dot(d1,d1), dot(d2,d2), dot(d3,d3));
 	vec3 Dw = sqrt(D/(1.0+D));
-	
+
 	Dw = mix(vec3(1.0), Dw, hextiling_fallOffContrast);	// 0.6
 	vec3 W = Dw*vec3(pow(w1,hextiling_exp), pow(w2,hextiling_exp), pow(w3, hextiling_exp));	// 7
 	W /= (W.x+W.y+W.z);
@@ -256,11 +256,11 @@ void hex2colTex(out vec4 color, out vec3 weights,
 	if(textureQueryLod(samp, st).x < 0.01) { // Close-ups!
 #endif
 	    // - The original code avoid triangle edge seams, but does not support LOD/mipmap
-		c1 = textureGrad(samp, st1, 
+		c1 = textureGrad(samp, st1,
 								   (dSTdx* rot1), (dSTdy* rot1));
 		c2 = textureGrad(samp, st2,
 								   (dSTdx* rot2), (dSTdy* rot2));
-		c3 = textureGrad(samp, st3, 
+		c3 = textureGrad(samp, st3,
 								   (dSTdx* rot3), (dSTdy* rot3));
 	} else {
 		// To support LOD/mipmap, we need normal texture accesses :(
@@ -272,7 +272,7 @@ void hex2colTex(out vec4 color, out vec3 weights,
 	// use luminance as weight
 	vec3 Lw = vec3(0.299, 0.587, 0.114);
 	vec3 Dw = vec3(dot(c1.xyz,Lw),dot(c2.xyz,Lw),dot(c3.xyz,Lw));
-	
+
 	Dw = mix(vec3(1.0), Dw, hextiling_fallOffContrast);	// 0.6
 	vec3 W = Dw*pow(vec3(w1, w2, w3), vec3(hextiling_exp));	// 7
 	W /= (W.x+W.y+W.z);
@@ -322,6 +322,6 @@ void hex2colTex(out vec4 color, out vec3 weights,
 	//hex2colTex(temp_samp, weights, side_sampler, uv1_triplanar_pos.xy, 1.0, 0.5);
 	////temp_samp.rgb = weights;
 	//samp += temp_samp * smoothstep((p_weights.x-p_weights.z+p_weights.y)+eh, 1.0, sides_smoothing);
-	//samp = normalize(samp); //normalize this additive mess 
+	//samp = normalize(samp); //normalize this additive mess
 	//return samp;
 //}

@@ -12,7 +12,6 @@ shader_parameter/min_precipice_range = Vector2(0.001, 0.2)
 
 [node name="Terrain" type="Node3D"]
 script = ExtResource("1_blkia")
-generate_in_editor = true
 
 [node name="HeightMap" type="SubViewport" parent="."]
 disable_3d = true

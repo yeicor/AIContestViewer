@@ -6,6 +6,13 @@ uniform vec3 p_normals[10];
 uniform int p_normals_count;
 uniform float blend_sharpness: hint_range(0.00001, 10.0) = 1.0;
 
+#ifndef rendering_method
+#define rendering_method "gl_compatibility"
+#endif
+#if rendering_method == "gl_compatibility"
+#define fma(a, b, c) a * b + c
+#endif
+
 // Derived from https://iquilezles.org/articles/noacos/ MIT license - Inigo Quilez 2013
 mat3 p_align(vec3 normal) {
 	const vec3 up = vec3(0., 1., 0.);
@@ -59,6 +66,6 @@ vec4[3] nplanar_weights(vec3 vert, vec3 normal) {
 	for (int i = 0; i < 3; i++) {
 		res[i].w /= sum;
 	}
-	
+
 	return res;
 }

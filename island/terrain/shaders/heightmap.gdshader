@@ -71,17 +71,24 @@ highp float heightmap_island(highp vec2 uv_raw, highp vec2 pixel_size) {
 	// Lanczos is better at smoothing and hiding seams, but linear defines clear water-level boundaries, so mix them.
 	highp float shore_farawayness_raw = abs(extreme_height_ramp - setting_island_water_level_at);
 	highp float extreme_height_ramp_factor = max(0.0, 1.0 - shore_farawayness_raw / (1.0 * setting_island_water_level_step));
-	highp float extreme_height = extreme_height_ramp; // * extreme_height_ramp_factor + extreme_height_smooth * (1.0 - extreme_height_ramp_factor);
+	highp float extreme_height = extreme_height_ramp * extreme_height_ramp_factor + extreme_height_smooth * (1.0 - extreme_height_ramp_factor);
 
 	// Apply some natural looking noise for realism, that is enforced to stay between water level and extreme_height
 	highp float noise_val = noise01(uv_fix);
 	highp float height = (extreme_height - setting_island_water_level_at) * noise_val + setting_island_water_level_at;
 
 	// Add some cliffs close to shore to break the coastline by overlapping more noise
-	highp float cliff_noise_val = noise01(uv_fix * vec2(2., 2.) + vec2(54.23491, -12.45356));
+	highp float cliff_noise_val = noise01(uv_fix * vec2(2.) + vec2(54.23491, -12.45356));
 	highp float cliff_max_height = setting_island_water_level_step * extreme_height_ramp_factor;
 	highp float cliff_cutoff = 0.6; // % of flat shores...
 	height += sign(extreme_height - setting_island_water_level_at) * cliff_max_height * max(0.0, cliff_noise_val - cliff_cutoff) / (1.0 - cliff_cutoff);
+
+	// Ensure that the ground goes deep to avoid weird bounds with depth-based transparent water
+	if (height < setting_island_water_level_at) {
+		highp float max_height_underwater = max(extreme_height_ramp, setting_island_water_level_at - setting_island_water_level_step);
+		max_height_underwater += noise01(uv_fix * vec2(9.) + vec2(-453.43, 324.23)) * 0.2 * setting_island_water_level_step;
+		height = min(height, max_height_underwater);
+	}
 
 	return height;
 }

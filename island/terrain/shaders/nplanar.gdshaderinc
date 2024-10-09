@@ -63,8 +63,10 @@ vec4[3] nplanar_weights(vec3 vert, vec3 normal) {
 		res[i].w = max(0.0, pow(res[i].w, blend_sharpness));
 		sum += res[i].w;
 	}
-	for (int i = 0; i < 3; i++) {
-		res[i].w /= sum;
+	if (sum > 0.0) {
+		for (int i = 0; i < 3; i++) {
+			res[i].w /= sum;
+		}
 	}
 
 	return res;

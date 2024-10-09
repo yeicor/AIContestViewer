@@ -10,7 +10,7 @@
 [ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/remove_outside_shapes.gd" id="8_cv2v7"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/randomize_rotation.gd" id="8_s5h08"]
 
-[sub_resource type="Resource" id="Resource_ace83"]
+[sub_resource type="Resource" id="Resource_k6eq3"]
 script = ExtResource("5_aq1ee")
 amount = 3
 enabled = true
@@ -19,7 +19,7 @@ custom_seed = 0
 restrict_height = true
 reference_frame = 1
 
-[sub_resource type="Resource" id="Resource_wlwg7"]
+[sub_resource type="Resource" id="Resource_easmy"]
 script = ExtResource("8_s5h08")
 rotation = Vector3(0, 360, 0)
 snap_angle = Vector3(0, 0, 0)
@@ -29,7 +29,7 @@ custom_seed = 0
 restrict_height = false
 reference_frame = 2
 
-[sub_resource type="Resource" id="Resource_ktuv2"]
+[sub_resource type="Resource" id="Resource_yw7pl"]
 script = ExtResource("6_n5y7k")
 iterations = 1
 offset_step = 40.0
@@ -41,7 +41,7 @@ custom_seed = 0
 restrict_height = true
 reference_frame = 0
 
-[sub_resource type="Resource" id="Resource_s7h6h"]
+[sub_resource type="Resource" id="Resource_bx6uw"]
 script = ExtResource("8_cv2v7")
 negative_shapes_only = false
 enabled = true
@@ -50,9 +50,9 @@ custom_seed = 0
 restrict_height = false
 reference_frame = 0
 
-[sub_resource type="Resource" id="Resource_test7"]
+[sub_resource type="Resource" id="Resource_y31ca"]
 script = ExtResource("3_lvlr0")
-stack = Array[ExtResource("4_8fvwu")]([SubResource("Resource_ace83"), SubResource("Resource_wlwg7"), SubResource("Resource_ktuv2"), SubResource("Resource_s7h6h")])
+stack = Array[ExtResource("4_8fvwu")]([SubResource("Resource_k6eq3"), SubResource("Resource_easmy"), SubResource("Resource_yw7pl"), SubResource("Resource_bx6uw")])
 
 [node name="Ocean" type="Node3D"]
 script = ExtResource("4_j2nh8")
@@ -61,6 +61,6 @@ script = ExtResource("4_j2nh8")
 
 [node name="ProtonScatter" parent="." instance=ExtResource("1_faalw")]
 enabled = false
-modifier_stack = SubResource("Resource_test7")
+modifier_stack = SubResource("Resource_y31ca")
 
 [connection signal="built" from="Water" to="." method="_on_water_built"]

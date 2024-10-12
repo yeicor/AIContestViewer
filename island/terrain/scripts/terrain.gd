@@ -3,6 +3,7 @@ class_name Terrain
 extends Node3D
 
 ## TerrainTool organizes the code to be able to generate islands on demand and even test them in the editor.
+signal terrain_ready(mi: MeshInstance3D)
 
 func clean():
 	for child in get_children():
@@ -100,4 +101,5 @@ func generate(game: GameState):
 			meshNode.mesh = hmesh
 			add_child(meshNode)
 			SLog.sd("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
+			terrain_ready.emit(meshNode)
 			_generate_thread.wait_to_finish()).call_deferred())

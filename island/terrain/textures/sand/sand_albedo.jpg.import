@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ddx0ewoa7f45c"
-path.s3tc="res://.godot/imported/snow1_normal_gl.jpg-7dacca2528b144172b2213193a12bf17.s3tc.ctex"
-path.etc2="res://.godot/imported/snow1_normal_gl.jpg-7dacca2528b144172b2213193a12bf17.etc2.ctex"
+uid="uid://bxw5ty7cti8hq"
+path.s3tc="res://.godot/imported/sand_albedo.jpg-f94e5b0d2d1ec0cb2128cba0f6062c61.s3tc.ctex"
+path.etc2="res://.godot/imported/sand_albedo.jpg-f94e5b0d2d1ec0cb2128cba0f6062c61.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/snow1/snow1_normal_gl.jpg"
-dest_files=["res://.godot/imported/snow1_normal_gl.jpg-7dacca2528b144172b2213193a12bf17.s3tc.ctex", "res://.godot/imported/snow1_normal_gl.jpg-7dacca2528b144172b2213193a12bf17.etc2.ctex"]
+source_file="res://island/terrain/textures/sand/sand_albedo.jpg"
+dest_files=["res://.godot/imported/sand_albedo.jpg-f94e5b0d2d1ec0cb2128cba0f6062c61.s3tc.ctex", "res://.godot/imported/sand_albedo.jpg-f94e5b0d2d1ec0cb2128cba0f6062c61.etc2.ctex"]
 
 [params]
 

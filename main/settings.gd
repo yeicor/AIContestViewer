@@ -9,40 +9,6 @@ static var _invalid_env_regex: RegEx = _invalid_env_regex_fn()
 var _loaded: bool             = false
 var _all_settings: Dictionary = {} # Keys are paths, and values are raw setting values
 
-
-func _init() -> void: # This runs before any _init() of the main scene (autoloaded)
-	assert(_instance == null, "Only 1 settings instance at a time!")
-	_instance = self
-
-	# HACK: Allow special env overrides before ini (like changing the settings file path or the presets)
-	_load_custom_settings_web()
-	_load_custom_settings_env()
-	_load_custom_settings_ini()
-
-	# Apply presets before the final pass to override some settings...
-	if _val("settings/print", true):
-		print("[before-logging] (SettingsAutoloaded) Applying presets...")
-	for setting_name: String in _all_settings_info.keys():
-		var mod_preset = _apply_presets(setting_name)
-		if mod_preset != null:
-			_all_settings[setting_name] = mod_preset
-
-	# Reload overrides after presets are applied, and giving more priority to env and web...
-	_load_custom_settings_ini()
-	_load_custom_settings_env()
-	_load_custom_settings_web()
-
-	# Override all global parameters as required
-	if _val("settings/print", true):
-		print("[before-logging] (SettingsAutoloaded) Publishing global shader parameters...")
-	for setting_name: String in _all_settings_info.keys():
-		setting_global_shader_set(setting_name)
-
-	_loaded = true
-	
-	# Set global seed for unreachable internal randf calls (best effort!)
-	seed(common_seed())
-
 func _ready():
 	# Print all settings if required
 	if _val("settings/print", true):
@@ -65,7 +31,7 @@ func _load_custom_settings_env() -> void:
 	# Fill project config from environment variables
 	if _val("settings/print", true):
 		print("[before-logging] (SettingsAutoloaded) Loading setting overrides from environment variables...")
-	for setting_name: String in _all_settings.keys():
+	for setting_name: String in _all_settings_info.keys():
 		# Replace all invalid characters in the environment variable name regex
 		var env_name: String = _invalid_env_regex.sub(setting_name, "_", true)
 		if OS.has_environment(env_name):
@@ -77,11 +43,11 @@ func _load_custom_settings_web() -> void:
 	if OS.has_feature("web"):
 		if _val("settings/print", true):
 			print("[before-logging] (SettingsAutoloaded) Loading setting overrides from query parameters...")
-		var queryParams = JSON.parse_string(JavaScriptBridge.eval("JSON.stringify(new URLSearchParams(window.location.search))"))
-		for setting_name: String in _all_settings.keys():
+		for setting_name: String in _all_settings_info.keys():
 			var query_name: String = _invalid_env_regex.sub(setting_name, "_", true)
-			if queryParams.has(query_name):
-				_load_parse_and_set(setting_name, queryParams[query_name], "web")
+			var query_value = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('"+query_name+"')")
+			if query_value != null:
+				_load_parse_and_set(setting_name, query_value, "web")
 
 
 func _load_custom_settings_ini() -> void: # Will enter first in the scene tree (but after all _init() functions)
@@ -171,9 +137,9 @@ func _val(path: String, skip_check: bool = false) -> Variant:
 
 
 ## Supports @tool by using default values if no instance is available
-static func _s_val(path: String) -> Variant:
-	if _instance != null && _instance._loaded:
-		return _instance._val(path)
+static func _s_val(path: String, skip_check: bool = false) -> Variant:
+	if _instance != null:
+		return _instance._val(path, skip_check)
 	else: # Also apply proper presets in the case of the static editor-only version.
 		var preset = _apply_presets(path)
 		if preset != null:
@@ -186,15 +152,17 @@ static func _s_val(path: String) -> Variant:
 static func _apply_presets(path: String) -> Variant:
 	match path:
 		"terrain/vertex_count":
-			return int(10000.0 * 10.0 ** preset_quality_linear())
+			return int(10000.0 * 10.0 ** preset_quality_linear(true))
+		"terrain/no_textures":
+			return preset_quality_linear(true) < 0
 		"ocean/vertex_count":
-			return int(10000.0 * 10.0 ** preset_quality_linear())
+			return int(10000.0 * 10.0 ** preset_quality_linear(true))
 		"ocean/screen_and_depth":
-			return preset_quality_linear() >= 0 and not OS.has_feature("web") # Web crashes for now
+			return preset_quality_linear(true) >= 0 and not OS.has_feature("web") # Web crashes for now
 		"common/props_multiplier":
-			return 10.0 ** (preset_quality_quadratic() * 0.25) # 0.1, 0.56, 1, 1.78, 10
+			return 10.0 ** (preset_quality_quadratic(true) * 0.25) # 0.1, 0.56, 1, 1.78, 10
 		"common/stochastic_textures":
-			return preset_quality_linear() >= 0
+			return preset_quality_linear(true) >= 2 # They really affect performance :/
 		_:
 			return null
 
@@ -217,7 +185,7 @@ static func project_godot() -> ConfigFile:
 func setting_global_shader_set(setting_name: String):
 	var safe_name := setting_global_shader_name(setting_name)
 	if project_godot() != null and project_godot().has_section_key("shader_globals", safe_name):
-		RenderingServer.global_shader_parameter_set(safe_name, Settings._s_val(setting_name))
+		RenderingServer.global_shader_parameter_set(safe_name, Settings._s_val(setting_name, true))
 
 
 ## Returns a string that can be used with a c-like preprocessor to define all current settings. Useful for shaders!
@@ -309,6 +277,11 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the terrain (can affect performance and initial load time).",
 		},
+		"terrain/no_textures": {
+			"default": null, # A quality preset will always override this
+			"type": TYPE_BOOL,
+			"info": "Whether to use textures or just simple colors to paint the terrain.",
+		},
 		"terrain/cell_border": {
 			"default": 0.01,
 			"type": TYPE_FLOAT,
@@ -347,6 +320,47 @@ static var _all_settings_info: Dictionary = \
 	}
 
 
+# INIT AFTER ALL VARIABLES ARE INITIALIZED
+
+func _init() -> void: # This runs before any _init() of the main scene (autoloaded)
+	assert(_instance == null, "Only 1 settings instance at a time!")
+	_instance = self
+
+	# HACK: Allow special env overrides before ini (like changing the settings file path or the presets)
+	_load_custom_settings_web()
+	_load_custom_settings_env()
+	_load_custom_settings_ini()
+
+	# Apply presets before the final pass to override some settings...
+	if _val("settings/print", true):
+		var preset_info := "("
+		for setting_name: String in _all_settings_info.keys():
+			if setting_name.begins_with("preset/"):
+				preset_info += setting_name.trim_prefix("preset/")
+				preset_info += ": " + _val(setting_name, true)
+		preset_info += ")"
+		print("[before-logging] (SettingsAutoloaded) Applying presets... " + preset_info)
+	for setting_name: String in _all_settings_info.keys():
+		var mod_preset = _apply_presets(setting_name)
+		if mod_preset != null:
+			_all_settings[setting_name] = mod_preset
+
+	# Reload overrides after presets are applied, and giving more priority to env and web...
+	_load_custom_settings_ini()
+	_load_custom_settings_env()
+	_load_custom_settings_web()
+
+	# Override all global parameters as required
+	if _val("settings/print", true):
+		print("[before-logging] (SettingsAutoloaded) Publishing global shader parameters...")
+	for setting_name: String in _all_settings_info.keys():
+		setting_global_shader_set(setting_name)
+
+	_loaded = true
+	
+	# Set global seed for unreachable internal randf calls (best effort!)
+	seed(common_seed())
+
 # ========== ALL SETTINGS ACCESSORS ==========
 static func common_seed() -> int: return _s_val("common/seed")
 
@@ -360,16 +374,16 @@ static func game_path() -> String: return _s_val("game/path")
 static var _preset_quality_values: Array = ["lowest", "low", "medium", "high", "highest"]
 
 
-static func preset_quality() -> String:
-	var preset = _s_val("preset/quality")
+static func preset_quality(skip_check: bool = false) -> String:
+	var preset = _s_val("preset/quality", skip_check)
 	assert(_preset_quality_values.has(preset), "Invalid quality preset: " + preset)
 	return preset
 
 
-@warning_ignore("integer_division") static func preset_quality_linear() -> int: return _preset_quality_values.find(preset_quality()) - _preset_quality_values.size() / 2
+@warning_ignore("integer_division") static func preset_quality_linear(skip_check: bool = false) -> int: return _preset_quality_values.find(preset_quality(skip_check)) - _preset_quality_values.size() / 2
 
 
-static func preset_quality_quadratic() -> int: return preset_quality_linear() ** 2 * sign(preset_quality_linear())
+static func preset_quality_quadratic(skip_check: bool = false) -> int: return preset_quality_linear(skip_check) ** 2 * sign(preset_quality_linear(skip_check))
 
 
 static func terrain_cell_side() -> float: return _s_val("terrain/cell_side")

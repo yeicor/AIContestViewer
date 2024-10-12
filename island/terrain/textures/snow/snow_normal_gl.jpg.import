@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjtek5ls4e2wt"
-path.s3tc="res://.godot/imported/rock1_roughness.jpg-ed9573d04bd69f8768c1fdee2635fcf3.s3tc.ctex"
-path.etc2="res://.godot/imported/rock1_roughness.jpg-ed9573d04bd69f8768c1fdee2635fcf3.etc2.ctex"
+uid="uid://ddx0ewoa7f45c"
+path.s3tc="res://.godot/imported/snow_normal_gl.jpg-b9dcdc9fef0f646e4c7523c552684571.s3tc.ctex"
+path.etc2="res://.godot/imported/snow_normal_gl.jpg-b9dcdc9fef0f646e4c7523c552684571.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/rock1/rock1_roughness.jpg"
-dest_files=["res://.godot/imported/rock1_roughness.jpg-ed9573d04bd69f8768c1fdee2635fcf3.s3tc.ctex", "res://.godot/imported/rock1_roughness.jpg-ed9573d04bd69f8768c1fdee2635fcf3.etc2.ctex"]
+source_file="res://island/terrain/textures/snow/snow_normal_gl.jpg"
+dest_files=["res://.godot/imported/snow_normal_gl.jpg-b9dcdc9fef0f646e4c7523c552684571.s3tc.ctex", "res://.godot/imported/snow_normal_gl.jpg-b9dcdc9fef0f646e4c7523c552684571.etc2.ctex"]
 
 [params]
 

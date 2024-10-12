@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bxw5ty7cti8hq"
-path.s3tc="res://.godot/imported/sand1_albedo.jpg-ba2f941ab75d922c37ea734cfc372be2.s3tc.ctex"
-path.etc2="res://.godot/imported/sand1_albedo.jpg-ba2f941ab75d922c37ea734cfc372be2.etc2.ctex"
+uid="uid://bjpawqrj6ii27"
+path.s3tc="res://.godot/imported/rock_albedo.jpg-436bf0469d513d71e5aea56d700bca60.s3tc.ctex"
+path.etc2="res://.godot/imported/rock_albedo.jpg-436bf0469d513d71e5aea56d700bca60.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/sand1/sand1_albedo.jpg"
-dest_files=["res://.godot/imported/sand1_albedo.jpg-ba2f941ab75d922c37ea734cfc372be2.s3tc.ctex", "res://.godot/imported/sand1_albedo.jpg-ba2f941ab75d922c37ea734cfc372be2.etc2.ctex"]
+source_file="res://island/terrain/textures/rock/rock_albedo.jpg"
+dest_files=["res://.godot/imported/rock_albedo.jpg-436bf0469d513d71e5aea56d700bca60.s3tc.ctex", "res://.godot/imported/rock_albedo.jpg-436bf0469d513d71e5aea56d700bca60.etc2.ctex"]
 
 [params]
 

@@ -112,7 +112,7 @@ setting_common_props_multiplier={
 }
 setting_common_stochastic_textures={
 "type": "bool",
-"value": true
+"value": false
 }
 setting_terrain_cell_side={
 "type": "float",
@@ -124,7 +124,11 @@ setting_terrain_max_steepness={
 }
 setting_terrain_vertex_count={
 "type": "int",
-"value": 1000
+"value": 100000
+}
+setting_terrain_no_textures={
+"type": "bool",
+"value": false
 }
 setting_terrain_cell_border={
 "type": "float",
@@ -136,11 +140,11 @@ setting_island_water_level_distance={
 }
 setting_island_water_level_at={
 "type": "float",
-"value": 0.44
+"value": 0.52381
 }
 setting_island_water_level_step={
 "type": "float",
-"value": 0.1
+"value": 0.0952381
 }
 setting_island_heightmap={
 "type": "sampler2D",

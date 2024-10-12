@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dhyswvn2hk8se"
-path.s3tc="res://.godot/imported/sand1_ao.jpg-a06bc77646a94c82eb76ed2ba77ed833.s3tc.ctex"
-path.etc2="res://.godot/imported/sand1_ao.jpg-a06bc77646a94c82eb76ed2ba77ed833.etc2.ctex"
+uid="uid://bjtek5ls4e2wt"
+path.s3tc="res://.godot/imported/rock_roughness.jpg-0702998bbc3405ecf3607f122cd31537.s3tc.ctex"
+path.etc2="res://.godot/imported/rock_roughness.jpg-0702998bbc3405ecf3607f122cd31537.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/sand1/sand1_ao.jpg"
-dest_files=["res://.godot/imported/sand1_ao.jpg-a06bc77646a94c82eb76ed2ba77ed833.s3tc.ctex", "res://.godot/imported/sand1_ao.jpg-a06bc77646a94c82eb76ed2ba77ed833.etc2.ctex"]
+source_file="res://island/terrain/textures/rock/rock_roughness.jpg"
+dest_files=["res://.godot/imported/rock_roughness.jpg-0702998bbc3405ecf3607f122cd31537.s3tc.ctex", "res://.godot/imported/rock_roughness.jpg-0702998bbc3405ecf3607f122cd31537.etc2.ctex"]
 
 [params]
 

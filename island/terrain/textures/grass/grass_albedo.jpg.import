@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5tehj0t24ld"
-path.s3tc="res://.godot/imported/snow1_albedo.jpg-38eba652677144b5da6fdc4a30a2a2d8.s3tc.ctex"
-path.etc2="res://.godot/imported/snow1_albedo.jpg-38eba652677144b5da6fdc4a30a2a2d8.etc2.ctex"
+uid="uid://d42jolqnbuby"
+path.s3tc="res://.godot/imported/grass_albedo.jpg-f1ff690652b09732a4eb810449b3424c.s3tc.ctex"
+path.etc2="res://.godot/imported/grass_albedo.jpg-f1ff690652b09732a4eb810449b3424c.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/snow1/snow1_albedo.jpg"
-dest_files=["res://.godot/imported/snow1_albedo.jpg-38eba652677144b5da6fdc4a30a2a2d8.s3tc.ctex", "res://.godot/imported/snow1_albedo.jpg-38eba652677144b5da6fdc4a30a2a2d8.etc2.ctex"]
+source_file="res://island/terrain/textures/grass/grass_albedo.jpg"
+dest_files=["res://.godot/imported/grass_albedo.jpg-f1ff690652b09732a4eb810449b3424c.s3tc.ctex", "res://.godot/imported/grass_albedo.jpg-f1ff690652b09732a4eb810449b3424c.etc2.ctex"]
 
 [params]
 

@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjpawqrj6ii27"
-path.s3tc="res://.godot/imported/rock1_albedo.jpg-6b868e723d08e4ac2f82bec52155f2a7.s3tc.ctex"
-path.etc2="res://.godot/imported/rock1_albedo.jpg-6b868e723d08e4ac2f82bec52155f2a7.etc2.ctex"
+uid="uid://b5fn2t7tmevo3"
+path.s3tc="res://.godot/imported/snow_roughness.jpg-3031ee2e2e692f15119260f03ce54baf.s3tc.ctex"
+path.etc2="res://.godot/imported/snow_roughness.jpg-3031ee2e2e692f15119260f03ce54baf.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/rock1/rock1_albedo.jpg"
-dest_files=["res://.godot/imported/rock1_albedo.jpg-6b868e723d08e4ac2f82bec52155f2a7.s3tc.ctex", "res://.godot/imported/rock1_albedo.jpg-6b868e723d08e4ac2f82bec52155f2a7.etc2.ctex"]
+source_file="res://island/terrain/textures/snow/snow_roughness.jpg"
+dest_files=["res://.godot/imported/snow_roughness.jpg-3031ee2e2e692f15119260f03ce54baf.s3tc.ctex", "res://.godot/imported/snow_roughness.jpg-3031ee2e2e692f15119260f03ce54baf.etc2.ctex"]
 
 [params]
 

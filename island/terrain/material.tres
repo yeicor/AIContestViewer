@@ -2,22 +2,22 @@
 
 [ext_resource type="Shader" path="res://island/terrain/shaders/cells.gdshader" id="1_hut0j"]
 [ext_resource type="Shader" path="res://island/terrain/shaders/terrain.gdshader" id="2_vg0pr"]
-[ext_resource type="Texture2D" uid="uid://d42jolqnbuby" path="res://island/terrain/textures/grass1/grass1_albedo.jpg" id="3_3h4y5"]
-[ext_resource type="Texture2D" uid="uid://bed1dknxbyrbp" path="res://island/terrain/textures/grass1/grass1_ao.jpg" id="4_tld68"]
-[ext_resource type="Texture2D" uid="uid://o8m86b1t4ai8" path="res://island/terrain/textures/grass1/grass1_normal_gl.jpg" id="5_o22ub"]
-[ext_resource type="Texture2D" uid="uid://cno3bysmawipc" path="res://island/terrain/textures/grass1/grass1_roughness.jpg" id="6_qtwmw"]
-[ext_resource type="Texture2D" uid="uid://bjpawqrj6ii27" path="res://island/terrain/textures/rock1/rock1_albedo.jpg" id="7_s0ghc"]
-[ext_resource type="Texture2D" uid="uid://bx4wikxif1d38" path="res://island/terrain/textures/rock1/rock1_ao.jpg" id="8_0wu3f"]
-[ext_resource type="Texture2D" uid="uid://b7fkd4ayornb1" path="res://island/terrain/textures/rock1/rock1_normal_gl.jpg" id="9_p06rt"]
-[ext_resource type="Texture2D" uid="uid://bjtek5ls4e2wt" path="res://island/terrain/textures/rock1/rock1_roughness.jpg" id="10_3hxic"]
-[ext_resource type="Texture2D" uid="uid://bxw5ty7cti8hq" path="res://island/terrain/textures/sand1/sand1_albedo.jpg" id="11_b5wd4"]
-[ext_resource type="Texture2D" uid="uid://dhyswvn2hk8se" path="res://island/terrain/textures/sand1/sand1_ao.jpg" id="12_yes8u"]
-[ext_resource type="Texture2D" uid="uid://bxgpuqd8ssud7" path="res://island/terrain/textures/sand1/sand1_normal_gl.jpg" id="13_w62at"]
-[ext_resource type="Texture2D" uid="uid://dudq6amp7k6ma" path="res://island/terrain/textures/sand1/sand1_roughness.jpg" id="14_qvgki"]
-[ext_resource type="Texture2D" uid="uid://5tehj0t24ld" path="res://island/terrain/textures/snow1/snow1_albedo.jpg" id="15_cjcs8"]
-[ext_resource type="Texture2D" uid="uid://c43rjyvowx77i" path="res://island/terrain/textures/snow1/snow1_ao.jpg" id="16_8uih7"]
-[ext_resource type="Texture2D" uid="uid://ddx0ewoa7f45c" path="res://island/terrain/textures/snow1/snow1_normal_gl.jpg" id="17_xrejs"]
-[ext_resource type="Texture2D" uid="uid://b5fn2t7tmevo3" path="res://island/terrain/textures/snow1/snow1_roughness.jpg" id="18_mqd1u"]
+[ext_resource type="Texture2D" uid="uid://d42jolqnbuby" path="res://island/terrain/textures/grass/grass_albedo.jpg" id="3_825v6"]
+[ext_resource type="Texture2D" uid="uid://bed1dknxbyrbp" path="res://island/terrain/textures/grass/grass_ao.jpg" id="4_24a22"]
+[ext_resource type="Texture2D" uid="uid://o8m86b1t4ai8" path="res://island/terrain/textures/grass/grass_normal_gl.jpg" id="5_sg5ik"]
+[ext_resource type="Texture2D" uid="uid://cno3bysmawipc" path="res://island/terrain/textures/grass/grass_roughness.jpg" id="6_8rj6g"]
+[ext_resource type="Texture2D" uid="uid://bjpawqrj6ii27" path="res://island/terrain/textures/rock/rock_albedo.jpg" id="7_bi0wb"]
+[ext_resource type="Texture2D" uid="uid://bx4wikxif1d38" path="res://island/terrain/textures/rock/rock_ao.jpg" id="8_wlha0"]
+[ext_resource type="Texture2D" uid="uid://b7fkd4ayornb1" path="res://island/terrain/textures/rock/rock_normal_gl.jpg" id="9_qi1pn"]
+[ext_resource type="Texture2D" uid="uid://bjtek5ls4e2wt" path="res://island/terrain/textures/rock/rock_roughness.jpg" id="10_4uo1r"]
+[ext_resource type="Texture2D" uid="uid://bxw5ty7cti8hq" path="res://island/terrain/textures/sand/sand_albedo.jpg" id="11_gijmr"]
+[ext_resource type="Texture2D" uid="uid://dhyswvn2hk8se" path="res://island/terrain/textures/sand/sand_ao.jpg" id="12_pn2w7"]
+[ext_resource type="Texture2D" uid="uid://bxgpuqd8ssud7" path="res://island/terrain/textures/sand/sand_normal_gl.jpg" id="13_euyum"]
+[ext_resource type="Texture2D" uid="uid://dudq6amp7k6ma" path="res://island/terrain/textures/sand/sand_roughness.jpg" id="14_c8q74"]
+[ext_resource type="Texture2D" uid="uid://5tehj0t24ld" path="res://island/terrain/textures/snow/snow_albedo.jpg" id="15_j73ul"]
+[ext_resource type="Texture2D" uid="uid://c43rjyvowx77i" path="res://island/terrain/textures/snow/snow_ao.jpg" id="16_akvsm"]
+[ext_resource type="Texture2D" uid="uid://ddx0ewoa7f45c" path="res://island/terrain/textures/snow/snow_normal_gl.jpg" id="17_1grca"]
+[ext_resource type="Texture2D" uid="uid://b5fn2t7tmevo3" path="res://island/terrain/textures/snow/snow_roughness.jpg" id="18_6hlke"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xoty1"]
 render_priority = 0
@@ -30,28 +30,41 @@ shader_parameter/below_water_color = Color(0.5, 0, 0, 0)
 render_priority = 0
 next_pass = SubResource("ShaderMaterial_xoty1")
 shader = ExtResource("2_vg0pr")
-shader_parameter/hextiling_fallOffContrast = 0.6
-shader_parameter/hextiling_exp = 7.0
-shader_parameter/p_normals = PackedVector3Array(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/p_normals = PackedVector3Array(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.302, 0.905, 0.302, -0.302, 0.905, 0.302, 0.302, 0.905, -0.302, -0.302, 0, -0.302)
 shader_parameter/p_normals_count = 3
 shader_parameter/blend_sharpness = 1.0
-shader_parameter/grass1_scale = Vector2(0.1, 0.1)
-shader_parameter/grass1_albedo = ExtResource("3_3h4y5")
-shader_parameter/grass1_normal = ExtResource("5_o22ub")
-shader_parameter/grass1_ao = ExtResource("4_tld68")
-shader_parameter/grass1_roughness = ExtResource("6_qtwmw")
-shader_parameter/rock1_scale = Vector2(0.1, 0.1)
-shader_parameter/rock1_albedo = ExtResource("7_s0ghc")
-shader_parameter/rock1_normal = ExtResource("9_p06rt")
-shader_parameter/rock1_ao = ExtResource("8_0wu3f")
-shader_parameter/rock1_roughness = ExtResource("10_3hxic")
-shader_parameter/sand1_scale = Vector2(0.1, 0.1)
-shader_parameter/sand1_albedo = ExtResource("11_b5wd4")
-shader_parameter/sand1_normal = ExtResource("13_w62at")
-shader_parameter/sand1_ao = ExtResource("12_yes8u")
-shader_parameter/sand1_roughness = ExtResource("14_qvgki")
-shader_parameter/snow1_scale = Vector2(0.1, 0.1)
-shader_parameter/snow1_albedo = ExtResource("15_cjcs8")
-shader_parameter/snow1_normal = ExtResource("17_xrejs")
-shader_parameter/snow1_ao = ExtResource("16_8uih7")
-shader_parameter/snow1_roughness = ExtResource("18_mqd1u")
+shader_parameter/nplanar_show_weights = false
+shader_parameter/grass_scale = Vector2(1, 1)
+shader_parameter/grass_strength = 0.85
+shader_parameter/grass_strength_noise = 0.1
+shader_parameter/grass_smooth = 0.5
+shader_parameter/grass_albedo = ExtResource("3_825v6")
+shader_parameter/grass_normal = ExtResource("5_sg5ik")
+shader_parameter/grass_ao = ExtResource("4_24a22")
+shader_parameter/grass_roughness = ExtResource("6_8rj6g")
+shader_parameter/rock_scale = Vector2(1, 1)
+shader_parameter/rock_strength = 0.85
+shader_parameter/rock_strength_noise = 0.2
+shader_parameter/rock_smooth = 0.05
+shader_parameter/rock_albedo = ExtResource("7_bi0wb")
+shader_parameter/rock_normal = ExtResource("9_qi1pn")
+shader_parameter/rock_ao = ExtResource("8_wlha0")
+shader_parameter/rock_roughness = ExtResource("10_4uo1r")
+shader_parameter/sand_scale = Vector2(1, 1)
+shader_parameter/sand_strength = 1.0
+shader_parameter/sand_strength_noise = 0.5
+shader_parameter/sand_smooth = 0.5
+shader_parameter/sand_height = 0.01
+shader_parameter/sand_albedo = ExtResource("11_gijmr")
+shader_parameter/sand_normal = ExtResource("13_euyum")
+shader_parameter/sand_ao = ExtResource("12_pn2w7")
+shader_parameter/sand_roughness = ExtResource("14_c8q74")
+shader_parameter/snow_scale = Vector2(1, 1)
+shader_parameter/snow_strength = 1.0
+shader_parameter/snow_strength_noise = 3.0
+shader_parameter/snow_smooth = 1.5
+shader_parameter/snow_height = 0.3
+shader_parameter/snow_albedo = ExtResource("15_j73ul")
+shader_parameter/snow_normal = ExtResource("17_1grca")
+shader_parameter/snow_ao = ExtResource("16_akvsm")
+shader_parameter/snow_roughness = ExtResource("18_6hlke")

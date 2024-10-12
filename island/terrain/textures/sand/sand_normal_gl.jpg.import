@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bx4wikxif1d38"
-path.s3tc="res://.godot/imported/rock1_ao.jpg-7a237946b0567f31e8db9948572720e2.s3tc.ctex"
-path.etc2="res://.godot/imported/rock1_ao.jpg-7a237946b0567f31e8db9948572720e2.etc2.ctex"
+uid="uid://bxgpuqd8ssud7"
+path.s3tc="res://.godot/imported/sand_normal_gl.jpg-1e125779d8ed623918b7ffc404c26669.s3tc.ctex"
+path.etc2="res://.godot/imported/sand_normal_gl.jpg-1e125779d8ed623918b7ffc404c26669.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://island/terrain/textures/rock1/rock1_ao.jpg"
-dest_files=["res://.godot/imported/rock1_ao.jpg-7a237946b0567f31e8db9948572720e2.s3tc.ctex", "res://.godot/imported/rock1_ao.jpg-7a237946b0567f31e8db9948572720e2.etc2.ctex"]
+source_file="res://island/terrain/textures/sand/sand_normal_gl.jpg"
+dest_files=["res://.godot/imported/sand_normal_gl.jpg-1e125779d8ed623918b7ffc404c26669.s3tc.ctex", "res://.godot/imported/sand_normal_gl.jpg-1e125779d8ed623918b7ffc404c26669.etc2.ctex"]
 
 [params]
 

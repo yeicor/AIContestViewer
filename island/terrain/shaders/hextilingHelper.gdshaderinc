@@ -1,6 +1,6 @@
 // Auto-include textureHextile based on global defines (inherit stochastic ones!)
 #ifndef s_common_stochastic_textures // Editor-only, allow setting all uniforms
-#define s_common_stochastic_textures true // And default to hextile
+#define s_common_stochastic_textures false // And default to not hextile
 #endif
 #if s_common_stochastic_textures
 #include "res://island/terrain/shaders/hextiling.gdshaderinc"

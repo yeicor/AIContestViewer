@@ -27,12 +27,11 @@ void fragment() {
 	bool cell_above_water =
 	texelFetch(setting_island_water_level_distance, cell_to_corner(ivec2(uv_data.xy)), 0).r > setting_island_water_level_at;
 	bool oob = uv_data.x < 0.0 || uv_data.x > uv_data.z || uv_data.y < 0.0 || uv_data.y > uv_data.w;
+	cell_above_water = cell_above_water && !oob;
 
-	if (!oob) {
-		vec4 full_color = cell_above_water ? above_water_color : below_water_color;
-	    ALBEDO = full_color.rgb;
-		ALPHA = lines * full_color.a;
-	}
+	vec4 full_color = cell_above_water ? above_water_color : below_water_color;
+    ALBEDO = full_color.rgb;
+	ALPHA = lines * full_color.a;
 }
 
 //void light() {

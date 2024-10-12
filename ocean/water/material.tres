@@ -41,7 +41,5 @@ shader_parameter/refraction_intensity = 0.4
 shader_parameter/max_visible_depth = 4.0
 shader_parameter/color_deep = Color(0, 0.1, 0.4, 1)
 shader_parameter/wave_noise = SubResource("NoiseTexture2D_iqqbh")
-shader_parameter/hextiling_fallOffContrast = 0.6
-shader_parameter/hextiling_exp = 7.0
 shader_parameter/surface_normals_a = ExtResource("2_64h5n")
 shader_parameter/surface_normals_b = ExtResource("3_6g5ih")

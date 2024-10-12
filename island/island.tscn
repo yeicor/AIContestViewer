@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bfq4y7aalc3s1"]
+
+[ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="1_3qeog"]
+
+[node name="Island" type="Node3D"]
+
+[node name="Terrain" parent="." instance=ExtResource("1_3qeog")]

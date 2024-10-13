@@ -17,7 +17,7 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 	var min_height: float     =  height_bounds.map(func(x): return x.min()).min()
 	var max_height: float     =  height_bounds.map(func(x): return x.max()).max()
 	var water_level_at: float =  (0.0 - min_height) / (max_height - min_height);
-	var y_level_step := 1.0 / float(max_height - min_height)
+	var y_level_step := 1.0 / (max_height - min_height)
 	#print("MAX HEIGHTS:\n" + GameState.array_2d_to_ascii_string(
 	#height_bounds.map(func(r): return r.map(func(x): return str(x)))))
 	var texture_data: Array = []
@@ -113,11 +113,13 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 
 
 func _read_height(x: int, z: int, min_height: float, max_height: float) -> float:
-	var color              := _last_heightmap.get_pixel(x, z)
+	return read_height(_last_heightmap, x, z, min_height, max_height)
+
+static func read_height(hm: Image, x: int, z: int, min_height: float, max_height: float) -> float:
+	var color              := hm.get_pixel(x, z)
 	const precision: float =  255.99999
 	var height: float      =  color.r + color.g / precision
 	return height * (max_height - min_height) + min_height
-
 
 func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float, y_level_step: float, semaphore: Semaphore, xz_counts: Vector2i):
 	var start_time := Time.get_ticks_msec()
@@ -126,7 +128,7 @@ func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float
 	var mat: Material = $HeightMap.material
 	mat.set_shader_parameter("my_seed", mseed)
 	Settings.island_water_level_distance_set(height_bounds_tex)
-	Settings.island_water_level_set(water_level_at)
+	Settings.island_water_level_at_set(water_level_at)
 	Settings.island_water_level_step_set(y_level_step)
 
 	self.set_update_mode(SubViewport.UPDATE_ONCE) # Render once!

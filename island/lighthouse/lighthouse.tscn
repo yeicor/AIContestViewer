@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://bup4red5vgsof"]
+
+[ext_resource type="PackedScene" uid="uid://ba04t0vgcj163" path="res://island/lighthouse/model/lighthouse.glb" id="1_534e3"]
+[ext_resource type="Script" path="res://island/lighthouse/lighthouse.gd" id="1_mjv0r"]
+
+[node name="Lighthouse" type="Node3D"]
+script = ExtResource("1_mjv0r")
+color = Color(1, 0, 0.898927, 1)
+
+[node name="lighthouse" parent="." instance=ExtResource("1_534e3")]

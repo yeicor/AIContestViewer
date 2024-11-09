@@ -96,10 +96,10 @@ func generate(game: GameState):
 		var hmesh: Mesh = heightmap.generate(game, my_seed, cell_side, steepness, vertex_count)
 		hmesh.surface_set_material(0, material)
 		(func():
+			_generate_thread.wait_to_finish()
 			var meshNode = MeshInstance3D.new()
 			meshNode.name = "_TerrainGen" + str(Time.get_ticks_usec())
 			meshNode.mesh = hmesh
 			add_child(meshNode)
 			SLog.sd("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
-			terrain_ready.emit(meshNode)
-			_generate_thread.wait_to_finish()).call_deferred())
+			terrain_ready.emit(meshNode)).call_deferred())

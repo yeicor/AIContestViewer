@@ -2,6 +2,8 @@ shader_type spatial;
 render_mode cull_disabled;
 
 uniform sampler2D tex: filter_linear_mipmap_anisotropic;
+// TODO: Generalize the replaced color and sensitivity by adding attributes and reuse for player
+
 uniform vec3 color: source_color = vec3(1.0);
 
 void fragment() {

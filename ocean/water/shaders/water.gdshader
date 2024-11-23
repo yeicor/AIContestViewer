@@ -247,7 +247,7 @@ void fragment() {
 	vec3 color_with_transparency 	= mix(surface_color, screen_color, transparency);
 	vec3 depth_color 				= mix(color_deep.rgb, color_with_transparency, depth_opacity);
 	vec3 water_color 				= (ssr_color.x >= 0.0) ? mix(depth_color, ssr_color, ssr_mix_strength) : depth_color;
-	
+
 	// FIXME: border color not properly computed when there is an overlay (like branches over water)
 	vec3 final_color				= mix(water_color, border_color, 1.0 - min(water_depth/border_scale, 1.0));
 

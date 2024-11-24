@@ -3,6 +3,7 @@ extends "base_modifier.gd"
 
 
 @export_file("Texture") var mask: String
+@export var mask_texture: Texture2D  # Alternative to mask above
 @export var mask_rotation := 0.0
 @export var mask_offset := Vector2.ZERO
 @export var mask_scale := Vector2.ONE
@@ -58,15 +59,17 @@ func _init() -> void:
 	p.set_description("Threshold above which the transforms are removed.")
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	if not ResourceLoader.exists(mask):
-		warning += "The specified file " + mask + " could not be loaded."
-		return
+	var texture: Texture = mask_texture
+	if not texture:
+		if not ResourceLoader.exists(mask):
+			warning += "The specified file " + mask + " could not be loaded."
+			return
 
-	var texture: Texture = load(mask)
+		texture = load(mask)
 
-	if not texture is Texture:
-		warning += "The specified file is not a valid texture."
-		return
+		if not texture is Texture:
+			warning += "The specified file is not a valid texture."
+			return
 
 	var image: Image
 

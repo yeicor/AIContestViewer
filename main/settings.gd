@@ -402,9 +402,16 @@ static func island_water_level_distance_set(texture: Texture2D) -> void:
 	assert(_instance != null)
 	_instance._all_settings["island/water_level_distance"] = texture
 	RenderingServer.global_shader_parameter_set("setting_island_water_level_distance", texture)
+	_island_water_level_distance_image_cache = null
 
 
-static  func island_water_level_distance() -> Texture2D: return _s_val("island/water_level_distance")
+static func island_water_level_distance() -> Texture2D: return _s_val("island/water_level_distance")
+static var _island_water_level_distance_image_cache: Image = null
+static func island_water_level_distance_image() -> Image: 
+	if _island_water_level_distance_image_cache == null:
+		_island_water_level_distance_image_cache = island_water_level_distance().get_image()
+	return _island_water_level_distance_image_cache
+
 
 
 static func island_water_level_at_set(value: float) -> void:

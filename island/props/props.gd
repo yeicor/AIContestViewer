@@ -1,46 +1,87 @@
 @tool
 extends Node3D
 
-var start_time := 0
+@onready var _scatterers_meta: Array[Dictionary] = [
+	{"scatterer": $Trees, "per_cell": 4.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.1, "biome_mod": func(height01, hit):
+		return 1.0 - abs(0.5 - height01) / 1.0 + (hit.normal.y - 0.9) / 0.1 if height01 >= 0.1 else 0.0},
+	{"scatterer": $Rocks, "per_cell": 1.0, "biome_noise_freq": 0.2, "biome_noise_strength01": 0.1, "biome_mod": func(height01, _hit):
+		return max((height01 - 0.6) / 0.1, 1.0 - abs(0.1 - height01) / 0.4)},
+	{"scatterer": $Grass, "per_cell": 8.0, "biome_noise_freq": 0.03, "biome_noise_strength01": 0.9, "biome_mod": func(height01, _hit):
+		return 1.0 if height01 >= 0.0 else 0.0},
+	{"scatterer": $Bushes, "per_cell": 3.0, "biome_noise_freq": 0.1, "biome_noise_strength01": 0.5, "biome_mod": func(height01, _hit):
+		return 1.0 if height01 >= 0.1 else 0.0},
+	{"scatterer": $DeadBranches, "per_cell": 3.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.5, "biome_mod": func(height01, _hit):
+		return max(0.0, 1.0 - abs(0.4 - height01) / 0.6)},
+]
 
 func _on_terrain_terrain_ready(mi: MeshInstance3D) -> void:
 	#Common
-	start_time = Time.get_ticks_msec()
-	var seed := Settings.common_seed()
+	Lighthouses.ensure_terrain_collision(mi)
+	var mseed := Settings.common_seed()
 	var aabb = mi.get_aabb()
-	var above_water_pos := Vector3(0, aabb.end.y / 2, 0)
-	var above_water_scale: Vector3 = aabb.size + Vector3(0, aabb.position.y, 0)
-	var num_cells := Settings.island_water_level_distance().get_size()
+	var num_cells: Vector2i = Vector2i((Settings.island_water_level_distance().get_size() - Vector2.ONE) / 2.0)
 	var props_mult := Settings.common_props_multiplier()
 	if props_mult < 1.0:
 		props_mult = pow(props_mult, 4.0)  # More intense reduction
-	
-	#TreesAndRocks
-	$TreesAndRocks.global_seed = seed
-	$TreesAndRocks/ScatterShape.position = above_water_pos
-	$TreesAndRocks/ScatterShape.scale = above_water_scale
-	$TreesAndRocks.modifier_stack.stack[0].amount = int(2.0 * num_cells.x * num_cells.y * props_mult)
-	SLog.sd("Building " + str($TreesAndRocks.modifier_stack.stack[0].amount) + " TreesAndRocks...")
-	$TreesAndRocks.chunk_dimensions = Vector3.ONE * 20.0 * aabb.size / Vector3(num_cells.x, 1, num_cells.y)
-	$TreesAndRocks.enabled = true
-	
-	# GrassAndBushes
-	$GrassAndBushes.global_seed = seed
-	$GrassAndBushes/ScatterShape.position = above_water_pos
-	$GrassAndBushes/ScatterShape.scale = above_water_scale
-	$GrassAndBushes.modifier_stack.stack[0].spacing = Vector3.ONE * 2.0 / props_mult
-	var same_grid_GrassAndBushes := 1
-	for i in range(1, same_grid_GrassAndBushes):
-		$GrassAndBushes.modifier_stack.stack[i].spacing = $GrassAndBushes.modifier_stack.stack[i - 1].spacing
-	SLog.sd("Building GrassAndBushes with spacing of " + str($GrassAndBushes.modifier_stack.stack[0].spacing) + "...")
-	$GrassAndBushes.modifier_stack.stack[same_grid_GrassAndBushes + 2].position = $GrassAndBushes.modifier_stack.stack[0].spacing / 2 # Uneven grid
-	$GrassAndBushes.chunk_dimensions = $TreesAndRocks.chunk_dimensions
-	$GrassAndBushes.enabled = true
 
+	#Handle all scatterers similarly, but with some customization
+	for scatterer_meta_i in range(_scatterers_meta.size()):
+		var start_time := Time.get_ticks_msec()
+		var scatterer_meta = _scatterers_meta[scatterer_meta_i]
+		var scatterer: Node3D = scatterer_meta["scatterer"]
+		var per_cell: float = scatterer_meta["per_cell"]
+		var biome_noise_freq: float = scatterer_meta["biome_noise_freq"]
+		var biome_noise_strength01: float = scatterer_meta["biome_noise_strength01"]
+		var biome_modifier: Callable = scatterer_meta["biome_mod"]
+		scatterer.global_seed = mseed + scatterer_meta_i
 
-func _on_TreesAndRocks_build_completed() -> void:
-	SLog.sd("[timing] TreesAndRocks build completed after " + str(Time.get_ticks_msec() - start_time) + " ms")
+		# Adjust shape to drop only above island area
+		scatterer.get_children().map(func(shape: Node3D):
+			if shape.name == "ScatterShape":  # TODO: Better detection
+				shape.position = Vector3(aabb.get_center().x, aabb.end.y, aabb.get_center().z)
+				shape.scale = aabb.size)
 
+		# Set the amount according to the per_cell modifier
+		scatterer.modifier_stack.stack[0].amount = int(per_cell * num_cells.x * num_cells.y * props_mult)
 
-func _on_GrassAndBushes_build_completed() -> void:
-	SLog.sd("[timing] GrassAndBushes build completed after " + str(Time.get_ticks_msec() - start_time) + " ms")
+		# Build biomes
+		# - Create noise for more natural looking results
+		var biome_texture := NoiseTexture2D.new()
+		biome_texture.width = num_cells.x
+		biome_texture.height = num_cells.y
+		var biome_texture_gen := FastNoiseLite.new()
+		biome_texture_gen.seed = scatterer.global_seed
+		biome_texture_gen.frequency = biome_noise_freq
+		biome_texture.noise = biome_texture_gen
+		await biome_texture.changed
+		# - Adjust the texture with our modifier
+		var biome_img: Image = biome_texture.get_image()
+		for y in range(num_cells.y):
+			for x in range(num_cells.x):
+				var hit = Lighthouses.query_terrain(mi, Vector2(x, y) + Vector2.ONE)
+				#print("XY cell: " + str(Vector2(x,y)) + ", hit: " + str(hit.position))
+				if not hit:
+					SLog.se("Didn't hit the terrain?!")
+					continue
+				var height01 = (hit.position.y - aabb.position.y) / aabb.size.y
+				var height01abovewater = (height01 - Settings.island_water_level_at()) / (1.0 - Settings.island_water_level_at())
+				var natural = clamp(biome_modifier.call(height01abovewater, hit), 0.0, 1.0) # Height can be negative for underwater, otherwise in [0, 1]
+				var noise = biome_img.get_pixel(x, y).r  # Apply previous noise!
+				var cell_likelyhood = noise * biome_noise_strength01 + natural * (1.0 - biome_noise_strength01)
+				biome_img.set_pixel(x, y, cell_likelyhood * Color.WHITE)
+				#print("X: " + str(x) + ", Y: " + str(y) + " > HIT: " + str(hit.position) + " | H: " + str(height01) + ", H2: " + str(height01abovewater) + ", M: " + str(mult) + " | C: " + str(biome_img.get_pixel(x, y)))
+		# - Set the noise as the clusterize parameter
+		var clusterize_index = 2
+		var clusterize = scatterer.modifier_stack.stack[clusterize_index]
+		clusterize.pixel_to_unit_ratio = 1.0 # / Settings.terrain_cell_side()
+		clusterize.mask_scale = Vector2.ONE * Settings.terrain_cell_side()
+		clusterize.mask_offset = -Vector2(num_cells) / 2.0
+		clusterize.mask_texture = ImageTexture.create_from_image(biome_img)
+		#biome_img.save_png("/home/yeicor/test.png")
+
+		SLog.sd("[timing] " + scatterer.name + " setup completed after " + str(Time.get_ticks_msec() - start_time) + "ms (will build " + str(scatterer.modifier_stack.stack[0].amount) + " elements)")
+		scatterer.chunk_dimensions = Vector3.ONE * 20.0 * aabb.size / Vector3(num_cells.x, 1, num_cells.y)
+		start_time = Time.get_ticks_msec()
+		scatterer.connect("build_completed", func():
+			SLog.sd("[timing] " + scatterer.name + " background build completed after " + str(Time.get_ticks_msec() - start_time) + " ms"), CONNECT_ONE_SHOT)
+		scatterer.enabled = true

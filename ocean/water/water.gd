@@ -7,13 +7,7 @@ signal built(size: Vector2)
 @warning_ignore("unused_private_class_variable")
 @export var generate_in_editor: bool = false:
 	set(new_val):
-		generate_in_editor = new_val
-		if generate_in_editor and Engine.is_editor_hint() and is_node_ready():
-			build(Vector2(210, 180))
-		else:
-			var node := get_node_or_null("Ocean")
-			if node != null:
-				node.queue_free()
+		build(Vector2(210, 180))
 
 var material: ShaderMaterial = preload("res://ocean/water/material.tres")
 

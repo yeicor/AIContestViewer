@@ -1,0 +1,110 @@
+[gd_scene load_steps=20 format=3 uid="uid://duwxmir5xnhrr"]
+
+[ext_resource type="Script" path="res://addons/proton_scatter/src/scatter.gd" id="1_3f3qy"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/modifier_stack.gd" id="2_m8kt4"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/base_modifier.gd" id="3_ah0ee"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/create_inside_random.gd" id="4_raenh"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/relax.gd" id="5_r1swu"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/clusterize.gd" id="6_ct5tg"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/project_on_geometry.gd" id="7_u8q1j"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/randomize_transforms.gd" id="8_538la"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/scatter_item.gd" id="9_o465t"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/scatter_shape.gd" id="10_y5ta0"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/shapes/box_shape.gd" id="11_i6h04"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/common/physics_helper.gd" id="12_axnw3"]
+
+[sub_resource type="Resource" id="Resource_ue5j5"]
+script = ExtResource("4_raenh")
+amount = 10
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = true
+reference_frame = 1
+
+[sub_resource type="Resource" id="Resource_3x4vg"]
+script = ExtResource("5_r1swu")
+iterations = 3
+offset_step = 3.0
+consecutive_step_multiplier = 0.5
+use_computeshader = true
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = true
+reference_frame = 0
+
+[sub_resource type="Resource" id="Resource_h2c2h"]
+script = ExtResource("6_ct5tg")
+mask = ""
+mask_rotation = 0.0
+mask_offset = Vector2(0, 0)
+mask_scale = Vector2(1, 1)
+pixel_to_unit_ratio = 64.0
+remove_below = 0.5
+remove_above = 1.0
+scale_transforms = false
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = false
+reference_frame = 0
+
+[sub_resource type="Resource" id="Resource_tqgtx"]
+script = ExtResource("7_u8q1j")
+ray_direction = Vector3(0, -1, 0)
+ray_length = 100.0
+ray_offset = 1.0
+remove_points_on_miss = true
+align_with_collision_normal = true
+max_slope = 75.0
+collision_mask = 1
+exclude_mask = 0
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = false
+reference_frame = 0
+
+[sub_resource type="Resource" id="Resource_uaejm"]
+script = ExtResource("8_538la")
+position = Vector3(0, 0, 0)
+rotation = Vector3(20, 360, 20)
+scale = Vector3(1.5, 1.5, 1.5)
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = false
+reference_frame = 2
+
+[sub_resource type="Resource" id="Resource_gd1qb"]
+script = ExtResource("2_m8kt4")
+stack = Array[ExtResource("3_ah0ee")]([SubResource("Resource_ue5j5"), SubResource("Resource_3x4vg"), SubResource("Resource_h2c2h"), SubResource("Resource_tqgtx"), SubResource("Resource_uaejm")])
+
+[sub_resource type="Resource" id="Resource_gcbw8"]
+script = ExtResource("11_i6h04")
+size = Vector3(1, 1, 1)
+
+[node name="Trees" type="Node3D"]
+process_mode = 3
+script = ExtResource("1_3f3qy")
+enabled = false
+modifier_stack = SubResource("Resource_gd1qb")
+Performance/use_chunks = true
+Performance/chunk_dimensions = Vector3(15, 15, 15)
+
+[node name="Tree" type="Node3D" parent="."]
+script = ExtResource("9_o465t")
+source_scale_multiplier = 0.75
+lod_generate = false
+path = "res://addons/proton_scatter/demos/assets/pine_tree.tscn"
+
+[node name="ScatterShape" type="Node3D" parent="."]
+transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, 0, 0, 0)
+script = ExtResource("10_y5ta0")
+shape = SubResource("Resource_gcbw8")
+
+[node name="PhysicsHelper" type="Node" parent="."]
+script = ExtResource("12_axnw3")
+
+[node name="ScatterOutput" type="Marker3D" parent="."]

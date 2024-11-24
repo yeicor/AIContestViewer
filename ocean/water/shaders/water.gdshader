@@ -222,6 +222,7 @@ void fragment() {
     vec4 view = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
     view.xyz /= view.w;
     float water_depth = -view.z + VERTEX.z;
+	water_depth = max(water_depth, 0.0);  // Fixes foam on transparent object above water
 
 	float surface_depth = FRAGCOORD.z;
 	vec3 screen_view_position 	= get_view_position_from_uv(refraction_uv, screen_depth_refraction, INV_PROJECTION_MATRIX);
@@ -250,6 +251,7 @@ void fragment() {
 
 	// FIXME: border color not properly computed when there is an overlay (like branches over water)
 	vec3 final_color				= mix(water_color, border_color, 1.0 - min(water_depth/border_scale, 1.0));
+	if (length(final_color - vec3(1.0)) < 0.01) final_color = water_color;
 
 	ALBEDO = final_color.rgb;
 #if !s_ocean_screen_and_depth // Force basic transparency without refraction when screen can't be read.

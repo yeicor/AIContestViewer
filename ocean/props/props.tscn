@@ -11,7 +11,7 @@
 [ext_resource type="Script" path="res://addons/proton_scatter/src/scatter_shape.gd" id="9_vscxj"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/shapes/box_shape.gd" id="10_x4opp"]
 
-[sub_resource type="Resource" id="Resource_2545p"]
+[sub_resource type="Resource" id="Resource_3y6bx"]
 script = ExtResource("4_nkee3")
 amount = 5
 enabled = true
@@ -20,7 +20,7 @@ custom_seed = 0
 restrict_height = true
 reference_frame = 1
 
-[sub_resource type="Resource" id="Resource_bbu10"]
+[sub_resource type="Resource" id="Resource_0x40f"]
 script = ExtResource("5_k3we1")
 rotation = Vector3(0, 360, 0)
 snap_angle = Vector3(0, 0, 0)
@@ -30,7 +30,7 @@ custom_seed = 0
 restrict_height = false
 reference_frame = 2
 
-[sub_resource type="Resource" id="Resource_ve1pd"]
+[sub_resource type="Resource" id="Resource_nmth1"]
 script = ExtResource("6_x3mme")
 iterations = 3
 offset_step = 15.0
@@ -42,7 +42,7 @@ custom_seed = 0
 restrict_height = true
 reference_frame = 0
 
-[sub_resource type="Resource" id="Resource_s5usq"]
+[sub_resource type="Resource" id="Resource_34xmw"]
 script = ExtResource("7_g7fpq")
 negative_shapes_only = true
 enabled = true
@@ -51,22 +51,22 @@ custom_seed = 0
 restrict_height = false
 reference_frame = 0
 
-[sub_resource type="Resource" id="Resource_h7kly"]
+[sub_resource type="Resource" id="Resource_fsawh"]
 script = ExtResource("2_k5nx6")
-stack = Array[ExtResource("3_3a7fo")]([SubResource("Resource_2545p"), SubResource("Resource_bbu10"), SubResource("Resource_ve1pd"), SubResource("Resource_s5usq")])
+stack = Array[ExtResource("3_3a7fo")]([SubResource("Resource_3y6bx"), SubResource("Resource_0x40f"), SubResource("Resource_nmth1"), SubResource("Resource_34xmw")])
 
 [sub_resource type="Resource" id="Resource_ujjuh"]
 script = ExtResource("10_x4opp")
-size = Vector3(0, 1, 1200)
+size = Vector3(0, 0, 0)
 
 [sub_resource type="Resource" id="Resource_roksv"]
 script = ExtResource("10_x4opp")
-size = Vector3(0, 1, 600)
+size = Vector3(0, 0, 0)
 
 [node name="ProtonScatter" type="Node3D"]
 script = ExtResource("1_4ecgs")
 render_mode = 1
-modifier_stack = SubResource("Resource_h7kly")
+modifier_stack = SubResource("Resource_fsawh")
 Performance/use_chunks = true
 Performance/chunk_dimensions = Vector3(300, 300, 300)
 

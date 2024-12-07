@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3 uid="uid://dwve4vt0aay4i"]
+
+[ext_resource type="Script" path="res://player/player.gd" id="1_5cqs2"]
+[ext_resource type="PackedScene" uid="uid://dr2f6dywskc6p" path="res://player/model/gandalf.glb" id="2_ma0lt"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7dlpn"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_yjpoe"]
+sky_material = SubResource("ProceduralSkyMaterial_7dlpn")
+
+[sub_resource type="Environment" id="Environment_88hp4"]
+background_mode = 2
+sky = SubResource("Sky_yjpoe")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="Player" type="Node3D"]
+script = ExtResource("1_5cqs2")
+color = Color(0.966437, 0, 1, 1)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_88hp4")
+
+[node name="gandalf" parent="." instance=ExtResource("2_ma0lt")]
+
+[node name="PlayerCam" type="Camera3D" parent="."]
+transform = Transform3D(-1, 2.99003e-08, -8.21505e-08, 0, 0.939693, 0.34202, 8.74228e-08, 0.34202, -0.939693, 0, 2, -1)

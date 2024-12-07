@@ -14,7 +14,10 @@ extends Node3D
 		return max(0.0, 1.0 - abs(0.4 - height01) / 0.6)},
 ]
 
-func _on_terrain_terrain_ready(mi: MeshInstance3D) -> void:
+func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
+	if Engine.is_editor_hint():
+		return # Avoid making persistent edits in the editor (remove this for testing)
+	
 	#Common
 	Lighthouses.ensure_terrain_collision(mi)
 	var mseed := Settings.common_seed()
@@ -39,7 +42,7 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D) -> void:
 		scatterer.get_children().map(func(shape: Node3D):
 			if shape.name == "ScatterShape":  # TODO: Better detection
 				shape.position = Vector3(aabb.get_center().x, aabb.end.y, aabb.get_center().z)
-				shape.scale = aabb.size)
+				shape.shape.size = aabb.size)
 
 		# Set the amount according to the per_cell modifier
 		scatterer.modifier_stack.stack[0].amount = int(per_cell * num_cells.x * num_cells.y * props_mult)

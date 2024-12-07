@@ -10,9 +10,13 @@ static func ensure_terrain_collision(mi: MeshInstance3D) -> void:
 		mi.create_trimesh_collision()
 		SLog.sd("[timing] Created collision for terrain in " + str(Time.get_ticks_msec() - start_time) + "ms")
 
-static func global_to_cell(pos: Vector2) -> Vector2:
+static func global_to_cell(pos: Vector2) -> Vector2: # TODO: Find a better place for these functions (Settings?)
 	var num_cells = Vector2i((Settings.island_water_level_distance().get_size() - Vector2.ONE) / 2.0)
-	return (pos - Settings.terrain_cell_side() * Vector2(num_cells) / 2.0) / Settings.terrain_cell_side()
+	return pos / Settings.terrain_cell_side() - Vector2(num_cells) / 2.0
+
+static func cell_to_global(cell: Vector2) -> Vector2:
+	var num_cells = Vector2i((Settings.island_water_level_distance().get_size() - Vector2.ONE) / 2.0)
+	return (cell - Vector2(num_cells) / 2.0) * Settings.terrain_cell_side()
 
 static func query_terrain(mi: MeshInstance3D, cell_xz: Vector2) -> Dictionary:
 	var aabb = mi.get_aabb()
@@ -23,7 +27,7 @@ static func query_terrain(mi: MeshInstance3D, cell_xz: Vector2) -> Dictionary:
 	var p = aabb.position + aabb.size * p_rel
 	return mi.get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(p, Vector3(p.x, aabb.position.y, p.z)))
 
-func _on_terrain_terrain_ready(mi: MeshInstance3D) -> void:
+func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 	ensure_terrain_collision(mi)
 	var start_time := Time.get_ticks_msec()
 	# Clear previous lighthouses
@@ -39,6 +43,7 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D) -> void:
 					var child = lh.instantiate()
 					# TODO: child.name (with original IDs, taken from the array...!)
 					child.position = hit.position
+					child.rotate_y(randf() * 2 * PI)
 					child.color = Color(randf(), randf(), randf())
 					add_child(child)
 				else:

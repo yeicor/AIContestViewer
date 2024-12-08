@@ -19,7 +19,7 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 		return # Avoid making persistent edits in the editor (remove this for testing)
 	
 	#Common
-	Lighthouses.ensure_terrain_collision(mi)
+	IslandH.ensure_terrain_collision(mi)
 	var mseed := Settings.common_seed()
 	var aabb = mi.get_aabb()
 	var num_cells: Vector2i = Vector2i((Settings.island_water_level_distance().get_size() - Vector2.ONE) / 2.0)
@@ -61,7 +61,7 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 		var biome_img: Image = biome_texture.get_image()
 		for y in range(num_cells.y):
 			for x in range(num_cells.x):
-				var hit = Lighthouses.query_terrain(mi, Vector2(x, y) + Vector2.ONE)
+				var hit = IslandH.query_terrain(mi, Vector2(x, y) + Vector2.ONE)
 				#print("XY cell: " + str(Vector2(x,y)) + ", hit: " + str(hit.position))
 				if not hit:
 					SLog.se("Didn't hit the terrain?!")

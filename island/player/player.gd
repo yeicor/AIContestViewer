@@ -19,7 +19,7 @@ func _ready() -> void:
 	
 	var mesh_instance: MeshInstance3D = $gandalf/Armature/Skeleton3D/mesh_001
 	new_mat.shader = preload("res://island/lighthouse/recolor.gdshader")
-	new_mat.set_shader_parameter("tex", preload("res://player/model/gandalf_texture.tres"))
+	new_mat.set_shader_parameter("tex", preload("res://island/player/model/gandalf_texture.tres"))
 	new_mat.set_shader_parameter("color_from", Vector3(0.5, 0.7, 0.8))
 	new_mat.set_shader_parameter("sensitivity", 0.2)
 	mesh_instance.set_surface_override_material(0, new_mat)

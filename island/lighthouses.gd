@@ -1,0 +1,24 @@
+@tool
+extends Node3D
+
+func _on_terrain_terrain_ready(mi: MeshInstance3D, game: GameState) -> void:
+	IslandH.ensure_terrain_collision(mi)
+	var start_time := Time.get_ticks_msec()
+	# Clear previous lighthouses
+	get_children().map(func(c): c.queue_free())
+	# Spawn the lighthouses at the appropriate locations...
+	var lh := preload("res://island/lighthouse/lighthouse.tscn")
+	var lh_wl_image := Settings.island_water_level_distance_image()
+	for lh_meta in game.lighthouses():
+		var lh_global_center = IslandH.cell_to_global(Vector2(lh_meta.pos()) + Vector2(0.5, 0.5))
+		var hit = IslandH.query_terrain(mi, lh_global_center)
+		if hit:
+			var child = lh.instantiate()
+			child.name = "Lighthouse@" + str(lh_meta.pos())
+			child.position = hit.position
+			child.rotate_y(randf() * 2 * PI)
+			child.color = Color(randf(), randf(), randf())
+			add_child(child)
+		else:
+			SLog.se("ERROR: Couldn't hit raycast to place lighthouse!!!")
+	SLog.sd("[timing] Placed lighthouses in " + str(Time.get_ticks_msec() - start_time) + "ms")

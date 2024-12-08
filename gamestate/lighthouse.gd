@@ -21,4 +21,3 @@ func owner() -> int:
 
 func to_ascii_string() -> String:
 	return "Lighthouse at " + str(self.pos()) + " with " + str(self.energy()) + " energy, owned by " + str(self.owner())
-

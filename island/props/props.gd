@@ -3,7 +3,7 @@ extends Node3D
 
 @onready var _scatterers_meta: Array[Dictionary] = [
 	{"scatterer": $Trees, "per_cell": 4.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.1, "biome_mod": func(height01, hit):
-		return 1.0 - abs(0.5 - height01) / 1.0 + (hit.normal.y - 0.9) / 0.1 if height01 >= 0.1 else 0.0},
+		return (1.0 - abs(0.5 - height01) / 1.0 + (hit.normal.y - 0.9) / 0.1) if height01 >= 0.1 else 0.0},
 	{"scatterer": $Rocks, "per_cell": 1.0, "biome_noise_freq": 0.2, "biome_noise_strength01": 0.1, "biome_mod": func(height01, _hit):
 		return max((height01 - 0.6) / 0.1, 1.0 - abs(0.1 - height01) / 0.4)},
 	{"scatterer": $Grass, "per_cell": 8.0, "biome_noise_freq": 0.03, "biome_noise_strength01": 0.9, "biome_mod": func(height01, _hit):
@@ -59,14 +59,15 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 		await biome_texture.changed
 		# - Adjust the texture with our modifier
 		var biome_img: Image = biome_texture.get_image()
-		for y in range(num_cells.y):
+		var hm_img = Settings.island_heightmap().get_image()
+		for y in range(num_cells.y): # Approximation over each cell instead of accessing all heightmap data for performance reasons :/
 			for x in range(num_cells.x):
 				var hit = IslandH.query_terrain(mi, Vector2(x, y) + Vector2.ONE)
 				#print("XY cell: " + str(Vector2(x,y)) + ", hit: " + str(hit.position))
 				if not hit:
 					SLog.se("Didn't hit the terrain?!")
 					continue
-				var height01 = (hit.position.y - aabb.position.y) / aabb.size.y
+				var height01 = HeightMap.read_height(hm_img, int(x / float(num_cells.x) * hm_img.get_width()), int(y / float(num_cells.y) * hm_img.get_height()), 0.0, 1.0)
 				var height01abovewater = (height01 - Settings.island_water_level_at()) / (1.0 - Settings.island_water_level_at())
 				var natural = clamp(biome_modifier.call(height01abovewater, hit), 0.0, 1.0) # Height can be negative for underwater, otherwise in [0, 1]
 				var noise = biome_img.get_pixel(x, y).r  # Apply previous noise!

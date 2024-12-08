@@ -1,0 +1,588 @@
+[gd_scene load_steps=2 format=3 uid="uid://bnyrr0gema147"]
+
+[ext_resource type="Script" path="res://island/player/test_colors.gd" id="1_xteb0"]
+
+[node name="Colors" type="GridContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 16
+script = ExtResource("1_xteb0")
+
+[node name="@ColorRect@65804" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0, 0, 1)
+
+[node name="@ColorRect@65805" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 1, 1, 1)
+
+[node name="@ColorRect@65806" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 1, 0, 1)
+
+[node name="@ColorRect@65807" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0, 1, 1)
+
+[node name="@ColorRect@65808" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0.75, 0, 1)
+
+[node name="@ColorRect@65809" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 1, 0.25, 1)
+
+[node name="@ColorRect@65810" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 0.25, 1, 1)
+
+[node name="@ColorRect@65811" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0, 0.75, 1)
+
+[node name="@ColorRect@65812" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0.375, 0, 1)
+
+[node name="@ColorRect@65813" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.875, 1, 0, 1)
+
+[node name="@ColorRect@65814" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 1, 0, 1)
+
+[node name="@ColorRect@65815" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 1, 0.625, 1)
+
+[node name="@ColorRect@65816" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 0.625, 1, 1)
+
+[node name="@ColorRect@65817" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0, 1, 1)
+
+[node name="@ColorRect@65818" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.875, 0, 1, 1)
+
+[node name="@ColorRect@65819" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0, 0.375, 1)
+
+[node name="@ColorRect@65820" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.125, 0.125, 1)
+
+[node name="@ColorRect@65821" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.5, 0.5, 1)
+
+[node name="@ColorRect@65822" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.3125, 0.5, 0.125, 1)
+
+[node name="@ColorRect@65823" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.3125, 0.125, 0.5, 1)
+
+[node name="@ColorRect@65824" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.40625, 0.125, 1)
+
+[node name="@ColorRect@65825" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.5, 0.21875, 1)
+
+[node name="@ColorRect@65826" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.21875, 0.5, 1)
+
+[node name="@ColorRect@65827" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.125, 0.40625, 1)
+
+[node name="@ColorRect@65828" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.265625, 0.125, 1)
+
+[node name="@ColorRect@65829" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.453125, 0.5, 0.125, 1)
+
+[node name="@ColorRect@65830" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.171875, 0.5, 0.125, 1)
+
+[node name="@ColorRect@65831" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.5, 0.359375, 1)
+
+[node name="@ColorRect@65832" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.359375, 0.5, 1)
+
+[node name="@ColorRect@65833" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.171875, 0.125, 0.5, 1)
+
+[node name="@ColorRect@65834" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.453125, 0.125, 0.5, 1)
+
+[node name="@ColorRect@65835" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.125, 0.265625, 1)
+
+[node name="@ColorRect@65836" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.75, 0.09375, 0.09375, 1)
+
+[node name="@ColorRect@65837" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.75, 0.75, 1)
+
+[node name="@ColorRect@65838" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.421875, 0.75, 0.09375, 1)
+
+[node name="@ColorRect@65839" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.421875, 0.09375, 0.75, 1)
+
+[node name="@ColorRect@65840" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.75, 0.585938, 0.09375, 1)
+
+[node name="@ColorRect@65841" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.75, 0.257812, 1)
+
+[node name="@ColorRect@65842" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.257812, 0.75, 1)
+
+[node name="@ColorRect@65843" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.75, 0.09375, 0.585938, 1)
+
+[node name="@ColorRect@65844" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.75, 0.339844, 0.09375, 1)
+
+[node name="@ColorRect@65845" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.667969, 0.75, 0.09375, 1)
+
+[node name="@ColorRect@65846" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.175781, 0.75, 0.09375, 1)
+
+[node name="@ColorRect@65847" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.75, 0.503906, 1)
+
+[node name="@ColorRect@65848" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.503906, 0.75, 1)
+
+[node name="@ColorRect@65849" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.175781, 0.09375, 0.75, 1)
+
+[node name="@ColorRect@65850" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.667969, 0.09375, 0.75, 1)
+
+[node name="@ColorRect@65851" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.75, 0.09375, 0.339844, 1)
+
+[node name="@ColorRect@65852" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.25, 0.09375, 0.09375, 1)
+
+[node name="@ColorRect@65853" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.25, 0.25, 1)
+
+[node name="@ColorRect@65854" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.171875, 0.25, 0.09375, 1)
+
+[node name="@ColorRect@65855" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.171875, 0.09375, 0.25, 1)
+
+[node name="@ColorRect@65856" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.25, 0.210938, 0.09375, 1)
+
+[node name="@ColorRect@65857" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.25, 0.132812, 1)
+
+[node name="@ColorRect@65858" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.132812, 0.25, 1)
+
+[node name="@ColorRect@65859" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.25, 0.09375, 0.210938, 1)
+
+[node name="@ColorRect@65860" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.25, 0.152344, 0.09375, 1)
+
+[node name="@ColorRect@65861" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.230469, 0.25, 0.09375, 1)
+
+[node name="@ColorRect@65862" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.113281, 0.25, 0.09375, 1)
+
+[node name="@ColorRect@65863" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.25, 0.191406, 1)
+
+[node name="@ColorRect@65864" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.09375, 0.191406, 0.25, 1)
+
+[node name="@ColorRect@65865" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.113281, 0.09375, 0.25, 1)
+
+[node name="@ColorRect@65866" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.230469, 0.09375, 0.25, 1)
+
+[node name="@ColorRect@65867" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.25, 0.09375, 0.152344, 1)
+
+[node name="@ColorRect@65868" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0, 0, 1)
+
+[node name="@ColorRect@65869" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 1, 1, 1)
+
+[node name="@ColorRect@65870" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 1, 0, 1)
+
+[node name="@ColorRect@65871" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0, 1, 1)
+
+[node name="@ColorRect@65872" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0.75, 0, 1)
+
+[node name="@ColorRect@65873" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 1, 0.25, 1)
+
+[node name="@ColorRect@65874" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 0.25, 1, 1)
+
+[node name="@ColorRect@65875" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0, 0.75, 1)
+
+[node name="@ColorRect@65876" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0.375, 0, 1)
+
+[node name="@ColorRect@65877" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.875, 1, 0, 1)
+
+[node name="@ColorRect@65878" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 1, 0, 1)
+
+[node name="@ColorRect@65879" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 1, 0.625, 1)
+
+[node name="@ColorRect@65880" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 0.625, 1, 1)
+
+[node name="@ColorRect@65881" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0, 1, 1)
+
+[node name="@ColorRect@65882" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.875, 0, 1, 1)
+
+[node name="@ColorRect@65883" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(1, 0, 0.375, 1)
+
+[node name="@ColorRect@65884" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.125, 0.125, 1)
+
+[node name="@ColorRect@65885" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.5, 0.5, 1)
+
+[node name="@ColorRect@65886" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.3125, 0.5, 0.125, 1)
+
+[node name="@ColorRect@65887" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.3125, 0.125, 0.5, 1)
+
+[node name="@ColorRect@65888" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.40625, 0.125, 1)
+
+[node name="@ColorRect@65889" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.5, 0.21875, 1)
+
+[node name="@ColorRect@65890" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.21875, 0.5, 1)
+
+[node name="@ColorRect@65891" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.125, 0.40625, 1)
+
+[node name="@ColorRect@65892" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.265625, 0.125, 1)
+
+[node name="@ColorRect@65893" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.453125, 0.5, 0.125, 1)
+
+[node name="@ColorRect@65894" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.171875, 0.5, 0.125, 1)
+
+[node name="@ColorRect@65895" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.5, 0.359375, 1)
+
+[node name="@ColorRect@65896" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.125, 0.359375, 0.5, 1)
+
+[node name="@ColorRect@65897" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.171875, 0.125, 0.5, 1)
+
+[node name="@ColorRect@65898" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.453125, 0.125, 0.5, 1)
+
+[node name="@ColorRect@65899" type="ColorRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.5, 0.125, 0.265625, 1)

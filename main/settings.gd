@@ -242,6 +242,11 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_INT,
 			"info": "The seed to generate the same island, camera paths, etc.",
 		},
+		"common/turn_ms": {
+			"default": 0.5,
+			"type": TYPE_FLOAT,
+			"info": "The time to spend animating each turn of the game, in seconds.",
+		},
 		"common/props_multiplier": {
 			"default": 1.0,
 			"type": TYPE_FLOAT,
@@ -363,6 +368,10 @@ func _init() -> void: # This runs before any _init() of the main scene (autoload
 
 # ========== ALL SETTINGS ACCESSORS ==========
 static func common_seed() -> int: return _s_val("common/seed")
+
+
+static func common_turn_secs() -> float: return _s_val("common/turn_ms")
+static func common_turn_secs_multiplier() -> float: return common_turn_secs() / 0.5
 
 
 static func common_props_multiplier() -> float: return _s_val("common/props_multiplier")

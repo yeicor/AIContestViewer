@@ -1,0 +1,38 @@
+[gd_scene load_steps=8 format=3 uid="uid://c3utfdyue5bsd"]
+
+[ext_resource type="Shader" path="res://island/player/lightning/lightning.gdshader" id="1_dl633"]
+[ext_resource type="Texture2D" uid="uid://686pgek3ga71" path="res://island/player/lightning/lightning_curve.tres" id="2_dvqlr"]
+[ext_resource type="Script" path="res://island/player/lightning/lightning_plane.gd" id="3_a6t0x"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_u25i3"]
+resource_local_to_scene = true
+noise_type = 3
+frequency = 0.001
+fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_e4ajc"]
+resource_local_to_scene = true
+noise = SubResource("FastNoiseLite_u25i3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4ogvs"]
+resource_local_to_scene = true
+render_priority = 1
+shader = ExtResource("1_dl633")
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/passes = 1
+shader_parameter/pass_angle = 60.0
+shader_parameter/color_gradient = ExtResource("2_dvqlr")
+shader_parameter/speed = 3.0
+shader_parameter/variation = 1.0
+shader_parameter/width = 0.1
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_e4ajc")
+shader_parameter/start_freedom = 0.0
+shader_parameter/end_freedom = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_etpp2"]
+
+[node name="LightningPlane" type="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_4ogvs")
+mesh = SubResource("PlaneMesh_etpp2")
+script = ExtResource("3_a6t0x")

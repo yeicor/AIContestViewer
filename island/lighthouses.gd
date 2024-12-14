@@ -9,6 +9,7 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, game: GameState) -> void:
 	# Spawn the lighthouses at the appropriate locations...
 	var lh := preload("res://island/lighthouse/lighthouse.tscn")
 	var lh_i := 0
+	var prev_child: LighthouseScene = null
 	for lh_meta in game.lighthouses():
 		var lh_global_center = IslandH.cell_to_global(Vector2(lh_meta.pos()) + Vector2(0.5, 0.5))
 		var hit = IslandH.query_terrain(mi, lh_global_center)
@@ -20,6 +21,17 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, game: GameState) -> void:
 			child.color = Color(0.3, 0.3, 0.3)  # Non-player color when unowned
 			child.color = ColorGenerator.get_color(lh_i)  # Only for testing visibility
 			add_child(child)
+			if prev_child != null: # Only for testing lightning connection of lighthouses
+				var lp := preload("res://island/player/lightning/lightning_plane.tscn").instantiate()
+				add_child(lp)
+				lp.name = "TestConnection@"+str(lh_meta.pos())
+				lp.start_freedom = 0.0
+				lp.end_freedom = 0.0
+				lp.variation = 0.01 # Very straight!
+				var from = prev_child.global_top_center
+				var to = child.global_top_center
+				lp.set_location(from, to)
+			prev_child = child
 		else:
 			SLog.se("ERROR: Couldn't hit raycast to place lighthouse!!!")
 		lh_i += 1

@@ -86,7 +86,8 @@ func _process(_delta: float) -> void:
 		# Smoothly rotate to face the target while walking towards it
 		var rotation_speed = PI / Settings.common_turn_secs_multiplier()
 		var rotation_target = -Vector3(walk_dest_pos.x - global_position.x, 0.0, walk_dest_pos.z - global_position.z)
-		quaternion = lerp(quaternion, Basis.looking_at(rotation_target).get_rotation_quaternion(), _delta * rotation_speed)
+		if(rotation_target.length_squared() > 0.001):
+			quaternion = lerp(quaternion, Basis.looking_at(rotation_target).get_rotation_quaternion(), _delta * rotation_speed)
 		
 	elif global_position != walk_dest_pos and walk_dest_pos.is_finite(): # End of walking event
 		global_position = walk_dest_pos

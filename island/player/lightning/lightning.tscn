@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://dd7xeeutlowd7"]
+
+[ext_resource type="Shader" path="res://island/player/lightning/lightning.gdshader" id="1_stjng"]
+[ext_resource type="Texture2D" uid="uid://686pgek3ga71" path="res://island/player/lightning/lightning_curve.tres" id="2_a7pcs"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_scbv1"]
+frequency = 0.0031
+fractal_type = 2
+domain_warp_enabled = true
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_kch2t"]
+seamless = true
+noise = SubResource("FastNoiseLite_scbv1")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rkd4u"]
+shader = ExtResource("1_stjng")
+shader_parameter/speed = 2.0
+shader_parameter/variation = 0.5
+shader_parameter/width = 0.15
+shader_parameter/noiseTexture = SubResource("NoiseTexture2D_kch2t")
+shader_parameter/startFreedom = 0.0
+shader_parameter/endFreedom = 1.0
+shader_parameter/color_gradient = ExtResource("2_a7pcs")
+
+[node name="Lightning" type="ColorRect"]
+material = SubResource("ShaderMaterial_rkd4u")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

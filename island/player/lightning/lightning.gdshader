@@ -51,5 +51,5 @@ void fragment(){
 			ALBEDO *= (3.0 + mod(TIME * speed * 3.0, 2.0) * glow_sample) / length(ALBEDO);
 		}
 	}
-	ALPHA = length(ALBEDO.rgb);
+	ALPHA = clamp(length(ALBEDO.rgb), 0.0, 1.0);
 }

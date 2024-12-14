@@ -1,32 +1,37 @@
-[gd_scene load_steps=6 format=3 uid="uid://c05vbnwjdchei"]
+[gd_scene load_steps=7 format=3 uid="uid://c05vbnwjdchei"]
 
-[ext_resource type="PackedScene" uid="uid://dd7xeeutlowd7" path="res://island/player/lightning/lightning_2d.tscn" id="1_vqj1c"]
+[ext_resource type="Shader" path="res://island/player/lightning/lightning.gdshader" id="1_cqjd5"]
+[ext_resource type="Texture2D" uid="uid://686pgek3ga71" path="res://island/player/lightning/lightning_curve.tres" id="2_tgswp"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_u25i3"]
+resource_local_to_scene = true
+noise_type = 3
+frequency = 0.001
+fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_e4ajc"]
+resource_local_to_scene = true
+noise = SubResource("FastNoiseLite_u25i3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x3rip"]
+resource_local_to_scene = true
+render_priority = 1
+shader = ExtResource("1_cqjd5")
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/passes = 3
+shader_parameter/pass_angle = 60.0
+shader_parameter/color_gradient = ExtResource("2_tgswp")
+shader_parameter/speed = 3.0
+shader_parameter/variation = 1.0
+shader_parameter/width = 0.1
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_e4ajc")
+shader_parameter/start_freedom = 1.0
+shader_parameter/end_freedom = 1.0
 
 [sub_resource type="SphereMesh" id="SphereMesh_2cubq"]
 radial_segments = 16
 rings = 8
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_m5k3f"]
-viewport_path = NodePath("SubViewport")
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_s33j4"]
-viewport_path = NodePath("SubViewport")
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w2gjf"]
-resource_local_to_scene = true
-transparency = 1
-cull_mode = 2
-albedo_texture = SubResource("ViewportTexture_m5k3f")
-emission_enabled = true
-emission = Color(1, 1, 1, 1)
-emission_texture = SubResource("ViewportTexture_s33j4")
-grow_amount = 3.58
-
 [node name="LightningSphere" type="MeshInstance3D"]
+material_override = SubResource("ShaderMaterial_x3rip")
 mesh = SubResource("SphereMesh_2cubq")
-surface_material_override/0 = SubResource("StandardMaterial3D_w2gjf")
-
-[node name="SubViewport" type="SubViewport" parent="."]
-transparent_bg = true
-
-[node name="Lightning" parent="SubViewport" instance=ExtResource("1_vqj1c")]

@@ -20,7 +20,7 @@ var global_top_center: Vector3:
 		return global_transform * (aabb.get_center() + Vector3(0.0, aabb.size.y / 2.0, 0.0))
 
 static func from_meta(_meta: Lighthouse, global_pos: Vector3) -> LighthouseScene:
-	var slf := preload("res://island/lighthouse/lighthouse.tscn").instantiate()
+	var slf: LighthouseScene = load("res://island/lighthouse/lighthouse.tscn").instantiate()
 	slf.meta = _meta
 	slf.name = "Lighthouse@" + str(_meta.pos())
 	slf.position = global_pos
@@ -46,7 +46,7 @@ func connect_to(other: LighthouseScene):
 	lp.name = _get_conn_id(other)
 	lp.start_freedom = 0.0
 	lp.end_freedom = 0.0
-	lp.variation = 0.01 # Very straight!
+	lp.variation = 0.02 # Almost straight line to correctly highlight triangle areas!
 	var from = global_top_center
 	var to = other.global_top_center
 	lp.set_location(from, to)

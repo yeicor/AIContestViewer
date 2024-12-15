@@ -42,7 +42,7 @@ func set_location(a: Vector3, b: Vector3):  # Always looking up for now
 	var dist_sqrt = sqrt(dist)
 	width = unit_width / dist_sqrt
 	(noise_texture.noise as FastNoiseLite).frequency = unit_freq * dist_sqrt
-	print("setting noise to ", unit_freq, " -- ", dist, " -- ", (noise_texture.noise as FastNoiseLite).frequency)
+	#print("setting noise to ", unit_freq, " -- ", dist, " -- ", (noise_texture.noise as FastNoiseLite).frequency)
 	global_position = (a + b) / 2.0
 	look_at_from_position(global_position, b)
 	var angle := atan2(a.y - b.y, Vector2(b.x, b.z).distance_to(Vector2(a.x, a.z)))

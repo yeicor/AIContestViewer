@@ -31,21 +31,21 @@ vec2 rotateUV(vec2 uv, float rotation) {
 void fragment(){
 	ALBEDO = vec3(0.0);
 	for (int i = 0; i < passes; i++) {
-		float cur_angle = pass_angle * float(i) / 180.0 * PI; 
+		float cur_angle = pass_angle * float(i) / 180.0 * PI;
 		vec2 uv = UV;
 		vec2 rotated_uv = rotateUV(UV, cur_angle);
-		
+
 		vec2 noise_uv = abs(mod(uv + vec2(-TIME + float(i) * 0.123, TIME / 4.0 + float(i) * 0.321) * speed, 2.0) - 1.0);
 		float noise_sample = texture(noise_texture, noise_uv).r;
 		float glow_sample = texture(noise_texture, noise_uv / 3.0).r; // Less inner variation
-		
+
 		float centered_line = (rotated_uv.y - 0.5) / width + 0.5;
 		float line_offset = (noise_sample - 0.5) * variation / width;
-		
+
 		float sample_at = centered_line + line_offset;
 		sample_at = mix(centered_line, sample_at, clamp(rotated_uv.x * 2.0 + start_freedom, 0.0, 1.0));
 		sample_at = mix(centered_line, sample_at,  clamp((1.0 - rotated_uv.x) * 2.0 + end_freedom, 0.0, 1.0));
-		
+
 		ALBEDO += color * texture(color_gradient, vec2(sample_at, sample_at)).rgb;
 		if (length(ALBEDO) > 0.1) {
 			ALBEDO *= (3.0 + mod(TIME * speed * 3.0, 2.0) * glow_sample) / length(ALBEDO);

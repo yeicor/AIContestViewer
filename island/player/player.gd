@@ -2,7 +2,8 @@
 extends Node3D
 
 @export var terrain_mi: MeshInstance3D
-@onready var animation_player = $gandalf/AnimationPlayer
+@onready var animation_player: AnimationPlayer = $gandalf/AnimationPlayer
+@onready var skeleton: Skeleton3D = $gandalf/Armature/Skeleton3D
 
 var new_mat := ShaderMaterial.new()
 # The color of the player
@@ -21,33 +22,40 @@ func _ready() -> void:
 	mesh_instance.set_surface_override_material(0, new_mat)
 	if color == null:
 		color = Color.AQUA
-	_idle()
-	_random_walk() # Randomly walk throughout the terrain for testing
+	if not Engine.is_editor_hint():
+		_idle()
+		_random_behavior() # Randomly perform actions throughout the terrain for testing
 
 func _idle():
-	walk_dest_time = -1
-	animation_player.animation_set_next("Idle", "Idle")
-	animation_player.play("Idle", Settings.common_turn_secs() / 4.0)
+	_anim_common("Idle", true)
+	anim_dest_time = -1
 
-func _random_walk():
-	var walk_timer = Timer.new()
-	walk_timer.autostart = true
-	walk_timer.wait_time = Settings.common_turn_secs()
-	walk_timer.timeout.connect(func():
-		var num_cells = IslandH.num_cells()
-		var cur_cell = Vector2i(IslandH.global_to_cell(Vector2(global_position.x, global_position.z)))
-		var next_cell = cur_cell + Vector2i(randi_range(-1, 1), randi_range(-1, 1))
-		next_cell.x = clamp(next_cell.x, 1, num_cells.x - 1) # Also avoids corners, but not all water cells...
-		next_cell.y = clamp(next_cell.y, 1, num_cells.y - 1)
-		if next_cell == cur_cell:
-			_idle()
-		else:
-			var next_pos = IslandH.cell_to_global(Vector2(next_cell) + Vector2(0.5, 0.5))
-			walk_to(next_pos, Settings.common_turn_secs()))
-	add_child(walk_timer)
-	walk_timer.start(0)
+func _random_behavior(turn_secs: float = Settings.common_turn_secs() * 5.0):
+	var timer = Timer.new()
+	timer.autostart = true
+	timer.wait_time = turn_secs
+	timer.timeout.connect(func():
+		if randi_range(0, 100) < 50:  # Attack
+			var target_cell = Vector2i(IslandH.global_to_cell(Vector2(global_position.x, global_position.z)))
+			var target_global = IslandH.cell_to_global(Vector2(target_cell) + Vector2(0.5, 0.5))
+			var _target = Vector3(target_global.x + 1, global_position.y + 15, target_global.y + 1)
+			attack(_target, turn_secs)
+		else: # Walk or idle
+			var num_cells = IslandH.num_cells()
+			var cur_cell = Vector2i(IslandH.global_to_cell(Vector2(global_position.x, global_position.z)))
+			var next_cell = cur_cell + Vector2i(randi_range(-1, 1), randi_range(-1, 1))
+			next_cell.x = clamp(next_cell.x, 1, num_cells.x - 1) # Also avoids corners, but not all water cells...
+			next_cell.y = clamp(next_cell.y, 1, num_cells.y - 1)
+			if next_cell == cur_cell:
+				_idle()
+			else:
+				var next_pos = IslandH.cell_to_global(Vector2(next_cell) + Vector2(0.5, 0.5))
+				walk_to(next_pos, turn_secs))
+	add_child(timer)
+	timer.start(0)
 
-func walk_to(global_center: Vector2, delta_secs: float):
+func walk_to(global_center: Vector2, _delta_secs: float = Settings.common_turn_secs()):
+	# TODO: Avoid some props and follow terrain shape better? Auto-generated navmesh?
 	var walk_to_pos = Vector3(global_center.x, -999, global_center.y)
 	if terrain_mi:
 		var hit = IslandH.query_terrain(terrain_mi, global_center)
@@ -58,38 +66,75 @@ func walk_to(global_center: Vector2, delta_secs: float):
 	else:
 		SLog.sw("Walk terrain not set!")
 	walk_to_pos.y = max(0.0, walk_to_pos.y)  # Walk on water
-	_walk_to(walk_to_pos, delta_secs)
+	_walk_to(walk_to_pos, _delta_secs)
 
+var attack_lightnings: Array = []
+func attack(_target: Vector3, _delta_secs: float = Settings.common_turn_secs()):
+	"""Animates the attack of the center of the cell that the player is on."""
+	for hand_bone_name in ["mixamorig_LeftHand", "mixamorig_RightHand"]:
+		var lp := preload("res://island/player/lightning/lightning_plane.tscn").instantiate()
+		add_child(lp)
+		lp.name = "attack_lightning_" + hand_bone_name
+		lp.start_freedom = 0.0
+		lp.end_freedom = 1.0
+		lp.color = color
+		var bone_id = skeleton.find_bone(hand_bone_name)
+		attack_lightnings.append([bone_id, lp])
+	target = _target
+	_anim_common("Attack", false, _delta_secs)
 
-var walk_from_transform: Transform3D = Transform3D()
-var walk_dest_pos: Vector3 = Vector3.INF
-var walk_from_time: float = 0
-var walk_dest_time: float = -1
-func _walk_to(destination: Vector3, delta_secs: float) -> void:
+var walk_from_transform: Transform3D = Transform3D.IDENTITY
+func _walk_to(destination: Vector3, _delta_secs: float = Settings.common_turn_secs()) -> void:
 	"""Makes the player walk toward a specified destination."""
 	walk_from_transform = global_transform.orthonormalized()
-	walk_dest_pos = destination
-	walk_from_time = Time.get_ticks_msec() / 1000.0
-	walk_dest_time = walk_from_time + delta_secs
-	animation_player.animation_set_next("Run", "Run")
-	animation_player.play("Run", Settings.common_turn_secs() / 4.0)  # Switch to walk animation
-	
+	target = destination
+	_anim_common("Run", true, _delta_secs)
 
+func _anim_common(_name: String, loop: bool, _delta_secs: float = Settings.common_turn_secs()):
+	anim_from_time = Time.get_ticks_msec() / 1000.0
+	anim_dest_time = anim_from_time + _delta_secs
+	animation_player.play(_name, _delta_secs / 4.0)  # Switch smoothly
+	if loop:
+		animation_player.animation_set_next(_name, _name)
+	else:
+		animation_player.speed_scale = _delta_secs / animation_player.current_animation_length
+
+var target: Vector3 = Vector3.INF
+var anim_from_time: float = 0
+var anim_dest_time: float = -1
 func _process(_delta: float) -> void:
 	# Determine the percentage of walk completion (0 to 1+)
-	var walk_progress = (Time.get_ticks_msec() / 1000.0 - walk_from_time) / (walk_dest_time - walk_from_time)
+	var anim_progress = (Time.get_ticks_msec() / 1000.0 - anim_from_time) / (anim_dest_time - anim_from_time)
 	
-	if walk_progress >= 0.0 and walk_progress < 1.0:
-		# Move towards the target based on the percentage of completion
-		global_position = lerp(walk_from_transform.origin, walk_dest_pos, walk_progress)
+	if anim_progress >= 0.0 and anim_progress < 1.0:
+		# If walking, move towards the target based on the percentage of completion
+		if walk_from_transform != Transform3D.IDENTITY:
+			global_position = lerp(walk_from_transform.origin, target, anim_progress)
 
-		# Smoothly rotate to face the target while walking towards it
+		# Always smoothly rotate to face the target while walking towards it
 		var rotation_speed = PI / Settings.common_turn_secs_multiplier()
-		var rotation_target = -Vector3(walk_dest_pos.x - global_position.x, 0.0, walk_dest_pos.z - global_position.z)
+		var rotation_target = -Vector3(target.x - global_position.x, 0.0, target.z - global_position.z)
 		if(rotation_target.length_squared() > 0.001):
 			quaternion = lerp(quaternion, Basis.looking_at(rotation_target).get_rotation_quaternion(), _delta * rotation_speed)
 		
-	elif global_position != walk_dest_pos and walk_dest_pos.is_finite(): # End of walking event
-		global_position = walk_dest_pos
-		_idle()
+		# If attacking, make sure the lightning is always aligned with the hands and target (even while rotating)
+		if not attack_lightnings.is_empty():
+			for alp in attack_lightnings:
+				var bone_pos := skeleton.transform * skeleton.get_bone_global_pose(alp[0])
+				var lp = alp[1]
+				lp.set_location(bone_pos.origin, target)
+		
+	else: # Not animating
+		if walk_from_transform != Transform3D.IDENTITY:
+			if global_position != target: # End of walking event
+				walk_from_transform = Transform3D.IDENTITY
+				global_position = target
+				_idle()
+		
+		if not attack_lightnings.is_empty(): # End of attacking event
+			for alp in attack_lightnings:
+				var lp = alp[1]
+				remove_child(lp)
+			attack_lightnings = []
+			_idle()
 		

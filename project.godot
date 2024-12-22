@@ -106,6 +106,10 @@ setting_common_seed={
 "type": "int",
 "value": 42
 }
+setting_common_turn_ms={
+"type": "float",
+"value": 0.5
+}
 setting_common_props_multiplier={
 "type": "float",
 "value": 1.77828
@@ -140,11 +144,11 @@ setting_island_water_level_distance={
 }
 setting_island_water_level_at={
 "type": "float",
-"value": 0.52381
+"value": 0.44
 }
 setting_island_water_level_step={
 "type": "float",
-"value": 0.0952381
+"value": 0.1
 }
 setting_island_heightmap={
 "type": "sampler2D",

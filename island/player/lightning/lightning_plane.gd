@@ -36,7 +36,7 @@ extends MeshInstance3D
 		end_freedom = new
 		mat.set_shader_parameter("end_freedom", end_freedom)
 
-func set_location(a: Vector3, b: Vector3):  # Always looking up for now
+func set_endpoints(a: Vector3, b: Vector3):  # Always looking up for now
 	var dist := a.distance_to(b)
 	scale = Vector3.ONE * dist / 2.0
 	var dist_sqrt = sqrt(dist)
@@ -44,7 +44,10 @@ func set_location(a: Vector3, b: Vector3):  # Always looking up for now
 	(noise_texture.noise as FastNoiseLite).frequency = unit_freq * dist_sqrt
 	#print("setting noise to ", unit_freq, " -- ", dist, " -- ", (noise_texture.noise as FastNoiseLite).frequency)
 	global_position = (a + b) / 2.0
-	look_at_from_position(global_position, b)
-	var angle := atan2(a.y - b.y, Vector2(b.x, b.z).distance_to(Vector2(a.x, a.z)))
-	rotate_x(angle if (b.x > a.x) else -angle)  # HACK: Rotations are hard
-	rotate_y(PI / 2.0)
+	# Compute rotations manually because quaternions are hard ;)
+	global_rotation = Vector3.ZERO
+	var dist_xz := Vector2(b.x, b.z).distance_to(Vector2(a.x, a.z))
+	var angle2 := atan2(b.y - a.y, dist_xz)
+	rotate_z(angle2)
+	var angle1 = -atan2(b.z - a.z, b.x - a.x)
+	rotate_y(angle1)

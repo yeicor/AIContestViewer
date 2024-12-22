@@ -49,7 +49,7 @@ func connect_to(other: LighthouseScene):
 	lp.variation = 0.02 # Almost straight line to correctly highlight triangle areas!
 	var from = global_top_center
 	var to = other.global_top_center
-	lp.set_location(from, to)
+	lp.set_endpoints(from, to)
 
 func disconnect_from(other: LighthouseScene) -> bool:
 	var par := (self.parent as Node3D)

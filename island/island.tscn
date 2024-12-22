@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bfq4y7aalc3s1"]
+[gd_scene load_steps=6 format=3 uid="uid://bfq4y7aalc3s1"]
 
 [ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="1_3qeog"]
 [ext_resource type="Script" path="res://island/lighthouses.gd" id="2_nth1s"]
 [ext_resource type="PackedScene" uid="uid://crcy7cdwij4v5" path="res://island/props/props.tscn" id="3_j85rw"]
 [ext_resource type="Script" path="res://island/players.gd" id="4_7uhkn"]
+[ext_resource type="Script" path="res://island/energy_balls.gd" id="5_o16me"]
 
 [node name="Island" type="Node3D"]
 
@@ -17,6 +18,10 @@ script = ExtResource("2_nth1s")
 [node name="Players" type="Node3D" parent="."]
 script = ExtResource("4_7uhkn")
 
+[node name="EnergyBalls" type="Node3D" parent="."]
+script = ExtResource("5_o16me")
+
 [connection signal="terrain_ready" from="Terrain" to="Lighthouses" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Props" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Players" method="_on_terrain_terrain_ready"]
+[connection signal="terrain_ready" from="Terrain" to="EnergyBalls" method="_on_terrain_terrain_ready"]

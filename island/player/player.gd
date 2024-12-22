@@ -20,45 +20,17 @@ func _ready() -> void:
 	new_mat.set_shader_parameter("color_from", Vector3(0.5, 0.7, 0.8))
 	new_mat.set_shader_parameter("sensitivity", 0.2)
 	mesh_instance.set_surface_override_material(0, new_mat)
-	if color == null:
-		color = Color.AQUA
-	if not Engine.is_editor_hint():
-		_idle()
-		_random_behavior() # Randomly perform actions throughout the terrain for testing
+	_idle()
 
 func _idle():
 	_anim_common("Idle", true)
 	anim_dest_time = -1
 
-func _random_behavior(turn_secs: float = Settings.common_turn_secs() * 5.0):
-	var timer = Timer.new()
-	timer.autostart = true
-	timer.wait_time = turn_secs
-	timer.timeout.connect(func():
-		if randi_range(0, 100) < 50:  # Attack
-			var target_cell = Vector2i(IslandH.global_to_cell(Vector2(global_position.x, global_position.z)))
-			var target_global = IslandH.cell_to_global(Vector2(target_cell) + Vector2(0.5, 0.5))
-			var _target = Vector3(target_global.x + 1, global_position.y + 15, target_global.y + 1)
-			attack(_target, turn_secs)
-		else: # Walk or idle
-			var num_cells = IslandH.num_cells()
-			var cur_cell = Vector2i(IslandH.global_to_cell(Vector2(global_position.x, global_position.z)))
-			var next_cell = cur_cell + Vector2i(randi_range(-1, 1), randi_range(-1, 1))
-			next_cell.x = clamp(next_cell.x, 1, num_cells.x - 1) # Also avoids corners, but not all water cells...
-			next_cell.y = clamp(next_cell.y, 1, num_cells.y - 1)
-			if next_cell == cur_cell:
-				_idle()
-			else:
-				var next_pos = IslandH.cell_to_global(Vector2(next_cell) + Vector2(0.5, 0.5))
-				walk_to(next_pos, turn_secs))
-	add_child(timer)
-	timer.start(0)
-
 func walk_to(global_center: Vector2, _delta_secs: float = Settings.common_turn_secs()):
-	# TODO: Avoid some props and follow terrain shape better? Auto-generated navmesh?
+	# TODO: Avoid some props and follow terrain shape better? Auto-generated navmesh may cause issues?
 	var walk_to_pos = Vector3(global_center.x, -999, global_center.y)
 	if terrain_mi:
-		var hit = IslandH.query_terrain(terrain_mi, global_center)
+		var hit = IslandH.height_at_global(global_center)
 		if hit:
 			walk_to_pos = hit.position
 		else:
@@ -76,7 +48,7 @@ func attack(_target: Vector3, _delta_secs: float = Settings.common_turn_secs()):
 		add_child(lp)
 		lp.name = "attack_lightning_" + hand_bone_name
 		lp.start_freedom = 0.0
-		lp.end_freedom = 1.0
+		lp.end_freedom = 0.0 # TODO: 1.0
 		lp.color = color
 		var bone_id = skeleton.find_bone(hand_bone_name)
 		attack_lightnings.append([bone_id, lp])
@@ -110,6 +82,8 @@ func _process(_delta: float) -> void:
 		# If walking, move towards the target based on the percentage of completion
 		if walk_from_transform != Transform3D.IDENTITY:
 			global_position = lerp(walk_from_transform.origin, target, anim_progress)
+			# Actually, always stick the player to the terrain height (performance?)
+			global_position.y = IslandH.height_at_global(Vector2(global_position.x, global_position.z))
 
 		# Always smoothly rotate to face the target while walking towards it
 		var rotation_speed = PI / Settings.common_turn_secs_multiplier()
@@ -120,9 +94,9 @@ func _process(_delta: float) -> void:
 		# If attacking, make sure the lightning is always aligned with the hands and target (even while rotating)
 		if not attack_lightnings.is_empty():
 			for alp in attack_lightnings:
-				var bone_pos := skeleton.transform * skeleton.get_bone_global_pose(alp[0])
+				var bone_pos := skeleton.global_transform # * skeleton.get_bone_global_pose(alp[0])
 				var lp = alp[1]
-				lp.set_location(bone_pos.origin, target)
+				lp.set_endpoints(bone_pos.origin, target)
 		
 	else: # Not animating
 		if walk_from_transform != Transform3D.IDENTITY:

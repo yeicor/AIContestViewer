@@ -2,15 +2,15 @@
 extends Node3D
 
 @onready var _scatterers_meta: Array[Dictionary] = [
-	{"scatterer": $Trees, "per_cell": 4.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.1, "biome_mod": func(height01, hit):
-		return (1.0 - abs(0.5 - height01) / 1.0 + (hit.normal.y - 0.9) / 0.1) if height01 >= 0.1 else 0.0},
-	{"scatterer": $Rocks, "per_cell": 1.0, "biome_noise_freq": 0.2, "biome_noise_strength01": 0.1, "biome_mod": func(height01, _hit):
+	{"scatterer": $Trees, "per_cell": 4.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.1, "biome_mod": func(height01, normal):
+		return (1.0 - abs(0.5 - height01) / 1.0 + (normal.y - 0.7) / 0.1) if height01 >= 0.15 else 0.0},
+	{"scatterer": $Rocks, "per_cell": 1.0, "biome_noise_freq": 0.2, "biome_noise_strength01": 0.1, "biome_mod": func(height01, _normal):
 		return max((height01 - 0.6) / 0.1, 1.0 - abs(0.1 - height01) / 0.4)},
-	{"scatterer": $Grass, "per_cell": 8.0, "biome_noise_freq": 0.03, "biome_noise_strength01": 0.9, "biome_mod": func(height01, _hit):
+	{"scatterer": $Grass, "per_cell": 8.0, "biome_noise_freq": 0.03, "biome_noise_strength01": 0.9, "biome_mod": func(height01, _normal):
 		return 1.0 if height01 >= 0.0 else 0.0},
-	{"scatterer": $Bushes, "per_cell": 3.0, "biome_noise_freq": 0.1, "biome_noise_strength01": 0.5, "biome_mod": func(height01, _hit):
+	{"scatterer": $Bushes, "per_cell": 3.0, "biome_noise_freq": 0.1, "biome_noise_strength01": 0.5, "biome_mod": func(height01, _normal):
 		return 1.0 if height01 >= 0.1 else 0.0},
-	{"scatterer": $DeadBranches, "per_cell": 3.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.5, "biome_mod": func(height01, _hit):
+	{"scatterer": $DeadBranches, "per_cell": 3.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.5, "biome_mod": func(height01, _normal):
 		return max(0.0, 1.0 - abs(0.4 - height01) / 0.6)},
 ]
 
@@ -18,8 +18,13 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 	if Engine.is_editor_hint():
 		return # Avoid making persistent edits in the editor (remove this for testing)
 	
+	# Collision
+	var start_time_collision := Time.get_ticks_msec()
+	mi.create_trimesh_collision() # This is required because the scatter addon uses real collisions.
+	# TODO: Use heightmap shape instead for performance
+	SLog.sd("[timing] Created terrain trimesh collision in " + str(Time.get_ticks_msec() - start_time_collision) + " ms")
+	
 	#Common
-	IslandH.ensure_terrain_collision(mi)
 	var mseed := Settings.common_seed()
 	var aabb = mi.get_aabb()
 	var num_cells: Vector2i = Vector2i((Settings.island_water_level_distance().get_size() - Vector2.ONE) / 2.0)
@@ -49,9 +54,10 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 
 		# Build biomes
 		# - Create noise for more natural looking results
+		var supersampling := 1 # Requires fixes if != 1
 		var biome_texture := NoiseTexture2D.new()
-		biome_texture.width = num_cells.x
-		biome_texture.height = num_cells.y
+		biome_texture.width = num_cells.x * supersampling
+		biome_texture.height = num_cells.y * supersampling
 		var biome_texture_gen := FastNoiseLite.new()
 		biome_texture_gen.seed = scatterer.global_seed
 		biome_texture_gen.frequency = biome_noise_freq
@@ -59,20 +65,24 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 		await biome_texture.changed
 		# - Adjust the texture with our modifier
 		var biome_img: Image = biome_texture.get_image()
-		var hm_img = Settings.island_heightmap().get_image()
-		for y in range(num_cells.y): # Approximation over each cell instead of accessing all heightmap data for performance reasons :/
-			for x in range(num_cells.x):
-				var hit = IslandH.query_terrain(mi, Vector2(x, y) + Vector2.ONE)
-				#print("XY cell: " + str(Vector2(x,y)) + ", hit: " + str(hit.position))
-				if not hit:
-					SLog.se("Didn't hit the terrain?!")
-					continue
-				var height01 = HeightMap.read_height(hm_img, int(x / float(num_cells.x) * hm_img.get_width()), int(y / float(num_cells.y) * hm_img.get_height()), 0.0, 1.0)
-				var height01abovewater = (height01 - Settings.island_water_level_at()) / (1.0 - Settings.island_water_level_at())
-				var natural = clamp(biome_modifier.call(height01abovewater, hit), 0.0, 1.0) # Height can be negative for underwater, otherwise in [0, 1]
+		for yi in range(num_cells.y * supersampling): # Approximation over each cell instead of accessing all heightmap data for performance reasons :/
+			var y = float(yi) / float(supersampling) + 1.0 / float(supersampling + 1) # [0.25, 0.75] instead of [0, 0.5]
+			for xi in range(num_cells.x * supersampling):
+				var x = float(xi) / float(supersampling) + 1.0 / float(supersampling + 1)
+				var sample_center_cell := Vector2(x, y)
+				var hit_height = IslandH.height_at_cell(sample_center_cell)
+				var normal = (Vector3( # BAD approximation
+					IslandH.height_at_cell(sample_center_cell + Vector2(0.1, 0.0)) - hit_height,
+					0.4, IslandH.height_at_cell(sample_center_cell + Vector2(0.0, 0.1)) - hit_height,
+				)).normalized()
+				#print("XY cell: " + str(Vector2(x,y)) + ", hit_height: " + str(hit_height) + ", normal: " + str(normal))
+				var height01abovewater = hit_height / aabb.end.y
+				var natural = clamp(biome_modifier.call(height01abovewater, normal), 0.0, 1.0) # Height can be negative for underwater, otherwise in [0, 1]
 				var noise = biome_img.get_pixel(x, y).r  # Apply previous noise!
-				var cell_likelyhood = noise * biome_noise_strength01 + natural * (1.0 - biome_noise_strength01)
-				biome_img.set_pixel(x, y, cell_likelyhood * Color.WHITE)
+				var cell_likelyhood = natural * (1.0 - biome_noise_strength01)
+				if natural < 0.001: # Ignore noise if natural is 0.0
+					cell_likelyhood += noise * biome_noise_strength01
+				biome_img.set_pixel(xi, biome_texture.height - 1 - yi, cell_likelyhood * Color.WHITE)
 				#print("X: " + str(x) + ", Y: " + str(y) + " > HIT: " + str(hit.position) + " | H: " + str(height01) + ", H2: " + str(height01abovewater) + ", M: " + str(mult) + " | C: " + str(biome_img.get_pixel(x, y)))
 		# - Set the noise as the clusterize parameter
 		var clusterize_index = 2
@@ -81,7 +91,7 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 		clusterize.mask_scale = Vector2.ONE * Settings.terrain_cell_side()
 		clusterize.mask_offset = -Vector2(num_cells) / 2.0
 		clusterize.mask_texture = ImageTexture.create_from_image(biome_img)
-		#biome_img.save_png("/home/yeicor/test.png")
+		#biome_img.save_png(OS.get_environment("HOME") + "/biome_"+scatterer.name+".png")
 
 		SLog.sd("[timing] " + scatterer.name + " setup completed after " + str(Time.get_ticks_msec() - start_time) + "ms (will build " + str(scatterer.modifier_stack.stack[0].amount) + " elements)")
 		scatterer.chunk_dimensions = Vector3.ONE * 20.0 * aabb.size / Vector3(num_cells.x, 1, num_cells.y)

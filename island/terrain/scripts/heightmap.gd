@@ -121,6 +121,28 @@ static func read_height(hm: Image, x: int, z: int, min_height: float, max_height
 	var height: float      =  color.r + color.g / precision
 	return height * (max_height - min_height) + min_height
 
+static func read_height_interpolated(hm: Image, x: float, z: float, min_height: float, max_height: float) -> float:
+	# Get integer parts of the coordinates
+	var x0 = int(floor(x))
+	var z0 = int(floor(z))
+	var x1 = x0 + 1
+	var z1 = z0 + 1
+
+	# Get fractional parts of the coordinates
+	var tx = x - x0
+	var tz = z - z0
+
+	# Read heights at the four corners
+	var h00 = read_height(hm, x0, z0, min_height, max_height)
+	var h10 = read_height(hm, x1, z0, min_height, max_height)
+	var h01 = read_height(hm, x0, z1, min_height, max_height)
+	var h11 = read_height(hm, x1, z1, min_height, max_height)
+
+	# Perform bilinear interpolation
+	var h0 = lerp(h00, h10, tx)  # Interpolate in the x-direction
+	var h1 = lerp(h01, h11, tx)  # Interpolate in the x-direction at z1
+	return lerp(h0, h1, tz)      # Interpolate in the z-direction
+
 func _run_gpu(mseed: int, height_bounds_tex: ImageTexture, water_level_at: float, y_level_step: float, semaphore: Semaphore, xz_counts: Vector2i):
 	var start_time := Time.get_ticks_msec()
 	self.size = xz_counts

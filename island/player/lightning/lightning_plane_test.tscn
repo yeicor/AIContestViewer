@@ -1,0 +1,45 @@
+[gd_scene load_steps=8 format=3 uid="uid://chrxqo3m3gtm4"]
+
+[ext_resource type="Script" path="res://island/player/lightning/lightning_plane_test.gd" id="1_kgykw"]
+[ext_resource type="PackedScene" uid="uid://c3utfdyue5bsd" path="res://island/player/lightning/lightning_plane.tscn" id="2_hnh5q"]
+[ext_resource type="Shader" path="res://island/player/lightning/lightning.gdshader" id="3_dvn7e"]
+[ext_resource type="Texture2D" uid="uid://686pgek3ga71" path="res://island/player/lightning/lightning_curve.tres" id="4_xsvcl"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_rpmd6"]
+resource_local_to_scene = true
+noise_type = 3
+frequency = 0.00140852
+fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_6nt41"]
+resource_local_to_scene = true
+noise = SubResource("FastNoiseLite_rpmd6")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q3jsi"]
+resource_local_to_scene = true
+render_priority = 1
+shader = ExtResource("3_dvn7e")
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/passes = 1
+shader_parameter/pass_angle = 60.0
+shader_parameter/color_gradient = ExtResource("4_xsvcl")
+shader_parameter/speed = 3.0
+shader_parameter/variation = 1.0
+shader_parameter/width = 0.0709965
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_6nt41")
+shader_parameter/start_freedom = 0.0
+shader_parameter/end_freedom = 0.0
+
+[node name="LightningPlaneTest" type="Node3D"]
+script = ExtResource("1_kgykw")
+
+[node name="LightningPlane" parent="." instance=ExtResource("2_hnh5q")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0.5, 0, 0)
+material_override = SubResource("ShaderMaterial_q3jsi")
+width = 0.0709965
+end_freedom = 0.0
+
+[node name="Start" type="Node3D" parent="."]
+
+[node name="End" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)

@@ -21,7 +21,7 @@ func _ready():
 
 func _load_parse_and_set(setting_name: String, raw: String, from: String):
 	var setting = _all_settings_info[setting_name]
-	var val     = _parse_string(raw, setting)
+	var val     = _parse_string(raw, setting, setting_name)
 	if _val("settings/print", true):
 		print("[before-logging] (SettingsAutoloaded) [" + from + "] Custom setting: " + setting_name + " -> " + str(val))
 	_all_settings[setting_name] = val
@@ -98,7 +98,7 @@ func generate_ini(skip_check: bool = false) -> String:
 	return exported_ini
 
 
-func _parse_string(_value: String, setting: Dictionary) -> Variant:
+func _parse_string(_value: String, setting: Dictionary, setting_name: String = "unknown") -> Variant:
 	if _value == "<null>":
 		return null
 	match setting["type"]:
@@ -120,7 +120,7 @@ func _parse_string(_value: String, setting: Dictionary) -> Variant:
 			var split: PackedStringArray = _value.split(",")
 			return Color(float(split[0]), float(split[1]), float(split[2]), float(split[3]))
 		_:
-			print("[before-logging?] (SettingsAutoloaded) Unsupported type for setting " + setting["name"] + ": " + str(setting["type"]))
+			print("[before-logging?] (SettingsAutoloaded) Unsupported type for setting " + setting_name + ": " + str(setting["type"]))
 			return _value
 
 
@@ -160,6 +160,7 @@ static func _apply_presets(path: String) -> Variant:
 		"ocean/screen_and_depth":
 			return preset_quality_linear(true) >= 0 and not OS.has_feature("web") # Web crashes for now
 		"common/props_multiplier":
+			#if OS.is_debug_build(): return 0.3 # Faster development iterations
 			return 10.0 ** (preset_quality_quadratic(true) * 0.25) # 0.1, 0.56, 1, 1.78, 10
 		"common/stochastic_textures":
 			return preset_quality_linear(true) >= 2 # They really affect performance :/
@@ -242,7 +243,7 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_INT,
 			"info": "The seed to generate the same island, camera paths, etc.",
 		},
-		"common/turn_ms": {
+		"common/turn_secs": {
 			"default": 0.5,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating each turn of the game, in seconds.",
@@ -278,12 +279,12 @@ static var _all_settings_info: Dictionary = \
 			"info": "The maximum steepness of the terrain use 1.0 for 45 degrees (+ noise)",
 		},
 		"terrain/vertex_count": {
-			"default": null, # A quality preset will always override this
+			"default": 10000, # A quality preset will always override this
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the terrain (can affect performance and initial load time).",
 		},
 		"terrain/no_textures": {
-			"default": null, # A quality preset will always override this
+			"default": false, # A quality preset will always override this
 			"type": TYPE_BOOL,
 			"info": "Whether to use textures or just simple colors to paint the terrain.",
 		},
@@ -313,12 +314,12 @@ static var _all_settings_info: Dictionary = \
 			"info": "Internal texture representing heightmap of the generated terrain for the shaders.",
 		},
 		"ocean/vertex_count": {
-			"default": null, # A quality preset will always override this
+			"default": 10000, # A quality preset will always override this
 			"type": TYPE_INT,
 			"info": "The number of vertices to use when generating the ocean, a value > 0 enables waves."
 		},
 		"ocean/screen_and_depth": {
-			"default": null, # A quality preset will always override this
+			"default": true, # A quality preset will always override this
 			"type": TYPE_BOOL,
 			"info": "Allow access to the special screen and depth textures for a better ocean (crashes on web)",
 		},
@@ -370,7 +371,7 @@ func _init() -> void: # This runs before any _init() of the main scene (autoload
 static func common_seed() -> int: return _s_val("common/seed")
 
 
-static func common_turn_secs() -> float: return _s_val("common/turn_ms")
+static func common_turn_secs() -> float: return _s_val("common/turn_secs")
 static func common_turn_secs_multiplier() -> float: return common_turn_secs() / 0.5
 
 
@@ -445,9 +446,15 @@ static func island_heightmap_set(value: Texture2D) -> void:
 	assert(_instance != null)
 	_instance._all_settings["island/heightmap"] = value
 	RenderingServer.global_shader_parameter_set("setting_island_heightmap", value)
+	_island_heightmap_cache = null
 
 
 static func island_heightmap() -> Texture2D: return _s_val("island/heightmap")
+static var _island_heightmap_cache: Image = null
+static func island_heightmap_image() -> Image: 
+	if _island_heightmap_cache == null:
+		_island_heightmap_cache = island_heightmap().get_image()
+	return _island_heightmap_cache
 
 
 static func ocean_vertex_count() -> int: return _s_val("ocean/vertex_count")

@@ -9,7 +9,6 @@ func clean():
 	for child in get_children():
 		if child.name.begins_with("_TerrainGen"):
 			child.queue_free()
-	
 
 @warning_ignore("unused_private_class_variable")
 @export var generate_in_editor: bool = false:

@@ -10,7 +10,7 @@
 script = ExtResource("1_rrmnf")
 
 [node name="RTSCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 100, 0)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 150, 0)
 environment = ExtResource("3_3dq86")
 current = true
 size = 300.0

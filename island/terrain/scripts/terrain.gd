@@ -55,7 +55,7 @@ func _ready():
 		cell_side = Settings.terrain_cell_side()
 		steepness = Settings.terrain_max_steepness()
 		# Prepare to generate as soon as the first game state is ready
-		SignalBus.read_game_state.connect(func(initial_state): generate(initial_state), Object.CONNECT_ONE_SHOT)
+		SignalBus.game_state.connect(func(initial_state, _turn, _phase): generate(initial_state), Object.CONNECT_ONE_SHOT)
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:

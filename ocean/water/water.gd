@@ -14,7 +14,7 @@ var material: ShaderMaterial = preload("res://ocean/water/material.tres")
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
-		# Automatically build the island once we know the size
+		# Automatically build the ocean once we know the island size (long-range dependency via signal bus)
 		SignalBus.island_global_shader_parameters_ready.connect(func(): build(Settings.island_water_level_distance().get_size() * Settings.terrain_cell_side()), CONNECT_ONE_SHOT)
 
 

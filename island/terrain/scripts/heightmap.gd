@@ -122,11 +122,11 @@ static func read_height(hm: Image, x: int, z: int, min_height: float, max_height
 	return height * (max_height - min_height) + min_height
 
 static func read_height_interpolated(hm: Image, x: float, z: float, min_height: float, max_height: float) -> float:
-	# Get integer parts of the coordinates
+	# Get integer parts of the coordinates (with clamp for added)
 	var x0 = int(floor(x))
 	var z0 = int(floor(z))
-	var x1 = x0 + 1
-	var z1 = z0 + 1
+	var x1 = min(x0 + 1, hm.get_width() - 1)
+	var z1 = min(z0 + 1, hm.get_height() - 1)
 
 	# Get fractional parts of the coordinates
 	var tx = x - x0

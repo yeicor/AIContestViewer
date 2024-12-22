@@ -3,7 +3,7 @@ extends Node3D
 
 @onready var _scatterers_meta: Array[Dictionary] = [
 	{"scatterer": $Trees, "per_cell": 4.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.1, "biome_mod": func(height01, normal):
-		return (1.0 - abs(0.5 - height01) / 1.0 + (normal.y - 0.7) / 0.1) if height01 >= 0.15 else 0.0},
+		return (1.0 - abs(0.5 - height01) / 1.0 + (normal.y - 0.7) / 0.3) if height01 >= 0.15 else 0.0},
 	{"scatterer": $Rocks, "per_cell": 1.0, "biome_noise_freq": 0.2, "biome_noise_strength01": 0.1, "biome_mod": func(height01, _normal):
 		return max((height01 - 0.6) / 0.1, 1.0 - abs(0.1 - height01) / 0.4)},
 	{"scatterer": $Grass, "per_cell": 8.0, "biome_noise_freq": 0.03, "biome_noise_strength01": 0.9, "biome_mod": func(height01, _normal):
@@ -15,15 +15,6 @@ extends Node3D
 ]
 
 func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
-	if Engine.is_editor_hint():
-		return # Avoid making persistent edits in the editor (remove this for testing)
-	
-	# Collision
-	var start_time_collision := Time.get_ticks_msec()
-	mi.create_trimesh_collision() # This is required because the scatter addon uses real collisions.
-	# TODO: Use heightmap shape instead for performance
-	SLog.sd("[timing] Created terrain trimesh collision in " + str(Time.get_ticks_msec() - start_time_collision) + " ms")
-	
 	#Common
 	var mseed := Settings.common_seed()
 	var aabb = mi.get_aabb()
@@ -32,6 +23,9 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 	if props_mult < 1.0:
 		props_mult = pow(props_mult, 4.0)  # More intense reduction
 
+	# Collision
+	add_collision_shape(mi, num_cells * 3 * int(props_mult), num_cells)
+	
 	#Handle all scatterers similarly, but with some customization
 	for scatterer_meta_i in range(_scatterers_meta.size()):
 		var start_time := Time.get_ticks_msec()
@@ -99,3 +93,49 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 		scatterer.connect("build_completed", func():
 			SLog.sd("[timing] " + scatterer.name + " background build completed after " + str(Time.get_ticks_msec() - start_time) + " ms"), CONNECT_ONE_SHOT)
 		scatterer.enabled = true
+
+
+func add_collision_shape(terrain: MeshInstance3D, num_samples: Vector2i, num_cells: Vector2i):
+	# Simplified heightmap collision
+	var start_time_collision := Time.get_ticks_msec()
+	var hm := HeightMapShape3D.new()
+	hm.map_width = num_cells.x
+	hm.map_depth = num_cells.y
+	if (float(num_samples.x) / float(num_cells.x) != float(num_samples.y) / float(num_cells.y)):
+		SLog.se("Heightmap collision shape requires uniform scaling, please fix your number of samples")
+	var uniform_scale := float(num_cells.x) / float(num_samples.x) * Settings.terrain_cell_side()
+
+	# Populate the heightmap
+	var map_data = Image.create_empty(num_samples.x, num_samples.y, false, Image.FORMAT_RF)
+	var aabb = terrain.get_aabb()
+	var min_height01 = 1.0
+	var max_height01 = 0.0
+	for yi in range(num_samples.y):
+		for xi in range(num_samples.x):
+			var cell_position := Vector2(
+				float(xi) / num_samples.x * num_cells.x,
+				float(yi) / num_samples.y * num_cells.y)
+			var height = IslandH.height_at_cell(cell_position)
+			var height01 = clamp((height - aabb.position.y) / aabb.size.y, 0.0, 1.0)
+			if height01 < min_height01: min_height01 = height01
+			if height01 > max_height01: max_height01 = height01
+			map_data.set_pixel(xi, num_samples.y - 1 - yi, Color.WHITE * height01)
+	hm.update_map_data_from_image(map_data, 
+		(aabb.position.y + aabb.size.y * min_height01) / uniform_scale, 
+		(aabb.end.y - + aabb.size.y * (1.0 - max_height01)) / uniform_scale)
+
+	# Create the collision object
+	var collision_body := StaticBody3D.new()
+	var collision_shape := CollisionShape3D.new()
+	collision_shape.shape = hm
+	collision_shape.scale = Vector3.ONE * uniform_scale # required to be uniform!
+	collision_body.add_child(collision_shape)
+	terrain.add_child(collision_body)
+
+	# Debugging
+	#var debug_mi := MeshInstance3D.new()
+	#debug_mi.mesh = hm.get_debug_mesh()
+	#debug_mi.scale = collision_shape.scale
+	#terrain.add_child(debug_mi)
+
+	SLog.sd("[timing] Created terrain heightmap collision in " + str(Time.get_ticks_msec() - start_time_collision) + " ms")

@@ -1,0 +1,72 @@
+[gd_scene load_steps=6 format=3 uid="uid://se6kclfe11gi"]
+
+[ext_resource type="Shader" uid="uid://b14kmfqhe1sey" path="res://ui/ui_turn_shader.tres" id="1_wdddq"]
+[ext_resource type="Script" path="res://ui/top_bar.gd" id="2_3cfon"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5k7yi"]
+shader = ExtResource("1_wdddq")
+shader_parameter/progress = 0.1
+shader_parameter/bg_color = Color(0.953125, 0.481089, 0, 1)
+shader_parameter/alpha = 0.25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4q84r"]
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_vtwdm"]
+font_size = 24
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[node name="UI" type="VBoxContainer"]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -208.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="TopBar" type="PanelContainer" parent="."]
+material = SubResource("ShaderMaterial_5k7yi")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4q84r")
+script = ExtResource("2_3cfon")
+
+[node name="MarginContainer" type="MarginContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopBar/MarginContainer"]
+material = SubResource("ShaderMaterial_5k7yi")
+layout_mode = 2
+
+[node name="TurnStaticLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Turn: "
+label_settings = SubResource("LabelSettings_vtwdm")
+
+[node name="TurnLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "-1"
+label_settings = SubResource("LabelSettings_vtwdm")
+
+[node name="Spacer" type="HBoxContainer" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "Open save(s) and reset viewer"
+theme_override_font_sizes/font_size = 24
+disabled = true
+text = "📂"
+flat = true

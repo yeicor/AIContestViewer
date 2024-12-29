@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://ordobflcpuj4"]
+[gd_scene load_steps=7 format=3 uid="uid://ordobflcpuj4"]
 
 [ext_resource type="Script" path="res://main/main.gd" id="1_rrmnf"]
 [ext_resource type="Script" path="res://addons/rts_camera_3d/rts_camera.gd" id="2_tsys7"]
 [ext_resource type="Environment" uid="uid://4g5i147j1mn3" path="res://main/environment.tres" id="3_3dq86"]
 [ext_resource type="PackedScene" uid="uid://bfq4y7aalc3s1" path="res://island/island.tscn" id="5_xdrxj"]
+[ext_resource type="PackedScene" uid="uid://se6kclfe11gi" path="res://ui/ui.tscn" id="6_a5eex"]
 [ext_resource type="PackedScene" uid="uid://4s5lkea8k2pu" path="res://ocean/ocean.tscn" id="6_gowfy"]
 
 [node name="Main" type="Node3D"]
@@ -37,11 +38,7 @@ max_zoom_height = 2000.0
 
 [node name="Island" parent="World" instance=ExtResource("5_xdrxj")]
 
-[node name="GUI" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="UI" parent="." instance=ExtResource("6_a5eex")]
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707107, -0.541675, 0.454519, 0, 0.642788, 0.766044, -0.707107, -0.541675, 0.454519, 0, 0, 0)

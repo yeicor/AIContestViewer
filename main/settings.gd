@@ -244,9 +244,14 @@ static var _all_settings_info: Dictionary = \
 			"info": "The seed to generate the same island, camera paths, etc.",
 		},
 		"common/turn_secs": {
-			"default": 2.5,
+			"default": 0.1,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating each turn of the game, in seconds.",
+		},
+		"common/turn_count": {
+			"default": 500,
+			"type": TYPE_INT,
+			"info": "If known (> 0), it is a hint providing the expected number of turns per rounds. Helps visualize progress.",
 		},
 		"common/props_multiplier": {
 			"default": 1.0,
@@ -373,6 +378,9 @@ static func common_seed() -> int: return _s_val("common/seed")
 
 static func common_turn_secs() -> float: return _s_val("common/turn_secs")
 static func common_turn_secs_multiplier() -> float: return common_turn_secs() / 0.5
+
+
+static func common_turn_count() -> int: return _s_val("common/turn_count")
 
 
 static func common_props_multiplier() -> float: return _s_val("common/props_multiplier")

@@ -75,20 +75,22 @@ static func _thread(game_paths: PackedStringArray):
 
 static func _emit_and_wait_phases_main_thread(state: GameState, turn: int, end_sem: Semaphore):
 	# Interested nodes can connect to this signal to receive game states.
+	var prev_phase_time := Time.get_ticks_msec()
 	if is_instance_valid(SignalBus):
-		Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_INIT)
 		SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_INIT)
 	if await _wait_unpaused_secs(0, false):
+		Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_INIT, "took", Time.get_ticks_msec()-prev_phase_time, "ms")
+		prev_phase_time = Time.get_ticks_msec()
 		if is_instance_valid(SignalBus):
-			Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_ANIMATE)
 			SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_ANIMATE)
-		# Wait for the next turn to read and emit another game state
 		if await _wait_unpaused_secs(int(Settings.common_turn_secs() * 1000), false):
-			# End animations and turn
+			Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_ANIMATE, "took", Time.get_ticks_msec()-prev_phase_time, "ms")
+			prev_phase_time = Time.get_ticks_msec()
 			if is_instance_valid(SignalBus):
-				Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_END)
 				SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_END)
 			await _wait_unpaused_secs(0, false)
+			Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_END, "took", Time.get_ticks_msec()-prev_phase_time, "ms")
+			prev_phase_time = Time.get_ticks_msec()
 	end_sem.post()
 	
 
@@ -113,12 +115,16 @@ static func _wait_unpaused_secs(remaining_wait_time: int, blocking_ok: bool) -> 
 		waiting_time_counts = runnable
 		_running_mutex.unlock()
 		
-		if blocking_ok:
-			OS.delay_msec(_sleep_ms)
+		if remaining_wait_time == 0 and waiting_time_counts: # Only one unpaused iteration
+			remaining_wait_time -= 1
 		else:
-			await SignalBus.get_tree().create_timer(_sleep_sec).timeout
-		if waiting_time_counts:
-			remaining_wait_time -= Time.get_ticks_msec() - _loop_start_time
+			var will_sleep_for_ms := maxi(mini(_sleep_ms, remaining_wait_time - (Time.get_ticks_msec() - _loop_start_time)), 10)
+			if blocking_ok:
+				OS.delay_msec(will_sleep_for_ms)
+			else:
+				await SignalBus.get_tree().create_timer(float(will_sleep_for_ms) / float(1000)).timeout
+			if waiting_time_counts:
+				remaining_wait_time -= Time.get_ticks_msec() - _loop_start_time
 			
 	return not was_stopped
 	

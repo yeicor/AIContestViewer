@@ -42,3 +42,12 @@ func output_messages(
 		LimboConsole.debug(msg_rich)
 	else:
 		LimboConsole.debug.bind(msg_rich).call_deferred()
+	# XXX: Avoid too much text on the console lagging the app
+	var cur_text := LimboConsole._output.text
+	while cur_text.length() > 10 * 1024:
+		var delete_to := cur_text.find("\n")
+		if delete_to == -1:
+			Log.w("Too much output in one line?!")
+		else:
+			cur_text = cur_text.substr(delete_to + 1)
+	LimboConsole._output.text = cur_text

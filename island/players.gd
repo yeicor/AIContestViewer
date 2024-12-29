@@ -2,6 +2,7 @@
 extends Node3D
 
 func _on_terrain_terrain_ready(mi: MeshInstance3D, game: GameState) -> void:
+	GameManager.pause() # Lock the game timer while generating
 	var start_time := Time.get_ticks_msec()
 	# Clear previous players
 	get_children().map(func(c): c.queue_free())
@@ -20,6 +21,7 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, game: GameState) -> void:
 		player.color = ColorGenerator.get_color(player_index)
 		add_child(player)
 	SLog.sd("[timing] Spawned players in " + str(Time.get_ticks_msec() - start_time) + "ms")
+	GameManager.resume()
 		
 		
 		

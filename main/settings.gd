@@ -244,7 +244,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The seed to generate the same island, camera paths, etc.",
 		},
 		"common/turn_secs": {
-			"default": 0.5,
+			"default": 2.5,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating each turn of the game, in seconds.",
 		},
@@ -258,10 +258,10 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_BOOL,
 			"info": "Enable to hide obvious tiling when repeating textures (terrain, ocean...), at the cost of some performance.",
 		},
-		"game/path": {
+		"game/paths": {
 			"default": "res://testdata/game.jsonl.gz",
 			"type": TYPE_STRING,
-			"info": "The game path to load. It may be a tcp:// for a tcp server or simply a Godot data path.",
+			"info": "The ;-separated game paths to load. It may be a tcp:// for a tcp server or simply a Godot data path.",
 		},
 		"preset/quality": {
 			"default": "high" if OS.has_feature("pc") else "medium" if OS.has_feature("mobile") else "low",
@@ -378,7 +378,7 @@ static func common_turn_secs_multiplier() -> float: return common_turn_secs() / 
 static func common_props_multiplier() -> float: return _s_val("common/props_multiplier")
 
 
-static func game_path() -> String: return _s_val("game/path")
+static func game_paths() -> PackedStringArray: return _s_val("game/paths").split(";", false)
 
 
 static var _preset_quality_values: Array = ["lowest", "low", "medium", "high", "highest"]

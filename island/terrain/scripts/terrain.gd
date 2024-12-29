@@ -31,7 +31,6 @@ func clean():
 			clean()
 			_regenerate_demo()
 
-
 @export var cell_side: float = 10:
 	set(new_cell_side):
 		cell_side = new_cell_side
@@ -55,27 +54,30 @@ func _ready():
 		cell_side = Settings.terrain_cell_side()
 		steepness = Settings.terrain_max_steepness()
 		# Prepare to generate as soon as the first game state is ready
-		SignalBus.game_state.connect(func(initial_state, _turn, _phase): generate(initial_state), Object.CONNECT_ONE_SHOT)
-
-func _notification(what):
-	if what == NOTIFICATION_PREDELETE:
-		if _generate_thread != null && _generate_thread.is_alive():
-			_generate_thread.wait_to_finish()
+		SignalBus.game_state.connect(func(initial_state, turn, phase):
+			# Regenerate terrain for each new game we find (it is likely to have a new map)
+			if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:
+				# Lock the game timer while generating
+				GameManager.pause()
+				terrain_ready.connect(func(_mi, _game): GameManager.resume(), CONNECT_ONE_SHOT)
+				generate(initial_state))
 
 var _last_regeneration_frame: int = -1234
 func _regenerate_demo():
 	if _last_regeneration_frame == Engine.get_frames_drawn():
 		return # Ignore multiple request on the same frame like while setting all properties at start.
 	_last_regeneration_frame = Engine.get_frames_drawn()
-	var game_reader: GameReader = GameReader.open(Settings.game_path())
+	var game_reader: GameReader = GameReader.open("res://testdata/game.jsonl.gz")
 	var first_round: GameState  = game_reader.parse_next_state()
 	generate(first_round)
 
 var _generate_thread: Thread = null
 
-func _exit_tree():
-	if _generate_thread != null && _generate_thread.is_started():
-		_generate_thread.wait_to_finish() # Should already be called.
+func _notification(what):
+	if what == NOTIFICATION_PREDELETE:
+		pass
+		#if _generate_thread != null && _generate_thread.is_alive():
+			#_generate_thread.wait_to_finish()
 
 func generate(game: GameState):
 	assert(vertex_count >= 0)

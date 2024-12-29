@@ -12,7 +12,7 @@ func _ready() -> void:
 			SignalBus.game_state.disconnect(listener[0]))
 	SignalBus.game_state.connect(listener[0])
 	# Start the game manager thread (after all inner scenes have been initialized and are ready!)
-	GameManager.start()
+	GameManager.start(Settings.game_paths())
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:

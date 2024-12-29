@@ -15,6 +15,7 @@ extends Node3D
 ]
 
 func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
+	GameManager.pause() # Lock the game timer while generating
 	#Common
 	var mseed := Settings.common_seed()
 	var aabb = mi.get_aabb()
@@ -90,9 +91,13 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 		SLog.sd("[timing] " + scatterer.name + " setup completed after " + str(Time.get_ticks_msec() - start_time) + "ms (will build " + str(scatterer.modifier_stack.stack[0].amount) + " elements)")
 		scatterer.chunk_dimensions = Vector3.ONE * 20.0 * aabb.size / Vector3(num_cells.x, 1, num_cells.y)
 		start_time = Time.get_ticks_msec()
+		GameManager.pause() # Lock the game timer while generating
 		scatterer.connect("build_completed", func():
-			SLog.sd("[timing] " + scatterer.name + " background build completed after " + str(Time.get_ticks_msec() - start_time) + " ms"), CONNECT_ONE_SHOT)
+			SLog.sd("[timing] " + scatterer.name + " background build completed after " + str(Time.get_ticks_msec() - start_time) + " ms")
+			GameManager.resume(), CONNECT_ONE_SHOT)
 		scatterer.enabled = true
+		
+	GameManager.resume() # See also callback pause and resumes!
 
 
 func add_collision_shape(terrain: MeshInstance3D, num_samples: Vector2i, num_cells: Vector2i):

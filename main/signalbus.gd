@@ -8,7 +8,7 @@ extends Node
 enum {GAME_STATE_PHASE_INIT, GAME_STATE_PHASE_ANIMATE, GAME_STATE_PHASE_END}
 
 ## Signal emitted when a new game state is entered. They are emitted in the main thread to allow UI edits.
-## This will be emitted at regular intervals as configured.
+## This will be emitted at regular intervals as configured. Turn is reset to 0 for new games.
 @warning_ignore("unused_signal")
 signal game_state(state: GameState, turn: int, phase: int)
 

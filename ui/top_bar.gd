@@ -5,11 +5,31 @@ extends PanelContainer
 func _ready() -> void:
 	SignalBus.game_state.connect(self._on_game_state)
 
-var _last_turn = -1
-func _on_game_state(_state: GameState, turn: int, _phase: int):
-	if turn != _last_turn:
-		turn_label.text = str(turn)
+func _on_game_state(_state: GameState, turn: int, phase: int):
+	if phase == SignalBus.GAME_STATE_PHASE_INIT:
+		turn_label.text = pretty_print_number(turn)
 		if Settings.common_turn_count() > 0:
-			var progress := clampf(float(turn) / float(Settings.common_turn_count()), 0, 1)
+			var progress := float(turn % Settings.common_turn_count()) / float(Settings.common_turn_count())
 			(self.material as ShaderMaterial).set_shader_parameter("progress", progress)
-		_last_turn = turn
+
+
+static func pretty_print_number(value: float, significant_digits: int = 3) -> String:
+	var suffixes = ["", "K", "M", "G", "T", "P", "E"]
+	var index = 0
+
+	while abs(value) >= 1000 and index < suffixes.size() - 1:
+		value /= 1000
+		index += 1
+		
+	# Determine the number of decimal places based on significant digits
+	var magnitude = floor(log(abs(value))/log(10)) if value != 0 else 0
+	var num_decimals = max(0, significant_digits - 1 - int(magnitude))
+
+	# Format the number with the calculated number of decimals
+	var formatted = "%.*f" % [num_decimals, value]
+
+	# Remove unnecessary ".0" or ".00" if present
+	if formatted.find(".") >= 0 and index == 0:
+		formatted = formatted.rstrip("0").rstrip(".")
+
+	return formatted + suffixes[index]

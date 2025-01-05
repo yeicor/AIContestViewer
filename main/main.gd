@@ -12,6 +12,7 @@ func _notification(what: int) -> void:
 		GameManager.stop()
 
 func _setup_debug_fps():
+	# Move to the left side to avoid conflicts with our main UI
 	var debug_fps_ui: Control = DebugMenu.get_child(0)
 	debug_fps_ui.set_anchors_preset(Control.LayoutPreset.PRESET_TOP_LEFT)
 	debug_fps_ui.position.x = 8
@@ -25,6 +26,9 @@ func _setup_debug_fps():
 			c.alignment = BoxContainer.ALIGNMENT_BEGIN
 		if c is GridContainer:
 			c.size_flags_horizontal = 0
+	# Auto-show on debug builds
+	if OS.is_debug_build():
+		DebugMenu.style = DebugMenu.Style.VISIBLE_DETAILED
 
 func _setup_console():
 	LimboConsole.register_command(_cmd_debug_draw, "debug_draw", "Change debug draw mode (see Viewport.DebugDraw enum, 0 to disable)")

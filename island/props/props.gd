@@ -15,6 +15,9 @@ extends Node3D
 ]
 
 func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
+	if Settings.common_props_multiplier() <= 0.0:
+		SLog.sd("Props disabled, skipping scatterer configuration...")
+		return
 	GameManager.pause() # Lock the game timer while generating
 	#Common
 	var mseed := Settings.common_seed()

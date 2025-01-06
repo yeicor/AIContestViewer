@@ -1,7 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://se6kclfe11gi"]
+[gd_scene load_steps=8 format=3 uid="uid://se6kclfe11gi"]
 
 [ext_resource type="Shader" uid="uid://b14kmfqhe1sey" path="res://ui/ui_turn_shader.tres" id="1_wdddq"]
 [ext_resource type="Script" path="res://ui/top_bar.gd" id="2_3cfon"]
+[ext_resource type="Script" path="res://ui/players.gd" id="3_0ss8a"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qdduo"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5k7yi"]
 shader = ExtResource("1_wdddq")
@@ -9,23 +12,24 @@ shader_parameter/progress = 0.1
 shader_parameter/bg_color = Color(0.953125, 0.481089, 0, 1)
 shader_parameter/alpha = 0.25
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4q84r"]
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
 [sub_resource type="LabelSettings" id="LabelSettings_vtwdm"]
-font_size = 24
+font_size = 48
 outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ev8vp"]
+bg_color = Color(0.8, 0.8, 0.8, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="UI" type="VBoxContainer"]
-anchors_preset = 11
-anchor_left = 1.0
+anchors_preset = -1
+anchor_left = 0.812
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -208.0
+offset_left = 8.57593
 offset_top = 8.0
 offset_right = -8.0
 offset_bottom = -8.0
@@ -33,10 +37,16 @@ grow_horizontal = 0
 grow_vertical = 2
 
 [node name="TopBar" type="PanelContainer" parent="."]
-material = SubResource("ShaderMaterial_5k7yi")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_4q84r")
+theme_override_styles/panel = SubResource("StyleBoxEmpty_qdduo")
 script = ExtResource("2_3cfon")
+
+[node name="Progress" type="ProgressBar" parent="TopBar"]
+layout_mode = 2
+size_flags_vertical = 1
+max_value = 1.0
+step = 0.0
+show_percentage = false
 
 [node name="MarginContainer" type="MarginContainer" parent="TopBar"]
 layout_mode = 2
@@ -48,6 +58,7 @@ theme_override_constants/margin_bottom = 0
 [node name="HBoxContainer" type="HBoxContainer" parent="TopBar/MarginContainer"]
 material = SubResource("ShaderMaterial_5k7yi")
 layout_mode = 2
+size_flags_horizontal = 4
 
 [node name="TurnStaticLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
@@ -59,14 +70,11 @@ layout_mode = 2
 text = "-1"
 label_settings = SubResource("LabelSettings_vtwdm")
 
-[node name="Spacer" type="HBoxContainer" parent="TopBar/MarginContainer/HBoxContainer"]
+[node name="Separator" type="Panel" parent="."]
+custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ev8vp")
 
-[node name="Button" type="Button" parent="TopBar/MarginContainer/HBoxContainer"]
+[node name="Players" type="VBoxContainer" parent="."]
 layout_mode = 2
-tooltip_text = "Open save(s) and reset viewer"
-theme_override_font_sizes/font_size = 24
-disabled = true
-text = "📂"
-flat = true
+script = ExtResource("3_0ss8a")

@@ -1,5 +1,7 @@
 extends PanelContainer
+class_name TopBar
 
+@onready var progress := $Progress
 @onready var turn_label := $MarginContainer/HBoxContainer/TurnLabel
 
 func _ready() -> void:
@@ -9,9 +11,7 @@ func _on_game_state(_state: GameState, turn: int, phase: int):
 	if phase == SignalBus.GAME_STATE_PHASE_INIT:
 		turn_label.text = pretty_print_number(turn)
 		if Settings.common_turn_count() > 0:
-			var progress := float(turn % Settings.common_turn_count()) / float(Settings.common_turn_count())
-			(self.material as ShaderMaterial).set_shader_parameter("progress", progress)
-
+			progress.value = float(turn % Settings.common_turn_count()) / float(Settings.common_turn_count())
 
 static func pretty_print_number(value: float, significant_digits: int = 3) -> String:
 	var suffixes = ["", "K", "M", "G", "T", "P", "E"]

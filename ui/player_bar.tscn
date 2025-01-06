@@ -1,0 +1,65 @@
+[gd_scene load_steps=5 format=3 uid="uid://bwru0xvge4oj5"]
+
+[ext_resource type="Script" path="res://ui/player_bar.gd" id="1_xn178"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n4tmx"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_sqjc6"]
+font_size = 20
+font_color = Color(0.6, 0.6, 0.6, 1)
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_uqlr6"]
+font_size = 20
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Bar" type="PanelContainer"]
+script = ExtResource("1_xn178")
+metadata/font_size = 0
+metadata/label_pre = ""
+
+[node name="Progress" type="ProgressBar" parent="."]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/background = SubResource("StyleBoxEmpty_n4tmx")
+max_value = 1.0
+show_percentage = false
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="LabelPre" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Label:"
+label_settings = SubResource("LabelSettings_sqjc6")
+
+[node name="Value" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "-1"
+label_settings = SubResource("LabelSettings_uqlr6")
+
+[node name="LabelPrePerTurn2" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "+"
+label_settings = SubResource("LabelSettings_sqjc6")
+
+[node name="ValuePerTurn" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "0
+"
+label_settings = SubResource("LabelSettings_uqlr6")
+
+[node name="LabelPostPerTurn" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "/t"
+label_settings = SubResource("LabelSettings_sqjc6")

@@ -1,6 +1,5 @@
-@tool
-extends EditorScript
-
+#@tool
+#extends EditorScript  # Breaks web builds for some reason if uncommented...
 class_name ColorGenerator
 
 # Initialize variables

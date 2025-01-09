@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://se6kclfe11gi"]
+[gd_scene load_steps=10 format=3 uid="uid://se6kclfe11gi"]
 
 [ext_resource type="Shader" uid="uid://b14kmfqhe1sey" path="res://ui/ui_turn_shader.tres" id="1_wdddq"]
 [ext_resource type="Script" path="res://ui/turn_bar.gd" id="2_3cfon"]
 [ext_resource type="Script" path="res://ui/players.gd" id="3_0ss8a"]
+[ext_resource type="Script" path="res://ui/loading_overlay.gd" id="4_o4676"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qdduo"]
 
@@ -24,64 +25,112 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="UI" type="VBoxContainer"]
-anchors_preset = -1
-anchor_left = 0.812
+[sub_resource type="LabelSettings" id="LabelSettings_qm3o6"]
+font_size = 128
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.57593
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = -8.0
-grow_horizontal = 0
+grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TurnBar" type="PanelContainer" parent="."]
+[node name="RightPanel" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -189.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="RightPanelVBox" type="VBoxContainer" parent="RightPanel"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="TurnBar" type="PanelContainer" parent="RightPanel/RightPanelVBox"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_qdduo")
 script = ExtResource("2_3cfon")
 
-[node name="Progress" type="ProgressBar" parent="TurnBar"]
+[node name="Progress" type="ProgressBar" parent="RightPanel/RightPanelVBox/TurnBar"]
 layout_mode = 2
 size_flags_vertical = 1
 max_value = 1.0
 step = 0.0
 show_percentage = false
 
-[node name="MarginContainer" type="MarginContainer" parent="TurnBar"]
+[node name="MarginContainer" type="MarginContainer" parent="RightPanel/RightPanelVBox/TurnBar"]
 layout_mode = 2
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TurnBar/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="RightPanel/RightPanelVBox/TurnBar/MarginContainer"]
 material = SubResource("ShaderMaterial_5k7yi")
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="TurnStaticLabel" type="Label" parent="TurnBar/MarginContainer/HBoxContainer"]
+[node name="TurnStaticLabel" type="Label" parent="RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Turn: "
 label_settings = SubResource("LabelSettings_vtwdm")
 horizontal_alignment = 2
 
-[node name="TurnLabel" type="Label" parent="TurnBar/MarginContainer/HBoxContainer"]
+[node name="TurnLabel" type="Label" parent="RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "-1"
 label_settings = SubResource("LabelSettings_vtwdm")
 
-[node name="PauseButton" type="Button" parent="TurnBar"]
+[node name="PauseButton" type="Button" parent="RightPanel/RightPanelVBox/TurnBar"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 flat = true
 
-[node name="Separator" type="Panel" parent="."]
+[node name="Separator" type="Panel" parent="RightPanel/RightPanelVBox"]
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ev8vp")
 
-[node name="Players" type="VBoxContainer" parent="."]
+[node name="Players" type="VBoxContainer" parent="RightPanel/RightPanelVBox"]
 layout_mode = 2
 script = ExtResource("3_0ss8a")
+
+[node name="LoadingOverlay" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 540)
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("4_o4676")
+
+[node name="MarginContainer" type="MarginContainer" parent="LoadingOverlay"]
+layout_mode = 2
+theme_override_constants/margin_left = 480
+theme_override_constants/margin_right = 480
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LoadingOverlay/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="LoadingOverlay/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Loading..."
+label_settings = SubResource("LabelSettings_qm3o6")
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="LoadingOverlay/MarginContainer/VBoxContainer"]
+layout_mode = 2
+indeterminate = true
+editor_preview_indeterminate = false

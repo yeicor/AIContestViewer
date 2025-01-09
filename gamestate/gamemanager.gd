@@ -79,17 +79,23 @@ static func _emit_and_wait_phases_main_thread(state: GameState, turn: int, end_s
 	if is_instance_valid(SignalBus):
 		SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_INIT)
 	if await _wait_unpaused_secs(0, false):
-		Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_INIT, "took", Time.get_ticks_msec()-prev_phase_time, "ms")
+		var phase_delta_time := Time.get_ticks_msec() - prev_phase_time
+		if phase_delta_time > 20:
+			Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_INIT, "took too long:", phase_delta_time, "ms")
 		prev_phase_time = Time.get_ticks_msec()
 		if is_instance_valid(SignalBus):
 			SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_ANIMATE)
 		if await _wait_unpaused_secs(int(Settings.common_turn_secs() * 1000), false):
-			Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_ANIMATE, "took", Time.get_ticks_msec()-prev_phase_time, "ms")
+			phase_delta_time = Time.get_ticks_msec() - prev_phase_time
+			if phase_delta_time > int(Settings.common_turn_secs() * 1500):
+				Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_ANIMATE, "took too long:", phase_delta_time, "ms")
 			prev_phase_time = Time.get_ticks_msec()
 			if is_instance_valid(SignalBus):
 				SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_END)
 			await _wait_unpaused_secs(0, false)
-			Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_END, "took", Time.get_ticks_msec()-prev_phase_time, "ms")
+			phase_delta_time = Time.get_ticks_msec() - prev_phase_time
+			if phase_delta_time > 20:
+				Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_END, "took too long:", phase_delta_time, "ms")
 			prev_phase_time = Time.get_ticks_msec()
 	end_sem.post()
 	

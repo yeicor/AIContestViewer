@@ -248,6 +248,11 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating each turn of the game, in seconds.",
 		},
+		"common/start_paused": {
+			"default": false,
+			"type": TYPE_BOOL,
+			"info": "Start the game paused. Press P, Space or click the turn indicator to unpause.",
+		},
 		"common/turn_count": {
 			"default": 500,
 			"type": TYPE_INT,
@@ -378,6 +383,9 @@ static func common_seed() -> int: return _s_val("common/seed")
 
 static func common_turn_secs() -> float: return _s_val("common/turn_secs")
 static func common_turn_secs_multiplier() -> float: return common_turn_secs() / 0.5
+
+
+static func common_start_paused() -> bool: return _s_val("common/start_paused")
 
 
 static func common_turn_count() -> int: return _s_val("common/turn_count")

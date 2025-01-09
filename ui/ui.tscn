@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://se6kclfe11gi"]
 
 [ext_resource type="Shader" uid="uid://b14kmfqhe1sey" path="res://ui/ui_turn_shader.tres" id="1_wdddq"]
-[ext_resource type="Script" path="res://ui/top_bar.gd" id="2_3cfon"]
+[ext_resource type="Script" path="res://ui/turn_bar.gd" id="2_3cfon"]
 [ext_resource type="Script" path="res://ui/players.gd" id="3_0ss8a"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qdduo"]
@@ -36,39 +36,46 @@ offset_bottom = -8.0
 grow_horizontal = 0
 grow_vertical = 2
 
-[node name="TopBar" type="PanelContainer" parent="."]
+[node name="TurnBar" type="PanelContainer" parent="."]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_qdduo")
 script = ExtResource("2_3cfon")
 
-[node name="Progress" type="ProgressBar" parent="TopBar"]
+[node name="Progress" type="ProgressBar" parent="TurnBar"]
 layout_mode = 2
 size_flags_vertical = 1
 max_value = 1.0
 step = 0.0
 show_percentage = false
 
-[node name="MarginContainer" type="MarginContainer" parent="TopBar"]
+[node name="MarginContainer" type="MarginContainer" parent="TurnBar"]
 layout_mode = 2
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TopBar/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="TurnBar/MarginContainer"]
 material = SubResource("ShaderMaterial_5k7yi")
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="TurnStaticLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+[node name="TurnStaticLabel" type="Label" parent="TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Turn: "
 label_settings = SubResource("LabelSettings_vtwdm")
+horizontal_alignment = 2
 
-[node name="TurnLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+[node name="TurnLabel" type="Label" parent="TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "-1"
 label_settings = SubResource("LabelSettings_vtwdm")
+
+[node name="PauseButton" type="Button" parent="TurnBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+flat = true
 
 [node name="Separator" type="Panel" parent="."]
 custom_minimum_size = Vector2(0, 8)

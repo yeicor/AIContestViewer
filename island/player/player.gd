@@ -1,5 +1,6 @@
 @tool
 extends Node3D
+class_name PlayerScene
 
 @export var terrain_mi: MeshInstance3D
 @onready var animation_player: AnimationPlayer = $gandalf/AnimationPlayer
@@ -30,15 +31,14 @@ func walk_to(global_center: Vector2, _delta_secs: float = Settings.common_turn_s
 	# TODO: Avoid some props and follow terrain shape better? Auto-generated navmesh may cause issues?
 	var walk_to_pos = Vector3(global_center.x, -999, global_center.y)
 	if terrain_mi:
-		var hit = IslandH.height_at_global(global_center)
-		if hit:
-			walk_to_pos = hit.position
-		else:
-			SLog.sw("Walk to raycast failed!")
+		walk_to_pos.y = IslandH.height_at_global(global_center)
 	else:
 		SLog.sw("Walk terrain not set!")
 	walk_to_pos.y = max(0.0, walk_to_pos.y)  # Walk on water
 	_walk_to(walk_to_pos, _delta_secs)
+
+func set_pos(global_center: Vector2):
+	walk_to(global_center, 0.0)
 
 var attack_lightnings: Array = []
 func attack(_target: Vector3, _delta_secs: float = Settings.common_turn_secs()):
@@ -62,10 +62,13 @@ func _walk_to(destination: Vector3, _delta_secs: float = Settings.common_turn_se
 	target = destination
 	_anim_common("Run", true, _delta_secs)
 
+var _last_anim = "None"
 func _anim_common(_name: String, loop: bool, _delta_secs: float = Settings.common_turn_secs()):
 	anim_from_time = Time.get_ticks_msec() / 1000.0
 	anim_dest_time = anim_from_time + _delta_secs
-	animation_player.play(_name, _delta_secs / 4.0)  # Switch smoothly
+	if _last_anim != _name:  # To avoid resetting animation when keeping the same one
+		animation_player.play(_name, _delta_secs / 4.0)  # Switch smoothly
+		_last_anim = _name
 	if loop:
 		animation_player.animation_set_next(_name, _name)
 	else:

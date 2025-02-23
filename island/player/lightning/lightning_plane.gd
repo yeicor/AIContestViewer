@@ -1,5 +1,6 @@
 @tool
 extends MeshInstance3D
+class_name LightningPlane
 
 @onready var mat: ShaderMaterial = self.material_override as ShaderMaterial
 @onready var unit_width: float = mat.get_shader_parameter("width") as float
@@ -43,9 +44,9 @@ func set_endpoints(a: Vector3, b: Vector3):  # Always looking up for now
 	width = unit_width / dist_sqrt
 	(noise_texture.noise as FastNoiseLite).frequency = unit_freq * dist_sqrt
 	#print("setting noise to ", unit_freq, " -- ", dist, " -- ", (noise_texture.noise as FastNoiseLite).frequency)
-	global_position = (a + b) / 2.0
+	position = (a + b) / 2.0
 	# Compute rotations manually because quaternions are hard ;)
-	global_rotation = Vector3.ZERO
+	rotation = Vector3.ZERO
 	var dist_xz := Vector2(b.x, b.z).distance_to(Vector2(a.x, a.z))
 	var angle2 := atan2(b.y - a.y, dist_xz)
 	rotate_z(angle2)

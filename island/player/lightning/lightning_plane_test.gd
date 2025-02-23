@@ -12,8 +12,8 @@ func _ready():
 	lightning.end_freedom = 0.0
 
 func _process(delta: float) -> void:
-	if start.global_position != start_last_loc or end.global_position != end_last_loc:
-		lightning.set_endpoints(start.global_position, end.global_position)
-		start_last_loc = start.global_position
-		end_last_loc = end.global_position
+	if start.position != start_last_loc or end.position != end_last_loc:
+		lightning.set_endpoints(start.position, end.position)
+		start_last_loc = start.position
+		end_last_loc = end.position
 	

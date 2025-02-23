@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://c05vbnwjdchei"]
+[gd_scene load_steps=8 format=3 uid="uid://c05vbnwjdchei"]
 
 [ext_resource type="Shader" path="res://island/player/lightning/lightning.gdshader" id="1_cqjd5"]
 [ext_resource type="Texture2D" uid="uid://686pgek3ga71" path="res://island/player/lightning/lightning_curve.tres" id="2_tgswp"]
+[ext_resource type="Script" path="res://island/player/lightning/lightning_plane.gd" id="3_a276i"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_u25i3"]
 resource_local_to_scene = true
@@ -35,3 +36,4 @@ rings = 8
 [node name="LightningSphere" type="MeshInstance3D"]
 material_override = SubResource("ShaderMaterial_x3rip")
 mesh = SubResource("SphereMesh_2cubq")
+script = ExtResource("3_a276i")

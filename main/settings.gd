@@ -244,7 +244,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The seed to generate the same island, camera paths, etc.",
 		},
 		"common/turn_secs": {
-			"default": 3.0,
+			"default": 1.0,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating each turn of the game, in seconds.",
 		},

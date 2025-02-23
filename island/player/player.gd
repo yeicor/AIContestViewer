@@ -2,8 +2,8 @@
 extends Node3D
 class_name PlayerScene
 
-@export var terrain_mi: MeshInstance3D
 @onready var animation_player: AnimationPlayer = $gandalf/AnimationPlayer
+@onready var mesh_instance: MeshInstance3D = $gandalf/Armature/Skeleton3D/mesh_001
 @onready var skeleton: Skeleton3D = $gandalf/Armature/Skeleton3D
 
 var new_mat := ShaderMaterial.new()
@@ -15,7 +15,7 @@ var new_mat := ShaderMaterial.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	var mesh_instance: MeshInstance3D = $gandalf/Armature/Skeleton3D/mesh_001
+	mesh_instance.scale *= 3  # Easier to see, less "realistic"...
 	new_mat.shader = preload("res://island/lighthouse/recolor.gdshader")
 	new_mat.set_shader_parameter("tex", preload("res://island/player/model/gandalf_texture.tres"))
 	new_mat.set_shader_parameter("color_from", Vector3(0.5, 0.7, 0.8))
@@ -28,32 +28,39 @@ func idle():
 	walk_from_transform = Transform3D.IDENTITY
 	anim_dest_time = anim_from_time
 
-func walk_to(global_center: Vector2, _delta_secs: float = Settings.common_turn_secs()):
+func walk_to(center: Vector2, _delta_secs: float = Settings.common_turn_secs()):
 	# TODO: Avoid some props and follow terrain shape better? Auto-generated navmesh may cause issues?
-	var walk_to_pos = Vector3(global_center.x, -999, global_center.y)
-	if terrain_mi:
-		walk_to_pos.y = IslandH.height_at_global(global_center)
-	else:
-		SLog.sw("Walk terrain not set!")
-	walk_to_pos.y = max(0.0, walk_to_pos.y)  # Walk on water
+	var walk_to_pos = Vector3(center.x, -999, center.y)
+	walk_to_pos.y = max(0.0, IslandH.height_at_global(center))  # Walk on water (should not be required...)
 	_walk_to(walk_to_pos, _delta_secs)
 
-func set_pos(global_center: Vector2):
-	walk_to(global_center, 0.0)
+func set_pos(center: Vector2):
+	walk_to(center, 0.0)
 
 var attack_lightnings: Array = []
-func attack(_target: Vector3, _delta_secs: float = Settings.common_turn_secs()):
+func attack(_target: Vector3, strength01: float = 1.0, _delta_secs: float = Settings.common_turn_secs()):
 	"""Animates the attack of the center of the cell that the player is on."""
+	#for i in range(skeleton.get_bone_count()):
+		#SLog.sd("Player bones: {0}".format([skeleton.get_bone_name(i)]))
 	for hand_bone_name in ["mixamorig_LeftHand", "mixamorig_RightHand"]:
 		var lp := preload("res://island/player/lightning/lightning_plane.tscn").instantiate()
-		get_parent().add_child(lp)
+		add_child(lp)
 		lp.name = "attack_lightning_" + hand_bone_name
-		lp.start_freedom = 0.0
-		lp.end_freedom = 1.0
-		# TODO: Make it more visible with more lightnings? Or strong lights or some other effect...
 		lp.color = color
+		lp.start_freedom = 0.0
+		lp.end_freedom = 0.3
+		lp.unit_width = strength01 * 0.25
 		var bone_id = skeleton.find_bone(hand_bone_name)
-		attack_lightnings.append([bone_id, lp])
+		attack_lightnings.append([lp, bone_id])
+	# Make it more visible by adding ball of lightning on target
+	var ls := preload("res://island/player/lightning/lightning_sphere.tscn").instantiate()
+	add_child(ls)
+	ls.name = "attack_lightning_sphere"
+	ls.color = color
+	ls.unit_width = strength01 * 0.5
+	ls.scale = Vector3.ONE * 0.75 * Settings.terrain_cell_side() * strength01
+	attack_lightnings.append([ls])
+	
 	walk_from_transform = Transform3D.IDENTITY
 	target = _target
 	_anim_common("Attack", true, _delta_secs)
@@ -61,7 +68,7 @@ func attack(_target: Vector3, _delta_secs: float = Settings.common_turn_secs()):
 var walk_from_transform: Transform3D = Transform3D.IDENTITY
 func _walk_to(destination: Vector3, _delta_secs: float = Settings.common_turn_secs()) -> void:
 	"""Makes the player walk toward a specified destination."""
-	walk_from_transform = global_transform.orthonormalized()
+	walk_from_transform = transform.orthonormalized()
 	target = destination
 	_anim_common("Run", true, _delta_secs)
 
@@ -84,40 +91,49 @@ var anim_dest_time: float = anim_from_time
 func _process(_delta: float) -> void:
 	# Determine the percentage of walk completion (0 to 1+)
 	var anim_progress = (Time.get_ticks_msec() / 1000.0 - anim_from_time) / (anim_dest_time - anim_from_time)
-	if !is_inf(anim_progress) and clampf(anim_progress, 0, 1.1) != anim_progress:
+	if !is_inf(anim_progress) and !is_nan(anim_progress) and clampf(anim_progress, 0, 1.1) != anim_progress:
 		SLog.sw("Animation progress: {0}. Time: {1} | From: {2} | Dest: {3}".format([anim_progress, Time.get_ticks_msec() / 1000.0, anim_from_time, anim_dest_time]))
 	
-	if anim_progress >= 0.0 and anim_progress < 1.0:
+	if !is_inf(anim_progress) and !is_nan(anim_progress) and anim_progress >= 0.0 and anim_progress < 1.0:
 		# If walking, move towards the target based on the percentage of completion
 		if walk_from_transform != Transform3D.IDENTITY:
-			global_position = lerp(walk_from_transform.origin, target, anim_progress)
+			position = lerp(walk_from_transform.origin, target, anim_progress)
 			# Actually, always stick the player to the terrain height (performance?)
-			global_position.y = IslandH.height_at_global(Vector2(global_position.x, global_position.z))
+			position.y = IslandH.height_at_global(Vector2(position.x, position.z))
+			ensure_no_lightnings() # Hides bug related to the else not detected sometimes
 
 		# Always smoothly rotate to face the target while walking towards it
 		var rotation_speed = max(PI, PI / Settings.common_turn_secs_multiplier())
-		var rotation_target = -Vector3(target.x - global_position.x, 0.0, target.z - global_position.z)
+		var rotation_target = -Vector3(target.x - position.x, 0.0, target.z - position.z)
 		if(rotation_target.length_squared() > 0.001):
 			quaternion = lerp(quaternion, Basis.looking_at(rotation_target).get_rotation_quaternion(), _delta * rotation_speed)
 		
 		# If attacking, make sure the lightning is always aligned with the hands and target (even while rotating)
 		if not attack_lightnings.is_empty():
 			for alp in attack_lightnings:
-				var lightning_from := skeleton.global_transform * Vector3(0.0, 0.3, -1.6) # HACK!
-				var lp = alp[1]
-				lp.set_endpoints(lightning_from, target)
+				var lightning: LightningPlane = alp[0]
+				if len(alp) > 1: # Hand lightnings
+					var lightning_from := Transform3D.IDENTITY.rotated(Vector3.RIGHT, PI/2) * \
+					mesh_instance.transform * skeleton.transform * skeleton.get_bone_global_pose(alp[1]).origin
+					# FIXME: target - position is "close enough" but not correct (check by reducing end_freedom)
+					lightning.set_endpoints(lightning_from, target - position)
+					# TODO: Also make sure it keeps looking at the camera for a better effect
+				else: # Sphere lightnings at target
+					lightning.global_position = target
 		
-	else: # Not animating
+	else: # Not animating (FIXME: this is not always detected as events can be faster than frames!)
 		if walk_from_transform != Transform3D.IDENTITY:
-			if global_position != target: # End of walking event
+			if position != target: # End of walking event
 				walk_from_transform = Transform3D.IDENTITY
-				global_position = target
-				idle()
+				position = target
+				#idle()
+		ensure_no_lightnings()
 		
-		if not attack_lightnings.is_empty(): # End of attacking event
-			for alp in attack_lightnings:
-				var lp = alp[1]
-				get_parent().remove_child(lp)
-			attack_lightnings = []
-			idle()
+func ensure_no_lightnings():
+	if not attack_lightnings.is_empty(): # End of attacking event
+		for alp in attack_lightnings:
+			remove_child(alp[0])
+		attack_lightnings = []
+		idle()
+		
 		

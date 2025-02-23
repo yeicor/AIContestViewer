@@ -14,10 +14,10 @@ var new_mat := ShaderMaterial.new()
 		new_mat.set_shader_parameter("color_to", color)
 		#print("Updated lighthouse color to ", color, "!")
 
-var global_top_center: Vector3:
+var top_center: Vector3:
 	get():
 		var aabb := mesh_instance.get_aabb()
-		return global_transform * (aabb.get_center() + Vector3(0.0, aabb.size.y / 2.0, 0.0))
+		return transform * (aabb.get_center() + Vector3(0.0, aabb.size.y / 2.0, 0.0))
 
 static func from_meta(_meta: Lighthouse, global_pos: Vector3) -> LighthouseScene:
 	var slf: LighthouseScene = load("res://island/lighthouse/lighthouse.tscn").instantiate()
@@ -42,23 +42,21 @@ func _get_conn_id(other: LighthouseScene) -> String:
 
 func connect_to(other: LighthouseScene):
 	var lp := preload("res://island/player/lightning/lightning_plane.tscn").instantiate()
-	self.get_parent_node_3d().add_child(lp)
+	self.add_child(lp)
 	lp.name = _get_conn_id(other)
 	lp.start_freedom = 0.0
 	lp.end_freedom = 0.0
 	lp.variation = 0.02 # Almost straight line to correctly highlight triangle areas!
-	var from = global_top_center
-	var to = other.global_top_center
-	lp.set_endpoints(from, to)
+	var to = other.global_transform * other.top_center - global_transform * top_center
+	lp.set_endpoints(top_center, to)
 
 func disconnect_from(other: LighthouseScene) -> bool:
-	var par := (self.parent as Node3D)
 	var conn_id := self._get_conn_id(other)
-	if par.has_node(conn_id):
-		par.remove_child(par.get_node(conn_id))
+	if has_node(conn_id):
+		remove_child(get_node(conn_id))
 		return true
 	conn_id = other._get_conn_id(self)
-	if par.has_node(conn_id):
-		par.remove_child(par.get_node(conn_id))
+	if has_node(conn_id):
+		remove_child(get_node(conn_id))
 		return true
 	return false

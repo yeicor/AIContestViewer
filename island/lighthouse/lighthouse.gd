@@ -17,7 +17,7 @@ var new_mat := ShaderMaterial.new()
 var top_center: Vector3:
 	get():
 		var aabb := mesh_instance.get_aabb()
-		return transform * (aabb.get_center() + Vector3(0.0, aabb.size.y / 2.0, 0.0))
+		return (aabb.get_center() + Vector3(0.0, aabb.size.y / 2.0, 0.0))
 
 static func from_meta(_meta: Lighthouse, global_pos: Vector3) -> LighthouseScene:
 	var slf: LighthouseScene = load("res://island/lighthouse/lighthouse.tscn").instantiate()
@@ -46,9 +46,8 @@ func connect_to(other: LighthouseScene):
 	lp.name = _get_conn_id(other)
 	lp.start_freedom = 0.0
 	lp.end_freedom = 0.0
-	lp.variation = 0.02 # Almost straight line to correctly highlight triangle areas!
-	var to = other.global_transform * other.top_center - global_transform * top_center
-	lp.set_endpoints(top_center, to)
+	lp.variation = 0.025 # Almost straight line to correctly highlight triangle areas!
+	lp.set_endpoints(top_center, transform.inverse() * other.transform * top_center)
 
 func disconnect_from(other: LighthouseScene) -> bool:
 	var conn_id := self._get_conn_id(other)

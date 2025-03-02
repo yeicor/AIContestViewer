@@ -22,7 +22,7 @@ var top_center: Vector3:
 static func from_meta(_meta: Lighthouse, global_pos: Vector3) -> LighthouseScene:
 	var slf: LighthouseScene = load("res://island/lighthouse/lighthouse.tscn").instantiate()
 	slf.meta = _meta
-	slf.name = "Lighthouse@" + str(_meta.pos())
+	slf.name = "Lighthouse_" + str(_meta.pos())
 	slf.position = global_pos
 	slf.rotate_y(randf() * 2 * PI)
 	slf.color = Color(0.3, 0.3, 0.3)  # Non-player color when unowned
@@ -38,24 +38,33 @@ func _ready():
 		color = Color.AQUA
 
 func _get_conn_id(other: LighthouseScene) -> String:
-	return "LHConnection@"+str(meta.pos())+","+str(other.meta.pos())
+	return "LHConnection_"+str(meta.pos())+","+str(other.meta.pos())
 
 func connect_to(other: LighthouseScene):
 	var lp := preload("res://island/player/lightning/lightning_plane.tscn").instantiate()
 	self.add_child(lp)
 	lp.name = _get_conn_id(other)
+	lp.color = color
 	lp.start_freedom = 0.0
 	lp.end_freedom = 0.0
-	lp.variation = 0.025 # Almost straight line to correctly highlight triangle areas!
 	lp.set_endpoints(top_center, transform.inverse() * other.transform * top_center)
+	lp.variation = 0.1 / pow(lp.scale.length_squared(), 0.25) # Almost straight line to correctly highlight triangle areas!
 
 func disconnect_from(other: LighthouseScene) -> bool:
-	var conn_id := self._get_conn_id(other)
-	if has_node(conn_id):
-		remove_child(get_node(conn_id))
-		return true
-	conn_id = other._get_conn_id(self)
-	if has_node(conn_id):
-		remove_child(get_node(conn_id))
+	var conn := _get_connection(other)
+	if conn != null:
+		conn.get_parent_node_3d().remove_child(conn)
 		return true
 	return false
+
+func is_connected_to(other: LighthouseScene) -> bool:
+	return _get_connection(other) != null
+
+func _get_connection(other: LighthouseScene) -> LighthouseScene:
+	var conn_id := self._get_conn_id(other)
+	var res := get_node_or_null(conn_id)
+	if res != null:
+		return res
+	conn_id = other._get_conn_id(self)
+	return other.get_node_or_null(conn_id)
+	

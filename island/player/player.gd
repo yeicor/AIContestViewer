@@ -91,7 +91,7 @@ var anim_dest_time: float = anim_from_time
 func _process(_delta: float) -> void:
 	# Determine the percentage of walk completion (0 to 1+)
 	var anim_progress = (Time.get_ticks_msec() / 1000.0 - anim_from_time) / (anim_dest_time - anim_from_time)
-	if !is_inf(anim_progress) and !is_nan(anim_progress) and clampf(anim_progress, 0, 1.1) != anim_progress:
+	if !is_inf(anim_progress) and !is_nan(anim_progress) and Time.get_ticks_msec() / 1000.0 - anim_dest_time > 0.1:
 		SLog.sw("Animation progress: {0}. Time: {1} | From: {2} | Dest: {3}".format([anim_progress, Time.get_ticks_msec() / 1000.0, anim_from_time, anim_dest_time]))
 	
 	if !is_inf(anim_progress) and !is_nan(anim_progress) and anim_progress >= 0.0 and anim_progress < 1.0:

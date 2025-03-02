@@ -4,6 +4,7 @@ class_name Main
 func _ready() -> void:
 	_setup_debug_fps()
 	_setup_console()
+	_setup_fullscreen()
 	# Start the game manager thread (after all inner scenes have been initialized and are ready!)
 	GameManager.start(Settings.game_paths())
 
@@ -44,3 +45,13 @@ func _setup_console():
 
 func _cmd_debug_draw(debug_draw: int):
 	get_viewport().debug_draw = debug_draw as Viewport.DebugDraw
+
+func _setup_fullscreen():
+	Log.d("Press " + str(InputMap.action_get_events("fullscreen").map(func(ev: InputEvent): return ev.as_text())) + " to toggle fullscreen")
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_released("fullscreen"):
+		if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_WINDOWED: 
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED) 

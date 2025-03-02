@@ -59,19 +59,24 @@ static func stop() -> void:
 static func _thread(game_paths: PackedStringArray):
 	var should_continue := true
 	var end_sem := Semaphore.new()
+	end_sem.post()
 	for game_path in game_paths:
 		var reader := GameReader.open(game_path)
 		var turn := 0
+		var old_state: GameState = null
 		while should_continue:
-			# Read game state (complete round -- ignore intermediate states)
+			# Read game state asynchronously (complete round -- ignore intermediate states)
 			var state := reader.parse_next_round()
-			# Publish game state via a global signal.
-			_emit_and_wait_phases_main_thread.bind(state, turn, end_sem).call_deferred()
 			end_sem.wait() # Wait for the previous main call to end
+			if old_state != null: old_state.free_recursive() # This state won't be used anymore
+			# Publish game state via a global signal.
+			old_state = state
+			_emit_and_wait_phases_main_thread.bind(old_state, turn, end_sem).call_deferred()
 			should_continue = await _wait_unpaused_secs(0, true) # Never awaits thanks to sleep
 			turn += 1
 		if not should_continue:
 			break
+	end_sem.queue_free()
 
 static func _emit_and_wait_phases_main_thread(state: GameState, turn: int, end_sem: Semaphore):
 	# Interested nodes can connect to this signal to receive game states.

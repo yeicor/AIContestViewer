@@ -59,7 +59,10 @@ func _ready():
 			if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:
 				# Lock the game timer while generating
 				GameManager.pause()
-				terrain_ready.connect(func(_mi, _game): GameManager.resume(), CONNECT_ONE_SHOT)
+				terrain_ready.connect(func(_mi, _game):
+					# Wait for performance to stabilize to avoid stutter after loading the island
+					await wait_for_stable_fps()
+					GameManager.resume(), CONNECT_ONE_SHOT)
 				generate(initial_state))
 
 var _last_regeneration_frame: int = -1234
@@ -104,3 +107,16 @@ func generate(game: GameState):
 			add_child(meshNode)
 			SLog.sd("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
 			terrain_ready.emit(meshNode, game)).call_deferred())
+
+func wait_for_stable_fps(max_frames_waiting = 10 * 60, stable_frames = 100, stable_frame_max_ms = 32) -> void:
+	var count = 0
+	var remaining = max_frames_waiting # 5 secs at 60 FPS
+	while count < 100 and remaining > 0:
+		await get_tree().process_frame
+		if Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0 < stable_frame_max_ms:
+			count += 1
+		else:
+			count = 0
+		remaining -= 1
+	Log.d("Reached stable framerate for %d frames (< %d ms) after waiting for %d frames" % [stable_frames, stable_frame_max_ms, max_frames_waiting - remaining])
+	if remaining == 0: Log.w("Gave up waiting for stable framerate...")

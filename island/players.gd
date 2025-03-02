@@ -1,6 +1,8 @@
 @tool
 extends Node3D
 
+@export var lighthousesParent: Node3D
+
 func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 	GameManager.pause() # Lock the game timer while generating
 	var start_time := Time.get_ticks_msec()
@@ -24,7 +26,6 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 
 var _player_to_next_pos: Dictionary = {}  # Precomputed during init, start animation on next phase
 var _player_attacks: Dictionary = {}
-var _last_lighthouses_by_cell: Dictionary = {}
 var _last_players: Array = []
 func _on_game_state(state: GameState, _turn: int, phase: int):
 	if phase == SignalBus.GAME_STATE_PHASE_INIT:
@@ -58,51 +59,40 @@ func _on_game_state(state: GameState, _turn: int, phase: int):
 				if Vector2i(IslandH.global_to_cell(prev_pos)) != Vector2i(cell): # Only move when needed! (not 100% valid in case of idles, but good enough)
 					_player_to_next_pos[player] = IslandH.cell_to_global(actual_target_cell)
 		
-		# => PRECOMPUTE ATTACK DATA
-		if not _last_lighthouses_by_cell.is_empty():
-			_player_attacks.clear()
-			for cell in cell_to_players: # "Optimization": only check lighthouses with players
-				for lh_meta in state.lighthouses():
-					if lh_meta.pos() == cell and _last_lighthouses_by_cell.has(cell):
-						var lh_prev_meta: Lighthouse = _last_lighthouses_by_cell.get(cell)
-						var expected_energy = max(0, lh_prev_meta.energy() - 10)
-						var got_energy = lh_meta.energy()
-						#Log.d("Possible attack on {lh_pos}:\nPREV: owner: {prev_owner}\tenergy: {prev_energy}\nCURR: owner: {curr_owner}\tenergy: {curr_energy}".format({"lh_pos": lh_meta.pos(), "prev_owner": lh_prev_meta.owner(), "prev_energy": lh_prev_meta.energy(), "curr_owner": lh_meta.owner(), "curr_energy": lh_meta.energy()}))
-						# The game format is lossy, so we make some assumptions here...
-						if got_energy != expected_energy: # Attacked by unknown players, assume all that are not doing other stuff
-							var attacks = []
-							for player_info in cell_to_players[cell]:
-								var pl_i = player_info[0]
-								var player_energy_delta = 0
-								if len(_last_players) > pl_i:
-									player_energy_delta = state_players[pl_i].energy() - _last_players[pl_i].energy()
-								attacks.append([player_info, max(0, -player_energy_delta)])
-							# Compute relative attack energies
-							var max_attack_energy = attacks.map(func(x): return x[1]).max()
-							_player_attacks[cell] = attacks.map(func(x): return [x[0], float(x[1]) / max_attack_energy])
-		
-		# Store the last available lighthouse metadata for future comparison
-		_last_lighthouses_by_cell.clear()
-		for lh_meta in state.lighthouses():
-			_last_lighthouses_by_cell[lh_meta.pos()] = lh_meta
+		# => PRECOMPUTE ATTACK/CONNECTION DATA (defaults to it if next to lighthouse, otherwise idle)
+		_player_attacks.clear()
+		for cell in cell_to_players: # "Optimization": only check lighthouses with players
+			for lh_meta in state.lighthouses():
+				if lh_meta.pos() == cell:
+					var attacks = []
+					for player_info in cell_to_players[cell]:
+						var pl_i = player_info[0]
+						var player_energy_delta = 0
+						if len(_last_players) > pl_i:
+							player_energy_delta = state_players[pl_i].energy() - _last_players[pl_i].energy()
+						attacks.append([player_info, max(1, -player_energy_delta)]) # If not attacking, connecting!
+					# Compute relative attack energies
+					var max_attack_energy = attacks.map(func(x): return x[1]).max()
+					_player_attacks[cell] = attacks.map(func(x): return [x[0], float(x[1]) / max_attack_energy])
 		
 
 	elif phase == SignalBus.GAME_STATE_PHASE_ANIMATE:
-		# Apply precomputed collision-avoiding target walk locations!
 		var players := state.players()
 		for player_index in range(players.size()):
 			var player_meta = players[player_index]
 			var player: PlayerScene = get_child(player_index)
 			var target_pos = _player_to_next_pos.get(player)
-			if target_pos != null:
+			if target_pos != null: # Apply precomputed collision-avoiding target walk locations!
 				player.walk_to(target_pos)
-			elif _player_attacks.has(player_meta.pos()):
+			elif _player_attacks.has(player_meta.pos()): # Attack / connect
 				var attack_pos = IslandH.hit_pos_at_cell(Vector2(player_meta.pos()) + Vector2.ONE * 0.5)
-				attack_pos.y += 15  # TODO: Get height of lighthouse programmatically
+				var lh_height = 20
+				if lighthousesParent.get_child_count() > 0:
+					lh_height = lighthousesParent.get_child(0).top_center.y
+				attack_pos.y += lh_height
 				var attack_energy = _player_attacks[player_meta.pos()].filter(func(x): return x[0][0] == player_index)[0][1]
 				player.attack(attack_pos, attack_energy)
-			# elif connect (special case of attack that shares animation?)
-			else:
+			else: # Default to idle otherwise
 				player.idle()
 				
 	else: # SignalBus.GAME_STATE_PHASE_END

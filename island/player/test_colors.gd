@@ -4,7 +4,9 @@ extends GridContainer
 
 @export var regenerate: bool = false:
 	set(new_val):
-		get_children().map(func(c): remove_child(c))
+		get_children().map(func(c): 
+			remove_child(c)
+			c.queue_free())
 		print("Generating colors!")
 		var vps = get_viewport_rect().size
 		var i := 0

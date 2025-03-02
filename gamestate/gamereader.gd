@@ -36,7 +36,7 @@ func _init(stream_peer: StreamPeer):
 	self._stream_peer = stream_peer
 
 
-## Parse the complete next round state, including moves from all bots
+## Parse the complete next round state, including moves from all bots. Remember to free the returned state!
 func parse_next_round() -> GameState:
 	if self.cur_state == null:
 		# Figure out how many players are there in the first round
@@ -57,6 +57,8 @@ func parse_next_round() -> GameState:
 		
 		if self.cur_state.round() != _expected_round:
 			Log.d("[gamereader] Error: Unexpected round number: " + str(cur_state.round()) + " (expected " + str(_expected_round) + ")")
+		
+		self.cur_state.free_recursive() # We don't care about this intermediate state
 	
 	_expected_round+=1
 	if self.cur_state.round() != _expected_round:
@@ -68,9 +70,8 @@ func parse_next_round() -> GameState:
 var cur_state: GameState = null
 
 
-## Parse the next state, updated after any bot makes a move in their turn (see parse_next_round)
-
-
+## Parse the next state, updated after any bot makes a move in their turn (see parse_next_round).
+## Remember to free the returned state
 func parse_next_state() -> GameState:
 	var raw_state: Dictionary = _read_json_line()
 	# Log.d"Raw state: " + JSON.stringify(raw_state))

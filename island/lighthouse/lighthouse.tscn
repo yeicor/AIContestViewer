@@ -1,10 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://bup4red5vgsof"]
+[gd_scene load_steps=4 format=3 uid="uid://bup4red5vgsof"]
 
 [ext_resource type="PackedScene" uid="uid://ba04t0vgcj163" path="res://island/lighthouse/model/lighthouse.glb" id="1_534e3"]
 [ext_resource type="Script" path="res://island/lighthouse/lighthouse.gd" id="1_mjv0r"]
+[ext_resource type="Script" path="res://addons/worstconcept-spawnpool/WCSpawnPool.gd" id="3_nnyu7"]
 
 [node name="Lighthouse" type="Node3D"]
 script = ExtResource("1_mjv0r")
 color = Color(0, 1, 0.189945, 1)
 
 [node name="lighthouse" parent="." instance=ExtResource("1_534e3")]
+
+[node name="Spawner" type="Node3D" parent="."]
+script = ExtResource("3_nnyu7")
+spawn_parent = NodePath("..")
+scene_file = "res://island/player/lightning/lightning_plane.tscn"

@@ -13,15 +13,35 @@ var new_mat := ShaderMaterial.new()
 		color = new_val
 		new_mat.set_shader_parameter("color_to", color)
 
+var attack_lightnings: Array = []
+@onready var lightning_plane := preload("res://island/player/lightning/lightning_plane.tscn")
+@onready var lightning_sphere := preload("res://island/player/lightning/lightning_sphere.tscn")
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	mesh_instance.scale *= 3  # Easier to see, less "realistic"...
+	mesh_instance.scale *= 4  # Easier to see, less "realistic"...
 	new_mat.shader = preload("res://island/lighthouse/recolor.gdshader")
 	new_mat.set_shader_parameter("tex", preload("res://island/player/model/gandalf_texture.tres"))
 	new_mat.set_shader_parameter("color_from", Vector3(0.5, 0.7, 0.8))
 	new_mat.set_shader_parameter("sensitivity", 0.2)
 	mesh_instance.set_surface_override_material(0, new_mat)
-	idle()
+	#
+	for hand_bone_name in ["mixamorig_LeftHand", "mixamorig_RightHand"]:
+		var lp := lightning_plane.instantiate()
+		add_child(lp)
+		lp.name = "attack_lightning_" + hand_bone_name
+		lp.color = color
+		lp.start_freedom = 0.0
+		lp.end_freedom = 0.3
+		var bone_id = skeleton.find_bone(hand_bone_name)
+		attack_lightnings.append([lp, bone_id])
+	# Make it more visible by adding ball of lightning on target
+	var ls := lightning_sphere.instantiate()
+	add_child(ls)
+	ls.name = "attack_lightning_sphere"
+	ls.color = color
+	attack_lightnings.append([ls])
+	attack(position + Vector3.UP * 25)
 
 func idle():
 	_anim_common("Idle", true)
@@ -37,30 +57,15 @@ func walk_to(center: Vector2, _delta_secs: float = Settings.common_turn_secs()):
 func set_pos(center: Vector2):
 	walk_to(center, 0.0)
 
-var attack_lightnings: Array = []
 func attack(_target: Vector3, strength01: float = 1.0, _delta_secs: float = Settings.common_turn_secs()):
 	"""Animates the attack of the center of the cell that the player is on."""
-	#for i in range(skeleton.get_bone_count()):
-		#SLog.sd("Player bones: {0}".format([skeleton.get_bone_name(i)]))
-	for hand_bone_name in ["mixamorig_LeftHand", "mixamorig_RightHand"]:
-		var lp := preload("res://island/player/lightning/lightning_plane.tscn").instantiate()
-		add_child(lp)
-		lp.name = "attack_lightning_" + hand_bone_name
-		lp.color = color
-		lp.start_freedom = 0.0
-		lp.end_freedom = 0.3
-		lp.unit_width = strength01 * 0.25
-		var bone_id = skeleton.find_bone(hand_bone_name)
-		attack_lightnings.append([lp, bone_id])
-	# Make it more visible by adding ball of lightning on target
-	var ls := preload("res://island/player/lightning/lightning_sphere.tscn").instantiate()
-	add_child(ls)
-	ls.name = "attack_lightning_sphere"
-	ls.color = color
-	ls.unit_width = strength01 * 0.5
-	ls.scale = Vector3.ONE * 0.75 * Settings.terrain_cell_side() * strength01
-	attack_lightnings.append([ls])
-	
+	for alp in attack_lightnings:
+		alp[0].visible = true
+		if len(alp) > 1: # Hand lightnings
+			alp[0].unit_width = strength01 * 0.75
+		else:
+			alp[0].unit_width = strength01 * 0.5
+			alp[0].scale = Vector3.ONE * 0.75 * Settings.terrain_cell_side() * strength01
 	walk_from_transform = Transform3D.IDENTITY
 	target = _target
 	_anim_common("Attack", true, _delta_secs)
@@ -100,7 +105,7 @@ func _process(_delta: float) -> void:
 			position = lerp(walk_from_transform.origin, target, anim_progress)
 			# Actually, always stick the player to the terrain height (performance?)
 			position.y = IslandH.height_at_global(Vector2(position.x, position.z))
-			ensure_no_lightnings() # Hides bug related to the else not detected sometimes
+			ensure_no_lightnings() # If turns are too fast, end animation code may not always run
 
 		# Always smoothly rotate to face the target while walking towards it
 		var rotation_speed = max(PI, PI / Settings.common_turn_secs_multiplier())
@@ -109,31 +114,25 @@ func _process(_delta: float) -> void:
 			quaternion = lerp(quaternion, Basis.looking_at(rotation_target).get_rotation_quaternion(), _delta * rotation_speed)
 		
 		# If attacking, make sure the lightning is always aligned with the hands and target (even while rotating)
-		if not attack_lightnings.is_empty():
-			for alp in attack_lightnings:
-				var lightning: LightningPlane = alp[0]
-				if len(alp) > 1: # Hand lightnings
-					var lightning_from := Transform3D.IDENTITY.rotated(Vector3.RIGHT, PI/2) * \
-					mesh_instance.transform * skeleton.transform * skeleton.get_bone_global_pose(alp[1]).origin
-					# FIXME: target - position is "close enough" but not correct (check by reducing end_freedom)
-					lightning.set_endpoints(lightning_from, target - position)
-					# TODO: Also make sure it keeps looking at the camera for a better effect
-				else: # Sphere lightnings at target
-					lightning.global_position = target
+		for alp in attack_lightnings:
+			var lightning: LightningPlane = alp[0]
+			if not lightning.visible: continue
+			if len(alp) > 1: # Hand lightnings
+				var lightning_from := Transform3D.IDENTITY.rotated(Vector3.RIGHT, PI/2) * \
+				mesh_instance.transform * skeleton.transform * skeleton.get_bone_global_pose(alp[1]).origin
+				# FIXME: target - position is "close enough" but not correct (check by reducing end_freedom)
+				lightning.set_endpoints(lightning_from, target - position)
+				# TODO: Also make sure it keeps looking at the camera for a better effect
+			else: # Sphere lightnings at target
+				lightning.global_position = target
 		
 	else: # Not animating (FIXME: this is not always detected as events can be faster than frames!)
 		if walk_from_transform != Transform3D.IDENTITY:
 			if position != target: # End of walking event
 				walk_from_transform = Transform3D.IDENTITY
 				position = target
-				#idle()
 		ensure_no_lightnings()
 		
 func ensure_no_lightnings():
-	if not attack_lightnings.is_empty(): # End of attacking event
-		for alp in attack_lightnings:
-			remove_child(alp[0])
-		attack_lightnings = []
-		idle()
-		
-		
+	for alp in attack_lightnings:
+		alp[0].visible = false

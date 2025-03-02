@@ -18,8 +18,9 @@ lhTriAreasParent = NodePath("../LighthouseTriangleAreas")
 
 [node name="Props" parent="." instance=ExtResource("3_j85rw")]
 
-[node name="Players" type="Node3D" parent="."]
+[node name="Players" type="Node3D" parent="." node_paths=PackedStringArray("lighthousesParent")]
 script = ExtResource("4_7uhkn")
+lighthousesParent = NodePath("../Lighthouses")
 
 [node name="EnergyBalls" type="Node3D" parent="."]
 script = ExtResource("5_o16me")

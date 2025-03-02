@@ -4,7 +4,9 @@ extends Node3D
 var energyBallScene := preload("res://island/player/lightning/lightning_sphere.tscn")
 
 func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
-	get_children().map(func(c): remove_child(c))
+	get_children().map(func(c): 
+		remove_child(c)
+		c.queue_free())
 	# TODO: May need particles and shaders for fast generation through simple texture edits...
 	var island_meta := game.island()
 	for z in island_meta.height():

@@ -34,6 +34,7 @@ radial_segments = 16
 rings = 8
 
 [node name="LightningSphere" type="MeshInstance3D"]
+visible = false
 material_override = SubResource("ShaderMaterial_x3rip")
 mesh = SubResource("SphereMesh_2cubq")
 script = ExtResource("3_a276i")

@@ -29,6 +29,7 @@ static func from_meta(_meta: Lighthouse, global_pos: Vector3) -> LighthouseScene
 	slf.color = ColorGenerator.get_color(_meta.pos().x)  # Only for testing visibility
 	return slf
 
+@onready var lightning_plane_pool := $Spawner
 func _ready():
 	new_mat.shader = preload("res://island/lighthouse/recolor.gdshader")
 	new_mat.set_shader_parameter("tex", preload("res://island/lighthouse/model/lighthouse_lighthouse_lighthouse_color.webp"))
@@ -36,13 +37,13 @@ func _ready():
 	mesh_instance.set_surface_override_material(0, new_mat)
 	if color == null:
 		color = Color.AQUA
+	lightning_plane_pool.despawn(await lightning_plane_pool.spawn()) # Preheat cache!
 
 func _get_conn_id(other: LighthouseScene) -> String:
 	return "LHConnection_"+str(meta.pos())+","+str(other.meta.pos())
 
 func connect_to(other: LighthouseScene):
-	var lp := preload("res://island/player/lightning/lightning_plane.tscn").instantiate()
-	self.add_child(lp)
+	var lp: LightningPlane = await lightning_plane_pool.spawn()
 	lp.name = _get_conn_id(other)
 	lp.color = color
 	lp.start_freedom = 0.0
@@ -53,7 +54,7 @@ func connect_to(other: LighthouseScene):
 func disconnect_from(other: LighthouseScene) -> bool:
 	var conn := _get_connection(other)
 	if conn != null:
-		conn.get_parent_node_3d().remove_child(conn)
+		lightning_plane_pool.despawn(conn)
 		return true
 	return false
 

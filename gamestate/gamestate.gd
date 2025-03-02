@@ -11,21 +11,37 @@ func _init(raw: Dictionary):
 func round() -> int:
 	return self._raw["round"]
 
-
+var _island := {}
 func island(energy_only: bool = true) -> Island:
-	return Island.new(self._raw["island"], energy_only)
+	if not _island.has(energy_only):
+		_island[energy_only] = Island.new(self._raw["island"], energy_only)
+	return _island[energy_only]
 
 
+var _players = null
 func players() -> Array:
-	return self._raw["players"].map(func(x): return Player.new(x))
+	if _players == null: _players = self._raw["players"].map(func(x): return Player.new(x))
+	return _players
 
 
+var _lighthouses = null
 func lighthouses() -> Array:
-	return self._raw["lighthouses"].values().map(func(x): return Lighthouse.new(x))
+	if _lighthouses == null: _lighthouses = self._raw["lighthouses"].values().map(func(x): return Lighthouse.new(x))
+	return _lighthouses
 
 
+var _connections = null
 func connections() -> Array:
-	return self._raw["conns"].map(func(x): return Connection.new(x))
+	if _connections == null: _connections = self._raw["conns"].map(func(x): return Connection.new(x))
+	return _connections
+
+
+func free_recursive() -> void:
+	_island = {}
+	_players = null
+	_lighthouses = null
+	_connections = null
+	self.queue_free()
 
 
 

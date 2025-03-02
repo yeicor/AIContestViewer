@@ -8,17 +8,23 @@ class SLogImpl:  # Basic, no customization for in-editor logging!
 		return super.stack_frame(index + 1)
 static func sd(msg):
 	if Engine.is_editor_hint():
-		SLogImpl.new().d(msg)
+		var s := SLogImpl.new()
+		s.d(msg)
+		s.queue_free()
 	else:
 		Log.d(msg)
 static func sw(msg):
 	if Engine.is_editor_hint():
-		SLogImpl.new().w(msg)
+		var s := SLogImpl.new()
+		s.w(msg)
+		s.queue_free()
 	else:
 		Log.w(msg)
 static func se(msg):
 	if Engine.is_editor_hint():
-		SLogImpl.new().e(msg)
+		var s := SLogImpl.new()
+		s.e(msg)
+		s.queue_free()
 	else:
 		Log.e(msg)
 

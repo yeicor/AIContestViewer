@@ -43,7 +43,7 @@ func _on_game_state(state: GameState, _turn: int, phase: int):
 			stable_key.sort()
 			next_conns[stable_key] = true
 			if !current_conns.erase(stable_key): # New
-				stable_key[0].connect_to(stable_key[1])
+				await stable_key[0].connect_to(stable_key[1])
 			tri_helper.get_or_add(conn_meta.from(), []).append(conn_meta.to())
 			tri_helper.get_or_add(conn_meta.to(), []).append(conn_meta.from())
 		for stable_key in current_conns.keys():
@@ -68,11 +68,14 @@ func _on_game_state(state: GameState, _turn: int, phase: int):
 		for tri in triangles:
 			next_tris[tri] = true
 			if !current_tris.erase(tri): # New
+				# TODO(perf): Also pool these MeshInstance nodes? Or use MultiMeshInstance + transforms?
 				var n := make_tri_node(tri, lh_by_pos[tri[0]].color)
 				n.name = str(tri)
 				lhTriAreasParent.add_child(n)
 		for tri in current_tris.keys(): # Deleted
-			lhTriAreasParent.remove_child(lhTriAreasParent.get_node(str(tri)))
+			var n := lhTriAreasParent.get_node(str(tri))
+			lhTriAreasParent.remove_child(n)
+			n.queue_free()
 		current_tris = next_tris
 			
 func make_tri_node(tri: Array, color: Color) -> MeshInstance3D:

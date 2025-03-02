@@ -134,13 +134,17 @@ setting_common_turn_secs={
 "type": "float",
 "value": 0.1
 }
+setting_common_start_paused={
+"type": "bool",
+"value": false
+}
 setting_common_turn_count={
 "type": "int",
 "value": 500
 }
 setting_common_props_multiplier={
 "type": "float",
-"value": 1.77828
+"value": 0.0
 }
 setting_common_stochastic_textures={
 "type": "bool",
@@ -179,6 +183,10 @@ setting_island_water_level_step={
 "value": 0.1
 }
 setting_island_heightmap={
+"type": "sampler2D",
+"value": "icon.svg"
+}
+setting_island_energymap={
 "type": "sampler2D",
 "value": "icon.svg"
 }

@@ -4,8 +4,9 @@ render_mode cull_back, diffuse_burley, specular_schlick_ggx;
 #include "cells.gdshaderinc"
 
 global uniform float setting_island_water_level_at;
+global uniform sampler2D setting_island_energymap : hint_roughness_gray, filter_linear;
 
-uniform float cell_border_scale : hint_range(0.0, 5.0, 0.1) = 1.0f; // Size of the border of each cell
+uniform float cell_border_scale : hint_range(0.0, 5.0, 0.1) = 2.0f; // Size of the border of each cell
 uniform vec4 above_water_color : source_color = vec4(vec3(0.75), 1.0);
 uniform vec4 below_water_color : source_color = vec4(0.5, 0.0, 0.0, 0.0);
 
@@ -28,10 +29,18 @@ void fragment() {
 	texelFetch(setting_island_water_level_distance, cell_to_corner(ivec2(uv_data.xy)), 0).r > setting_island_water_level_at;
 	bool oob = uv_data.x < 0.0 || uv_data.x > uv_data.z || uv_data.y < 0.0 || uv_data.y > uv_data.w;
 	cell_above_water = cell_above_water && !oob;
+	vec4 edge_color = cell_above_water ? above_water_color : below_water_color;
 
-	vec4 full_color = cell_above_water ? above_water_color : below_water_color;
-    ALBEDO = full_color.rgb;
-	ALPHA = lines * full_color.a;
+	// Get the energy of the cell to highlight the ones with more
+	float energy = texelFetch(setting_island_energymap, ivec2(uv_data.xy), 0).r;
+
+	// Compute final color
+    ALBEDO = lines * edge_color.rgb + (1.0 - lines) * vec3(0.0);
+	if (lines > 0.1) {
+		ALPHA = (lines - 0.1) / 0.9;
+	} else {
+		ALPHA = 0.5 * (1.0 - energy);
+	}
 }
 
 //void light() {

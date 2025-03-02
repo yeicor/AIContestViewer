@@ -244,7 +244,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The seed to generate the same island, camera paths, etc.",
 		},
 		"common/turn_secs": {
-			"default": 0.1,
+			"default": 0.25,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating each turn of the game, in seconds.",
 		},
@@ -322,6 +322,11 @@ static var _all_settings_info: Dictionary = \
 			"default": "",
 			"type": -RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D,
 			"info": "Internal texture representing heightmap of the generated terrain for the shaders.",
+		},
+		"island/energymap": {
+			"default": "",
+			"type": -RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D,
+			"info": "Internal texture representing energy of each cell to use in shaders.",
 		},
 		"ocean/vertex_count": {
 			"default": 10000, # A quality preset will always override this
@@ -471,6 +476,21 @@ static func island_heightmap_image() -> Image:
 	if _island_heightmap_cache == null:
 		_island_heightmap_cache = island_heightmap().get_image()
 	return _island_heightmap_cache
+
+
+static func island_energymap_set(value: Texture2D) -> void:
+	assert(_instance != null)
+	_instance._all_settings["island/energymap"] = value
+	RenderingServer.global_shader_parameter_set("setting_island_energymap", value)
+	_island_energymap_cache = null
+
+
+static func island_energymap() -> Texture2D: return _s_val("island/energymap")
+static var _island_energymap_cache: Image = null
+static func island_energymap_image() -> Image: 
+	if _island_energymap_cache == null:
+		_island_energymap_cache = island_energymap().get_image()
+	return _island_energymap_cache
 
 
 static func ocean_vertex_count() -> int: return _s_val("ocean/vertex_count")

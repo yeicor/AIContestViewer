@@ -132,7 +132,7 @@ setting_common_seed={
 }
 setting_common_turn_secs={
 "type": "float",
-"value": 0.1
+"value": 0.25
 }
 setting_common_start_paused={
 "type": "bool",
@@ -195,6 +195,14 @@ setting_ocean_vertex_count={
 "value": 100000
 }
 setting_ocean_screen_and_depth={
+"type": "bool",
+"value": true
+}
+setting_camera_auto_pitch={
+"type": "float",
+"value": 20.0
+}
+setting_camera_auto_include_owned={
 "type": "bool",
 "value": true
 }

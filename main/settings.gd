@@ -169,7 +169,7 @@ static func _apply_presets(path: String) -> Variant:
 
 
 static func setting_global_shader_name(setting_name: String, prefix: String = "setting_") -> String:
-	return prefix + _invalid_env_regex.sub(setting_name, "_")
+	return prefix + _invalid_env_regex.sub(setting_name, "_", true)
 
 
 static var _project_godot: ConfigFile
@@ -337,6 +337,21 @@ static var _all_settings_info: Dictionary = \
 			"default": true, # A quality preset will always override this
 			"type": TYPE_BOOL,
 			"info": "Allow access to the special screen and depth textures for a better ocean (crashes on web)",
+		},
+		"camera/mode": {
+			"default": "auto",
+			"type": TYPE_STRING,
+			"info": "The camera mode, which can be 'auto' or 'manual'",
+		},
+		"camera/auto/pitch": {
+			"default": 20.0,
+			"type": TYPE_FLOAT,
+			"info": "The pitch angle of the camera, in degrees. 0 is vertical and 90 is horizontal.",
+		},
+		"camera/auto/include_owned": {
+			"default": true,
+			"type": TYPE_BOOL,
+			"info": "Whether the auto camera also includes owned lighthouses on the frame at all times or just players.",
 		},
 	}
 

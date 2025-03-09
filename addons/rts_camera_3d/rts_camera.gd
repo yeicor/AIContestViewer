@@ -9,7 +9,6 @@ extends Camera3D
 @export var orbit_speed := 0.3
 @export var rotation_speed := 3
 @export var rotation_sprint_speed := 6
-@export var default_rotation_x := -35.0
 @export var rotation_clamping := Vector2(-80, -35)
 
 @export_group("Pan")
@@ -56,8 +55,7 @@ var _is_edge_panning := false
 
 
 func _ready():
-	rotation_degrees.x = default_rotation_x
-	_target_zoom = position.y
+	_target_zoom = position.distance_to(Vector3.ZERO)
 	_target_zoom_position = position
 
 

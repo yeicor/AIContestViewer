@@ -101,7 +101,7 @@ void vertex() {
 	// TODO: Read global shader parameters for island and settings!
     // Get the vertex position in world space
 	vertex_uv = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
-	ivec2 terrain_cell_count = textureSize(setting_island_water_level_distance, 0);
+	ivec2 terrain_cell_count = (textureSize(setting_island_water_level_distance, 0) - 1) / 2;
 	vec2 terrain_half_size = vec2(terrain_cell_count) * setting_terrain_cell_side / 2.0;
 	if (abs(VERTEX.x) + 1e-2 >= terrain_half_size.x * wave_fade_size_multiplier || abs(VERTEX.z) + 1e-2 > terrain_half_size.y * wave_fade_size_multiplier) {
 		VERTEX.xz *= 100.0;

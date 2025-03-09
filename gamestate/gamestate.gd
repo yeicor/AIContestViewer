@@ -1,5 +1,4 @@
 class_name GameState
-extends Node
 
 var _raw: Dictionary
 
@@ -34,15 +33,6 @@ var _connections = null
 func connections() -> Array:
 	if _connections == null: _connections = self._raw["conns"].map(func(x): return Connection.new(x))
 	return _connections
-
-
-func free_recursive() -> void:
-	_island = {}
-	_players = null
-	_lighthouses = null
-	_connections = null
-	self.queue_free()
-
 
 
 static func array_2d_to_ascii_string(arr: Array, blank: int = 1) -> String:

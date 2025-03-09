@@ -344,9 +344,14 @@ static var _all_settings_info: Dictionary = \
 			"info": "The camera mode, which can be 'auto' or 'manual'",
 		},
 		"camera/auto/pitch": {
-			"default": 20.0,
+			"default": -65.0,
 			"type": TYPE_FLOAT,
-			"info": "The pitch angle of the camera, in degrees. 0 is vertical and 90 is horizontal.",
+			"info": "The pitch angle of the camera, in degrees. 0 is horizontal and -90 is vertical.",
+		},
+		"camera/auto/rot_speed": {
+			"default": -0.05,
+			"type": TYPE_FLOAT,
+			"info": "The rotation speed of the camera, in radians per second.",
 		},
 		"camera/auto/include_owned": {
 			"default": true,
@@ -512,3 +517,19 @@ static func ocean_vertex_count() -> int: return _s_val("ocean/vertex_count")
 
 
 static func ocean_screen_and_depth() -> bool: return _s_val("ocean/screen_and_depth")
+
+enum {CAMERA_MODE_MANUAL, CAMERA_MODE_AUTO}
+
+static func camera_mode() -> int: 
+	if _s_val("camera/mode") == "auto":
+		return CAMERA_MODE_AUTO
+	else:
+		return CAMERA_MODE_MANUAL
+
+static func camera_mode_auto() -> bool: return camera_mode() == CAMERA_MODE_AUTO
+
+static func camera_auto_pitch() -> float: return _s_val("camera/auto/pitch")
+
+static func camera_auto_rot_speed() -> float: return _s_val("camera/auto/rot_speed")
+
+static func camera_auto_include_owned() -> bool: return _s_val("camera/auto/include_owned")

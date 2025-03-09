@@ -57,8 +57,6 @@ func parse_next_round() -> GameState:
 		
 		if self.cur_state.round() != _expected_round:
 			Log.d("[gamereader] Error: Unexpected round number: " + str(cur_state.round()) + " (expected " + str(_expected_round) + ")")
-		
-		self.cur_state.free_recursive() # We don't care about this intermediate state
 	
 	_expected_round+=1
 	if self.cur_state.round() != _expected_round:

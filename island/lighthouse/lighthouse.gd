@@ -2,6 +2,8 @@
 extends Node3D
 class_name LighthouseScene
 
+static var unowned_color := Color(0.3, 0.3, 0.3)
+
 var meta: Lighthouse
 
 @onready var mesh_instance: MeshInstance3D = $lighthouse/Lighthouse
@@ -25,8 +27,8 @@ static func from_meta(_meta: Lighthouse, global_pos: Vector3) -> LighthouseScene
 	slf.name = "Lighthouse_" + str(_meta.pos())
 	slf.position = global_pos
 	slf.rotate_y(randf() * 2 * PI)
-	slf.color = Color(0.3, 0.3, 0.3)  # Non-player color when unowned
-	slf.color = ColorGenerator.get_color(_meta.pos().x)  # Only for testing visibility
+	slf.color = unowned_color  # Non-player color when unowned
+	#slf.color = ColorGenerator.get_color(_meta.pos().x)  # Only for testing visibility
 	return slf
 
 @onready var lightning_plane_pool := $Spawner

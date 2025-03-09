@@ -14,10 +14,16 @@ var material: ShaderMaterial = preload("res://ocean/water/material.tres")
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
-		# Automatically build the ocean once we know the island size (long-range dependency via signal bus)
-		SignalBus.island_global_shader_parameters_ready.connect(func(): build(Settings.island_water_level_distance().get_size() * Settings.terrain_cell_side()), CONNECT_ONE_SHOT)
+		# Prepare to generate as soon as a new game round starts
+		SignalBus.game_state.connect(func(initial_state: GameState, turn, phase):
+			# Regenerate water for each new game we find (it is likely to have a new map)
+			if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:
+				# Lock the game timer while generating (not actually needed due to sync work)
+				GameManager.pause()
+				build(Vector2(initial_state.island().size()) * Settings.terrain_cell_side())
+				GameManager.resume())
 
-
+var _material_code_modified = false
 func build(size: Vector2):
 	# Create or reuse the existing child node
 	var oceanMeshNode: MeshInstance3D
@@ -36,7 +42,9 @@ func build(size: Vector2):
 	pmesh.size = size * size_multiplier
 	pmesh.subdivide_depth = int(sqrt(Settings.ocean_vertex_count()))
 	pmesh.subdivide_width = pmesh.subdivide_depth
-	material.shader.code = Settings.as_defines() + material.shader.code
+	if not _material_code_modified:
+		material.shader.code = Settings.as_defines() + material.shader.code
+		_material_code_modified = true
 	pmesh.material = material
 	SLog.sd("Ocean has " + str(Vector2(pmesh.subdivide_width, pmesh.subdivide_depth)) + " cells.")
 	

@@ -53,7 +53,7 @@ func _ready():
 		vertex_count = Settings.terrain_vertex_count()
 		cell_side = Settings.terrain_cell_side()
 		steepness = Settings.terrain_max_steepness()
-		# Prepare to generate as soon as the first game state is ready
+		# Prepare to generate as soon as a new game round starts
 		SignalBus.game_state.connect(func(initial_state, turn, phase):
 			# Regenerate terrain for each new game we find (it is likely to have a new map)
 			if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:

@@ -68,7 +68,6 @@ static func _thread(game_paths: PackedStringArray):
 			# Read game state asynchronously (complete round -- ignore intermediate states)
 			var state := reader.parse_next_round()
 			end_sem.wait() # Wait for the previous main call to end
-			if old_state != null: old_state.free_recursive() # This state won't be used anymore
 			# Publish game state via a global signal.
 			old_state = state
 			_emit_and_wait_phases_main_thread.bind(old_state, turn, end_sem).call_deferred()

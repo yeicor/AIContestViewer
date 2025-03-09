@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://ordobflcpuj4"]
+[gd_scene load_steps=11 format=3 uid="uid://ordobflcpuj4"]
 
 [ext_resource type="Script" path="res://main/main.gd" id="1_rrmnf"]
 [ext_resource type="Script" path="res://addons/rts_camera_3d/rts_camera.gd" id="2_tsys7"]
@@ -7,21 +7,30 @@
 [ext_resource type="PackedScene" uid="uid://se6kclfe11gi" path="res://ui/ui.tscn" id="6_a5eex"]
 [ext_resource type="PackedScene" uid="uid://4s5lkea8k2pu" path="res://ocean/ocean.tscn" id="6_gowfy"]
 
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_s0s0s"]
+
+[sub_resource type="Sky" id="Sky_31ni3"]
+sky_material = SubResource("PhysicalSkyMaterial_s0s0s")
+
+[sub_resource type="Environment" id="Environment_604ld"]
+background_mode = 2
+sky = SubResource("Sky_31ni3")
+
+[sub_resource type="CameraAttributesPhysical" id="CameraAttributesPhysical_lcbyj"]
+
 [node name="Main" type="Node3D"]
 script = ExtResource("1_rrmnf")
 
 [node name="RTSCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 150, 0)
-environment = ExtResource("3_3dq86")
+transform = Transform3D(0.615182, -0.269644, 0.740839, -1.49012e-08, 0.939692, 0.342021, -0.788385, -0.210405, 0.578082, 0.645127, 0.341206, 0.670754)
+environment = SubResource("Environment_604ld")
+attributes = SubResource("CameraAttributesPhysical_lcbyj")
 current = true
-size = 300.0
-near = 1.0
 script = ExtResource("2_tsys7")
 move_speed = 100.0
 sprint_speed = 200.0
 rotation_speed = 1
 rotation_sprint_speed = 3
-default_rotation_x = -89.999
 rotation_clamping = Vector2(-89.999, -10)
 pan_speed = 1000.0
 pan_on_screen_edge = false

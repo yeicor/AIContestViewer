@@ -1,16 +1,37 @@
-[gd_scene load_steps=6 format=3 uid="uid://bfq4y7aalc3s1"]
+[gd_scene load_steps=15 format=3 uid="uid://bfq4y7aalc3s1"]
 
 [ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="1_3qeog"]
 [ext_resource type="Script" path="res://island/lighthouses.gd" id="2_nth1s"]
 [ext_resource type="PackedScene" uid="uid://crcy7cdwij4v5" path="res://island/props/props.tscn" id="3_j85rw"]
 [ext_resource type="Script" path="res://island/players.gd" id="4_7uhkn"]
 [ext_resource type="Script" path="res://island/energy.gd" id="5_o16me"]
+[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="6_4yap0"]
+[ext_resource type="Script" path="res://island/auto_camera.gd" id="6_b7pyx"]
+[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="7_l4kva"]
+[ext_resource type="Script" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="8_gwggm"]
+[ext_resource type="Environment" uid="uid://4g5i147j1mn3" path="res://main/environment.tres" id="8_wbpqa"]
+
+[sub_resource type="Resource" id="Resource_6yosp"]
+script = ExtResource("8_gwggm")
+duration = 1.0
+transition = 0
+ease = 2
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_s0s0s"]
+
+[sub_resource type="Sky" id="Sky_31ni3"]
+sky_material = SubResource("PhysicalSkyMaterial_s0s0s")
+
+[sub_resource type="Environment" id="Environment_veato"]
+background_mode = 2
+sky = SubResource("Sky_31ni3")
 
 [node name="Island" type="Node3D"]
 
 [node name="Terrain" parent="." instance=ExtResource("1_3qeog")]
 
 [node name="Lighthouses" type="Node3D" parent="." node_paths=PackedStringArray("lhTriAreasParent")]
+unique_name_in_owner = true
 script = ExtResource("2_nth1s")
 lhTriAreasParent = NodePath("../LighthouseTriangleAreas")
 
@@ -19,11 +40,41 @@ lhTriAreasParent = NodePath("../LighthouseTriangleAreas")
 [node name="Props" parent="." instance=ExtResource("3_j85rw")]
 
 [node name="Players" type="Node3D" parent="." node_paths=PackedStringArray("lighthousesParent")]
+unique_name_in_owner = true
 script = ExtResource("4_7uhkn")
 lighthousesParent = NodePath("../Lighthouses")
 
 [node name="Energy" type="Node3D" parent="."]
 script = ExtResource("5_o16me")
+
+[node name="AutoCamera" type="Node3D" parent="."]
+script = ExtResource("6_b7pyx")
+
+[node name="PhantomCamera" type="Node3D" parent="AutoCamera" node_paths=PackedStringArray("follow_target")]
+transform = Transform3D(0.999972, 0, 0, 0, 1, 0, 0, 0, 0.999998, 0, 0, 0)
+top_level = true
+script = ExtResource("7_l4kva")
+follow_mode = 1
+follow_target = NodePath("../CameraTargetPos")
+look_at_mode = 3
+tween_resource = SubResource("Resource_6yosp")
+environment = ExtResource("8_wbpqa")
+follow_damping = true
+follow_damping_value = Vector3(0.5, 0.5, 0.5)
+follow_distance = 0.0
+spring_length = 0.0
+look_at_damping = true
+look_at_damping_value = 1.0
+
+[node name="Camera3D" type="Camera3D" parent="AutoCamera"]
+environment = SubResource("Environment_veato")
+
+[node name="PhantomCameraHost" type="Node" parent="AutoCamera/Camera3D"]
+process_priority = 300
+process_physics_priority = 300
+script = ExtResource("6_4yap0")
+
+[node name="CameraTargetPos" type="Node3D" parent="AutoCamera"]
 
 [connection signal="terrain_ready" from="Terrain" to="Lighthouses" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Props" method="_on_terrain_terrain_ready"]

@@ -859,7 +859,7 @@ func _pcam_tween(delta: float) -> void:
 							_active_pcam_3d.tween_transition,
 							_active_pcam_3d.tween_ease
 						)
-				if _cam_exposure_min_exposure_value_changed:
+				if _cam_exposure_min_exposure_value_changed and camera_3d.attributes.auto_exposure_enabled:
 					camera_3d.attributes.auto_exposure_min_exposure_value = \
 						_tween_interpolate_value(
 							_prev_cam_exposure_min_exposure_value,

@@ -5,6 +5,7 @@ func _ready() -> void:
 	_setup_debug_fps()
 	_setup_console()
 	_setup_fullscreen()
+	_setup_camera()
 	# Start the game manager thread (after all inner scenes have been initialized and are ready!)
 	GameManager.start(Settings.game_paths())
 
@@ -35,13 +36,6 @@ func _setup_console():
 	LimboConsole.register_command(_cmd_debug_draw, "debug_draw", "Change debug draw mode (see Viewport.DebugDraw enum, 0 to disable)")
 	LimboConsole.show_console()
 	Log.d("Press " + str(InputMap.action_get_events("limbo_console_toggle").map(func(ev: InputEvent): return ev.as_text())) + " to toggle this console")
-	# Auto-hide console after initial load
-	var listener: Array = []
-	listener.append(func(_state, _turn, phase): 
-		if phase == SignalBusStatic.GAME_STATE_PHASE_ANIMATE: 
-			LimboConsole.hide_console()
-			SignalBus.game_state.disconnect(listener[0]))
-	SignalBus.game_state.connect(listener[0])
 
 func _cmd_debug_draw(debug_draw: int):
 	get_viewport().debug_draw = debug_draw as Viewport.DebugDraw
@@ -54,4 +48,17 @@ func _input(event: InputEvent) -> void:
 		if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_WINDOWED: 
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		else:
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED) 
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
+func _setup_camera():
+	SignalBus.game_state.connect(func (state: GameState, turn, phase):
+		if turn == 0: # Terrain is re-generated on each initial turn, and it is a slow process
+			if phase == SignalBus.GAME_STATE_PHASE_INIT:
+				if Settings.camera_mode_auto():
+					$RTSCamera.look_at_from_position(Vector3(
+						float(state.island().width()) / 2.0 * Settings.terrain_cell_side(), 100,
+						float(state.island().height()) / 2.0 * Settings.terrain_cell_side()
+					), Vector3.ZERO)
+			if phase == SignalBus.GAME_STATE_PHASE_ANIMATE:
+				if Settings.camera_mode_auto():
+					$RTSCamera.queue_free())

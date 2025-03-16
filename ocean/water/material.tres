@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://dqmcm1ebiwd1y"]
 
-[ext_resource type="Shader" path="res://ocean/water/shaders/water.gdshader" id="1_5aa1n"]
+[ext_resource type="Shader" uid="uid://c7qo60tprr7qs" path="res://ocean/water/shaders/water.gdshader" id="1_5aa1n"]
 [ext_resource type="Texture2D" uid="uid://bduktpovmijlj" path="res://ocean/water/textures/water_normal.png" id="2_64h5n"]
 [ext_resource type="Texture2D" uid="uid://7oakr7mj5tvk" path="res://ocean/water/textures/water_uv.png" id="3_6g5ih"]
 
@@ -34,12 +34,12 @@ shader_parameter/wave_fade_size_multiplier = 2.0
 shader_parameter/wave_uv_scale = 30.0
 shader_parameter/wave_time_scale = 1.0
 shader_parameter/wave_normal_flatness = 30.0
+shader_parameter/wave_noise = SubResource("NoiseTexture2D_iqqbh")
 shader_parameter/wave_noise_strength = 0.2
 shader_parameter/border_color = Color(1, 1, 1, 1)
 shader_parameter/border_scale = 1.0
 shader_parameter/refraction_intensity = 0.4
 shader_parameter/max_visible_depth = 4.0
 shader_parameter/color_deep = Color(0, 0.1, 0.4, 1)
-shader_parameter/wave_noise = SubResource("NoiseTexture2D_iqqbh")
 shader_parameter/surface_normals_a = ExtResource("2_64h5n")
 shader_parameter/surface_normals_b = ExtResource("3_6g5ih")

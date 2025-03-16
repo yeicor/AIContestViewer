@@ -1,7 +1,7 @@
 [gd_resource type="ShaderMaterial" load_steps=20 format=3 uid="uid://c2nfyav24pgv8"]
 
-[ext_resource type="Shader" path="res://island/terrain/shaders/cells.gdshader" id="1_hut0j"]
-[ext_resource type="Shader" path="res://island/terrain/shaders/terrain.gdshader" id="2_vg0pr"]
+[ext_resource type="Shader" uid="uid://bamw07pt8wgoj" path="res://island/terrain/shaders/cells.gdshader" id="1_hut0j"]
+[ext_resource type="Shader" uid="uid://b2d5l1gd6q8si" path="res://island/terrain/shaders/terrain.gdshader" id="2_vg0pr"]
 [ext_resource type="Texture2D" uid="uid://d42jolqnbuby" path="res://island/terrain/textures/grass/grass_albedo.jpg" id="3_825v6"]
 [ext_resource type="Texture2D" uid="uid://bed1dknxbyrbp" path="res://island/terrain/textures/grass/grass_ao.jpg" id="4_24a22"]
 [ext_resource type="Texture2D" uid="uid://o8m86b1t4ai8" path="res://island/terrain/textures/grass/grass_normal_gl.jpg" id="5_sg5ik"]
@@ -54,17 +54,17 @@ shader_parameter/sand_scale = Vector2(1, 1)
 shader_parameter/sand_strength = 1.0
 shader_parameter/sand_strength_noise = 0.5
 shader_parameter/sand_smooth = 0.5
-shader_parameter/sand_height = 0.01
 shader_parameter/sand_albedo = ExtResource("11_gijmr")
 shader_parameter/sand_normal = ExtResource("13_euyum")
 shader_parameter/sand_ao = ExtResource("12_pn2w7")
 shader_parameter/sand_roughness = ExtResource("14_c8q74")
+shader_parameter/sand_height = 0.01
 shader_parameter/snow_scale = Vector2(1, 1)
 shader_parameter/snow_strength = 1.0
 shader_parameter/snow_strength_noise = 3.0
 shader_parameter/snow_smooth = 1.5
-shader_parameter/snow_height = 0.3
 shader_parameter/snow_albedo = ExtResource("15_j73ul")
 shader_parameter/snow_normal = ExtResource("17_1grca")
 shader_parameter/snow_ao = ExtResource("16_akvsm")
 shader_parameter/snow_roughness = ExtResource("18_6hlke")
+shader_parameter/snow_height = 0.3

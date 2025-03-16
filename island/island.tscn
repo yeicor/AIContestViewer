@@ -1,15 +1,16 @@
-[gd_scene load_steps=15 format=3 uid="uid://bfq4y7aalc3s1"]
+[gd_scene load_steps=17 format=3 uid="uid://bfq4y7aalc3s1"]
 
 [ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="1_3qeog"]
-[ext_resource type="Script" path="res://island/lighthouses.gd" id="2_nth1s"]
+[ext_resource type="Script" uid="uid://bfn5xc7dj5xhn" path="res://island/lighthouses.gd" id="2_nth1s"]
 [ext_resource type="PackedScene" uid="uid://crcy7cdwij4v5" path="res://island/props/props.tscn" id="3_j85rw"]
-[ext_resource type="Script" path="res://island/players.gd" id="4_7uhkn"]
-[ext_resource type="Script" path="res://island/energy.gd" id="5_o16me"]
-[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="6_4yap0"]
-[ext_resource type="Script" path="res://island/auto_camera.gd" id="6_b7pyx"]
-[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="7_l4kva"]
-[ext_resource type="Script" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="8_gwggm"]
+[ext_resource type="Script" uid="uid://51rqnade5ip" path="res://island/players.gd" id="4_7uhkn"]
+[ext_resource type="Script" uid="uid://b5ps3ai5pk348" path="res://island/energy.gd" id="5_o16me"]
+[ext_resource type="Script" uid="uid://8dorpcvp0dxt" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="6_4yap0"]
+[ext_resource type="Script" uid="uid://c0mx6eh7bf8vt" path="res://island/auto_camera.gd" id="6_b7pyx"]
+[ext_resource type="Script" uid="uid://bxbc4fhj7sxw2" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="7_l4kva"]
+[ext_resource type="Script" uid="uid://tihkq6mjut6i" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="8_gwggm"]
 [ext_resource type="Environment" uid="uid://4g5i147j1mn3" path="res://main/environment.tres" id="8_wbpqa"]
+[ext_resource type="Script" uid="uid://wm2f0rgjbugg" path="res://addons/phantom_camera/scripts/resources/phantom_camera_noise_3d.gd" id="10_wyjn7"]
 
 [sub_resource type="Resource" id="Resource_6yosp"]
 script = ExtResource("8_gwggm")
@@ -17,12 +18,28 @@ duration = 1.0
 transition = 0
 ease = 2
 
+[sub_resource type="Resource" id="Resource_mggs4"]
+script = ExtResource("10_wyjn7")
+amplitude = 200.0
+frequency = 0.002
+randomize_noise_seed = 1
+noise_seed = 0
+rotational_noise = false
+positional_noise = true
+rotational_multiplier_x = 1.0
+rotational_multiplier_y = 1.0
+rotational_multiplier_z = 1.0
+positional_multiplier_x = 1.0
+positional_multiplier_y = 0.3
+positional_multiplier_z = 1.0
+metadata/_custom_type_script = "uid://wm2f0rgjbugg"
+
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_s0s0s"]
 
 [sub_resource type="Sky" id="Sky_31ni3"]
 sky_material = SubResource("PhysicalSkyMaterial_s0s0s")
 
-[sub_resource type="Environment" id="Environment_veato"]
+[sub_resource type="Environment" id="Environment_wyjn7"]
 background_mode = 2
 sky = SubResource("Sky_31ni3")
 
@@ -31,7 +48,6 @@ sky = SubResource("Sky_31ni3")
 [node name="Terrain" parent="." instance=ExtResource("1_3qeog")]
 
 [node name="Lighthouses" type="Node3D" parent="." node_paths=PackedStringArray("lhTriAreasParent")]
-unique_name_in_owner = true
 script = ExtResource("2_nth1s")
 lhTriAreasParent = NodePath("../LighthouseTriangleAreas")
 
@@ -40,7 +56,6 @@ lhTriAreasParent = NodePath("../LighthouseTriangleAreas")
 [node name="Props" parent="." instance=ExtResource("3_j85rw")]
 
 [node name="Players" type="Node3D" parent="." node_paths=PackedStringArray("lighthousesParent")]
-unique_name_in_owner = true
 script = ExtResource("4_7uhkn")
 lighthousesParent = NodePath("../Lighthouses")
 
@@ -50,24 +65,26 @@ script = ExtResource("5_o16me")
 [node name="AutoCamera" type="Node3D" parent="."]
 script = ExtResource("6_b7pyx")
 
-[node name="PhantomCamera" type="Node3D" parent="AutoCamera" node_paths=PackedStringArray("follow_target")]
-transform = Transform3D(0.999972, 0, 0, 0, 1, 0, 0, 0, 0.999998, 0, 0, 0)
+[node name="PhantomCamera" type="Node3D" parent="AutoCamera" node_paths=PackedStringArray("follow_target", "look_at_target")]
+transform = Transform3D(-1.19948e-07, -0.0995037, 0.995037, -7.49676e-09, 0.995037, 0.0995037, -1.0062, 7.45058e-09, -1.19209e-07, 10, 1, 0)
 top_level = true
 script = ExtResource("7_l4kva")
 follow_mode = 1
 follow_target = NodePath("../CameraTargetPos")
-look_at_mode = 3
+look_at_mode = 2
+look_at_target = NodePath("../CameraTargetLookAt")
 tween_resource = SubResource("Resource_6yosp")
+tween_on_load = false
 environment = ExtResource("8_wbpqa")
-follow_damping = true
-follow_damping_value = Vector3(0.5, 0.5, 0.5)
+follow_damping_value = Vector3(2.5, 2.5, 2.5)
 follow_distance = 0.0
 spring_length = 0.0
-look_at_damping = true
-look_at_damping_value = 1.0
+look_at_damping_value = 3.0
+noise = SubResource("Resource_mggs4")
 
 [node name="Camera3D" type="Camera3D" parent="AutoCamera"]
-environment = SubResource("Environment_veato")
+transform = Transform3D(-1.19209e-07, -0.0995037, 0.995037, -7.45058e-09, 0.995037, 0.0995037, -1, 4.44816e-09, -1.19359e-07, 5.32269, -0.896309, 4.63422)
+environment = SubResource("Environment_wyjn7")
 
 [node name="PhantomCameraHost" type="Node" parent="AutoCamera/Camera3D"]
 process_priority = 300
@@ -75,8 +92,12 @@ process_physics_priority = 300
 script = ExtResource("6_4yap0")
 
 [node name="CameraTargetPos" type="Node3D" parent="AutoCamera"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1, 0)
+
+[node name="CameraTargetLookAt" type="Node3D" parent="AutoCamera"]
 
 [connection signal="terrain_ready" from="Terrain" to="Lighthouses" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Props" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Players" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Energy" method="_on_terrain_terrain_ready"]
+[connection signal="terrain_ready" from="Terrain" to="AutoCamera" method="_on_terrain_terrain_ready"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://bbvx0y3ablhoa"]
 
-[ext_resource type="Script" path="res://ocean/water/water.gd" id="4_j2nh8"]
+[ext_resource type="Script" uid="uid://caklilvms4roe" path="res://ocean/water/water.gd" id="4_j2nh8"]
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_ewnyi"]
 input_name = "normal"

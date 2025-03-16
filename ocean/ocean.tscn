@@ -2,13 +2,13 @@
 
 [ext_resource type="PackedScene" uid="uid://0reojd5aiiqi" path="res://ocean/props/props.tscn" id="1_faalw"]
 [ext_resource type="PackedScene" uid="uid://bbvx0y3ablhoa" path="res://ocean/water/water.tscn" id="1_nm1yq"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/modifier_stack.gd" id="3_lvlr0"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/base_modifier.gd" id="4_8fvwu"]
-[ext_resource type="Script" path="res://ocean/ocean.gd" id="4_j2nh8"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/create_inside_random.gd" id="5_aq1ee"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/relax.gd" id="6_n5y7k"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/remove_outside_shapes.gd" id="8_cv2v7"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/randomize_rotation.gd" id="8_s5h08"]
+[ext_resource type="Script" uid="uid://43om7if72vtx" path="res://addons/proton_scatter/src/stack/modifier_stack.gd" id="3_lvlr0"]
+[ext_resource type="Script" uid="uid://wr173va7va6r" path="res://addons/proton_scatter/src/modifiers/base_modifier.gd" id="4_8fvwu"]
+[ext_resource type="Script" uid="uid://c48nbu4d3spk7" path="res://ocean/ocean.gd" id="4_j2nh8"]
+[ext_resource type="Script" uid="uid://b2dqvnvhokhjr" path="res://addons/proton_scatter/src/modifiers/create_inside_random.gd" id="5_aq1ee"]
+[ext_resource type="Script" uid="uid://b2w3lbb8cj61g" path="res://addons/proton_scatter/src/modifiers/relax.gd" id="6_n5y7k"]
+[ext_resource type="Script" uid="uid://bj560odckm32" path="res://addons/proton_scatter/src/modifiers/remove_outside_shapes.gd" id="8_cv2v7"]
+[ext_resource type="Script" uid="uid://dmu7f0wwg755r" path="res://addons/proton_scatter/src/modifiers/randomize_rotation.gd" id="8_s5h08"]
 
 [sub_resource type="Resource" id="Resource_m2iik"]
 script = ExtResource("5_aq1ee")

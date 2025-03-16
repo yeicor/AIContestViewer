@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://bup4red5vgsof"]
 
 [ext_resource type="PackedScene" uid="uid://ba04t0vgcj163" path="res://island/lighthouse/model/lighthouse.glb" id="1_534e3"]
-[ext_resource type="Script" path="res://island/lighthouse/lighthouse.gd" id="1_mjv0r"]
-[ext_resource type="Script" path="res://addons/worstconcept-spawnpool/WCSpawnPool.gd" id="3_nnyu7"]
+[ext_resource type="Script" uid="uid://bvqglrfwa0iuq" path="res://island/lighthouse/lighthouse.gd" id="1_mjv0r"]
+[ext_resource type="Script" uid="uid://dr3noydgo8l30" path="res://addons/worstconcept-spawnpool/WCSpawnPool.gd" id="3_nnyu7"]
 
 [node name="Lighthouse" type="Node3D"]
 script = ExtResource("1_mjv0r")

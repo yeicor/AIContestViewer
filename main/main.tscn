@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://ordobflcpuj4"]
 
-[ext_resource type="Script" path="res://main/main.gd" id="1_rrmnf"]
-[ext_resource type="Script" path="res://addons/rts_camera_3d/rts_camera.gd" id="2_tsys7"]
+[ext_resource type="Script" uid="uid://bud4ra04lnr7s" path="res://main/main.gd" id="1_rrmnf"]
+[ext_resource type="Script" uid="uid://mxgjc2u65gtm" path="res://addons/rts_camera_3d/rts_camera.gd" id="2_tsys7"]
 [ext_resource type="Environment" uid="uid://4g5i147j1mn3" path="res://main/environment.tres" id="3_3dq86"]
 [ext_resource type="PackedScene" uid="uid://bfq4y7aalc3s1" path="res://island/island.tscn" id="5_xdrxj"]
 [ext_resource type="PackedScene" uid="uid://se6kclfe11gi" path="res://ui/ui.tscn" id="6_a5eex"]

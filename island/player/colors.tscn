@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bnyrr0gema147"]
 
-[ext_resource type="Script" path="res://island/player/test_colors.gd" id="1_xteb0"]
+[ext_resource type="Script" uid="uid://c0h5qmrs2us6r" path="res://island/player/test_colors.gd" id="1_xteb0"]
 
 [node name="Colors" type="GridContainer"]
 anchors_preset = 15

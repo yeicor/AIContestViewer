@@ -1,5 +1,7 @@
-extends "res://addons/LogDuck/LogDuck.gd"
+@tool
+
 class_name SLog
+extends "res://addons/LogDuck/LogDuck.gd"
 
 # HACK that is also valid in the editor, for @tool!
 class SLogImpl:  # Basic, no customization for in-editor logging!

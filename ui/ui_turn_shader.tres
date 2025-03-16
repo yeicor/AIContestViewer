@@ -28,7 +28,7 @@ default_value = 0.25
 code = "shader_type canvas_item;
 render_mode blend_mix;
 
-uniform float progress : hint_range(0, 1, 0.10000000149012) = 0.10000000149012;
+uniform float progress : hint_range(0.0, 1.0, 0.10000000149012) = 0.10000000149012;
 uniform vec4 bg_color : source_color = vec4(0.953125, 0.481089, 0.000000, 1.000000);
 uniform float alpha = 0.25;
 

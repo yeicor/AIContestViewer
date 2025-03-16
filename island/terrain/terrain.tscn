@@ -1,14 +1,11 @@
 [gd_scene load_steps=5 format=3 uid="uid://cjklklxubiss0"]
 
-[ext_resource type="Script" path="res://island/terrain/scripts/terrain.gd" id="1_blkia"]
-[ext_resource type="Shader" path="res://island/terrain/shaders/heightmap.gdshader" id="3_hlvgl"]
-[ext_resource type="Script" path="res://island/terrain/scripts/heightmap.gd" id="3_lm46a"]
+[ext_resource type="Script" uid="uid://yy6lr1lcpi18" path="res://island/terrain/scripts/terrain.gd" id="1_blkia"]
+[ext_resource type="Shader" uid="uid://cvpjwpk6mfmpg" path="res://island/terrain/shaders/heightmap.gdshader" id="3_hlvgl"]
+[ext_resource type="Script" uid="uid://d06ujdo3wok4d" path="res://island/terrain/scripts/heightmap.gd" id="3_lm46a"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8usiv"]
 shader = ExtResource("3_hlvgl")
-shader_parameter/debug_height = false
-shader_parameter/my_seed = 42
-shader_parameter/min_precipice_range = Vector2(0.001, 0.2)
 
 [node name="Terrain" type="Node3D"]
 script = ExtResource("1_blkia")

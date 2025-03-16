@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://calo0i77jtrwp"]
 
 [ext_resource type="PackedScene" uid="uid://berqtjn65kru1" path="res://ocean/props/models/ship.glb" id="1_rsbui"]
-[ext_resource type="Script" path="res://ocean/props/floating.gd" id="2_k2pha"]
+[ext_resource type="Script" uid="uid://6f0murmornh5" path="res://ocean/props/floating.gd" id="2_k2pha"]
 
 [node name="Floating" type="Node3D"]
 script = ExtResource("2_k2pha")

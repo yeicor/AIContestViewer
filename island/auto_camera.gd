@@ -7,6 +7,7 @@ extends Node3D
 @onready var camera_target_look_at := $CameraTargetLookAt
 
 var _my_time_offset := 0.0
+var _keypoints: Array[Vector3] = [] # Locations that the camera should keep in frame at all times.
 func _ready() -> void:
 	if Settings.camera_mode_auto():
 		SignalBus.game_state.connect(self._on_game_state)
@@ -24,13 +25,13 @@ func _ready() -> void:
 			node.queue_free()
 
 func _on_terrain_terrain_ready(_mi: MeshInstance3D, state: GameState) -> void:
+	GameManager.pause()
 	# Wait for terrain and auto-snap in place for turn 0
-	cur_zoom = IslandH.num_cells().distance_to(Vector2i.ZERO) * Settings.terrain_cell_side() / 3.0
-	max_zoom_out = IslandH.num_cells().distance_to(Vector2i.ZERO) * Settings.terrain_cell_side() / 1.5
+	cur_dist = IslandH.num_cells().distance_to(Vector2i.ZERO) * Settings.terrain_cell_side() / 3.0
+	recompute_lookAt_info(state)
+	self._my_time_offset = 0.0
 	self.recompute_pos(camera_3d, 0.0)
-	recompute_lookAt(state)
-	camera_3d.look_at(camera_target_look_at.position)
-	self._my_time_offset = 0.01
+	GameManager.resume()
 
 func _on_game_state(state: GameState, turn: int, phase: int):
 	if turn == 0:
@@ -38,16 +39,21 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 			$Camera3D.current = true
 	else:
 		if phase == SignalBus.GAME_STATE_PHASE_INIT:
-			recompute_lookAt(state)
-			phantom_camera.look_at_damping = true # FIXME: Only enable after snapping into place (avoid first jump!)
+			recompute_lookAt_info(state)
 
 func _process(delta: float) -> void:
-	if self._my_time_offset > 0.0: # Wait to be enabled
+	if not _keypoints.is_empty(): # Wait to be enabled
 		self.recompute_pos(camera_target_pos, self._my_time_offset)
+		var sum := func(accum, number): return accum + number
+		camera_target_look_at.global_position = _keypoints.reduce(sum, Vector3.ZERO) / _keypoints.size()
+		if self._my_time_offset == 0.0:
+			camera_3d.look_at(camera_target_look_at.position)
+		else:
+			phantom_camera.look_at_damping = true # FIXME: Only enable after snapping into place (avoid first jump!)
+			#phantom_camera.follow_damping = true # FIXME: Only enable after snapping into place (avoid first jump!)
 		self._my_time_offset += delta
 
-var cur_zoom := 100.0 
-var max_zoom_out := 100.0 
+var cur_dist := 100.0
 func recompute_pos(cam: Node3D, time: float):
 	# Drone-like view of the game
 	var rot_angle := PI / 2 + Settings.camera_auto_rot_speed() * time
@@ -55,22 +61,24 @@ func recompute_pos(cam: Node3D, time: float):
 	var dir := Vector3(0, 1, 0).rotated(Vector3(1,0,0), deg_to_rad(270 - Settings.camera_auto_pitch()))\
 	.rotated(Vector3(0, 1, 0), rot_angle)
 	# TODO: Adjust zoom to show every relevant object in frame! UI.distance_to_game_area()!
-	var zoom_anim = smoothstep(0.0, 10.0, time)
-	var zoom = (1.0 - zoom_anim) * cur_zoom + zoom_anim * max_zoom_out
-	phantom_camera.look_at_offset = Vector3(dir.x, 0, dir.z) * zoom / 2.5 # Help camera look at everything
-	cam.position = zoom * dir
+	var wanted_dist_delta := -1.0
+	for p in _keypoints: # Displace the look at offset to ensure correct centering according to UI!
+		wanted_dist_delta = max(wanted_dist_delta, UI.distance_to_game_area(p) - 1.0)
+	#print("wanted_dist_delta:", wanted_dist_delta)
+	cur_dist = cur_dist + 0.25 * wanted_dist_delta * Settings.terrain_cell_side()
+	cam.position = cur_dist * dir
+	 # Help camera look at everything given the offset caused by the right UI panel
+	var wanted_offset = UI.projected_game_area_center(cur_dist) - camera_target_look_at.position
+	phantom_camera.look_at_offset = wanted_offset.length() * camera_3d.transform.basis.x
+	phantom_camera.look_at_offset.y = -0.3 * IslandH.num_cells().distance_to(Vector2i.ZERO) * Settings.terrain_cell_side() # Why?!
+	#print("wanted_offset:", wanted_offset.length(), "\t| ", camera_target_look_at.position)
 
-func recompute_lookAt(state: GameState):
+func recompute_lookAt_info(state: GameState):
 	# Look at targets (predict currently animating turn locations, smooth)
-	var wanted_look_at_pos = Vector3.ZERO
-	var wanted_look_at_pos_count := 0
+	_keypoints.clear()
 	for p in state.players():
-		wanted_look_at_pos += IslandH.hit_pos_at_cell(Vector2(p.pos()) + Vector2.ONE * 0.5)
-		wanted_look_at_pos_count += 1
+		_keypoints.push_back(IslandH.hit_pos_at_cell(Vector2(p.pos()) + Vector2.ONE * 0.5))
 	if Settings.camera_auto_include_owned():
 		for lh in state.lighthouses():
 			if lh.owner() >= 0:
-				wanted_look_at_pos += IslandH.hit_pos_at_cell(Vector2(lh.pos()) + Vector2.ONE * 0.5)
-				wanted_look_at_pos_count += 1
-	if wanted_look_at_pos_count > 0:
-		camera_target_look_at.position = wanted_look_at_pos / wanted_look_at_pos_count
+				_keypoints.push_back(IslandH.hit_pos_at_cell(Vector2(lh.pos()) + Vector2.ONE * 0.5))

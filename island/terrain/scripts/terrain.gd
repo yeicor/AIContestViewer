@@ -63,6 +63,9 @@ func _ready():
 					# Wait for performance to stabilize to avoid stutter after loading the island
 					await wait_for_stable_fps()
 					GameManager.resume(), CONNECT_ONE_SHOT)
+				# TODO: Detect if there are no changes to the island and keep old mesh while triggering signal (provide cached info for listeners!)
+				# Remove any previous MeshInstance3D child and create a new one
+				get_children().map(func (x): if (x is MeshInstance3D): remove_child(x))
 				generate(initial_state))
 
 var _last_regeneration_frame: int = -1234

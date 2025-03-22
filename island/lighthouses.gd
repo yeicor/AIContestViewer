@@ -16,7 +16,8 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 		add_child(LighthouseScene.from_meta(lh_meta, hit_pos))
 	current_conns = {} # Map has just been reset
 	current_tris = {} # Map has just been reset
-	SignalBus.game_state.connect(_on_game_state)
+	if not SignalBus.game_state.is_connected(_on_game_state):
+		SignalBus.game_state.connect(_on_game_state)
 	SLog.sd("[timing] Placed lighthouses in " + str(Time.get_ticks_msec() - start_time) + "ms")
 	GameManager.resume()
 

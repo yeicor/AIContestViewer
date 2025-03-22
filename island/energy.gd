@@ -10,7 +10,8 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 	energy_img = Image.create_empty((img_with_corners.get_width()-1)/2, (img_with_corners.get_height()-1)/2, false, Image.FORMAT_R8)
 	Settings.island_energymap_set(ImageTexture.create_from_image(energy_img))
 	_on_game_state(game, -1, SignalBusStatic.GAME_STATE_PHASE_INIT) # Reuse code
-	SignalBus.game_state.connect(_on_game_state)
+	if not SignalBus.game_state.is_connected(_on_game_state):
+		SignalBus.game_state.connect(_on_game_state)
 	SLog.sd("[timing] Energy setup in " + str(Time.get_ticks_msec() - start_time) + "ms")
 	GameManager.resume()
 	

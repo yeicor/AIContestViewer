@@ -55,10 +55,8 @@ func _setup_camera():
 		if turn == 0: # Terrain is re-generated on each initial turn, and it is a slow process
 			if phase == SignalBus.GAME_STATE_PHASE_INIT:
 				if Settings.camera_mode_auto():
+					$RTSCamera.current = true # Temporarily set this point of view
 					$RTSCamera.look_at_from_position(Vector3(
 						float(state.island().width()) / 2.0 * Settings.terrain_cell_side(), 100,
 						float(state.island().height()) / 2.0 * Settings.terrain_cell_side()
-					), Vector3.ZERO)
-			if phase == SignalBus.GAME_STATE_PHASE_ANIMATE:
-				if Settings.camera_mode_auto():
-					$RTSCamera.queue_free())
+					), Vector3.ZERO))

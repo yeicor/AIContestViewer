@@ -269,7 +269,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "Enable to hide obvious tiling when repeating textures (terrain, ocean...), at the cost of some performance.",
 		},
 		"game/paths": {
-			"default": "res://testdata/game.jsonl.gz",
+			"default": "res://testdata/game.jsonl.gz;res://testdata/game.jsonl.gz;res://testdata/game.jsonl.gz",
 			"type": TYPE_STRING,
 			"info": "The ;-separated game paths to load. It may be a tcp:// for a tcp server or simply a Godot data path.",
 		},

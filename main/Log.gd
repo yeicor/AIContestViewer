@@ -45,11 +45,15 @@ func output_messages(
 		full_stack_rich = full_stack_plain
 		stack_frame_rich = stack_frame_plain
 	super.output_messages(level, msg_plain, msg_rich, full_stack_rich, stack_frame_rich, full_stack_plain, stack_frame_plain)
+	if not Engine.is_editor_hint():
+		if OS.get_thread_caller_id() == OS.get_main_thread_id():
+			output_limbo(msg_rich)
+		else:
+			output_limbo.bind(msg_rich).call_deferred()
+
+func output_limbo(msg_rich: String):
 	# After printing to the text console as usual, also print to the embedded graphical console (F2)
-	if OS.get_thread_caller_id() == OS.get_main_thread_id():
-		LimboConsole.debug(msg_rich)
-	else:
-		LimboConsole.debug.bind(msg_rich).call_deferred()
+	LimboConsole.debug(msg_rich)
 	# XXX: Avoid too much text on the console lagging the app
 	var cur_text := LimboConsole._output.text
 	while cur_text.length() > 10 * 1024:
@@ -59,3 +63,4 @@ func output_messages(
 		else:
 			cur_text = cur_text.substr(delete_to + 1)
 	LimboConsole._output.text = cur_text
+	

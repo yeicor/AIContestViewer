@@ -57,57 +57,53 @@ static func stop() -> void:
 
 
 static func _thread(game_paths: PackedStringArray):
-	var should_continue := true
 	var end_sem := Semaphore.new()
 	end_sem.post()
+	var last_state: GameState = null
+	var last_turn := 0
 	for game_path in game_paths:
 		var reader := GameReader.open(game_path)
-		var turn := 0
-		var old_state: GameState = null
-		while should_continue:
+		var same_game_round := true
+		last_turn = 0
+		while same_game_round:
+			# For debugging round changes, finish early
+			#if last_turn > 10: break
 			# Read game state asynchronously (complete round -- ignore intermediate states)
 			var state := reader.parse_next_round()
-			end_sem.wait() # Wait for the previous main call to end
+			end_sem.wait() # Wait for the previous listeners to end while we are ready for next round
+			last_state = state # We can now set the new preparsed state and insta-emit signals!
 			# Publish game state via a global signal.
-			old_state = state
-			_emit_and_wait_phases_main_thread.bind(old_state, turn, end_sem).call_deferred()
-			should_continue = await _wait_unpaused_secs(0, true) # Never awaits thanks to sleep
-			turn += 1
-		if not should_continue:
-			break
-	end_sem.queue_free()
+			_emit_and_wait_phases_main_thread.bind(last_state, last_turn, end_sem).call_deferred()
+			same_game_round = await _wait_unpaused_ms(0, true) # Never awaits thanks to sleep
+			last_turn += 1
+		_emit_and_wait_phase_main_thread.bind(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_ROUND, 0).call_deferred() # TODO: Configurable time in settings
+	_emit_and_wait_phase_main_thread.bind(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_GAME, 0).call_deferred() # TODO: Configurable time in settings
 
 static func _emit_and_wait_phases_main_thread(state: GameState, turn: int, end_sem: Semaphore):
 	# Interested nodes can connect to this signal to receive game states.
+	if await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_INIT, 0):
+		if await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_ANIMATE, Settings.common_turn_secs()):
+			await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_END, 0)
+	end_sem.post()
+
+
+static func _emit_and_wait_phase_main_thread(state: GameState, turn: int, phase: int, time_secs: float) -> bool:
 	var prev_phase_time := Time.get_ticks_msec()
 	if is_instance_valid(SignalBus):
-		SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_INIT)
-	if await _wait_unpaused_secs(0, false):
+		SignalBus.game_state.emit(state, turn, phase)
+	var wait_ms = int(time_secs * 1000)
+	if await _wait_unpaused_ms(wait_ms, false):
 		var phase_delta_time := Time.get_ticks_msec() - prev_phase_time
-		if phase_delta_time > 20:
-			Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_INIT, "took too long:", phase_delta_time, "ms")
-		prev_phase_time = Time.get_ticks_msec()
-		if is_instance_valid(SignalBus):
-			SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_ANIMATE)
-		if await _wait_unpaused_secs(int(Settings.common_turn_secs() * 1000), false):
-			phase_delta_time = Time.get_ticks_msec() - prev_phase_time
-			if phase_delta_time > int(Settings.common_turn_secs() * 1500):
-				Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_ANIMATE, "took too long:", phase_delta_time, "ms")
-			prev_phase_time = Time.get_ticks_msec()
-			if is_instance_valid(SignalBus):
-				SignalBus.game_state.emit(state, turn, SignalBusStatic.GAME_STATE_PHASE_END)
-			await _wait_unpaused_secs(0, false)
-			phase_delta_time = Time.get_ticks_msec() - prev_phase_time
-			if phase_delta_time > 20:
-				Log.d("Publishing state for turn", turn, "phase", SignalBusStatic.GAME_STATE_PHASE_END, "took too long:", phase_delta_time, "ms")
-			prev_phase_time = Time.get_ticks_msec()
-	end_sem.post()
-	
+		if phase_delta_time > 1.5 * wait_ms + 20:
+			Log.d("Publishing state for turn", turn, "phase", phase, "took too long:", phase_delta_time, "ms")
+		return true
+	return false
+
 
 static var _sleep_ms := 100
 static var _sleep_sec := float(_sleep_ms) / 1000.0
 ## This may actually wait for slighly longer, but will always pause until resumed
-static func _wait_unpaused_secs(remaining_wait_time: int, blocking_ok: bool) -> bool:
+static func _wait_unpaused_ms(remaining_wait_time: int, blocking_ok: bool) -> bool:
 	var waiting_time_counts: bool
 	var was_stopped = false
 	while remaining_wait_time >= 0: # == 0 to detect pauses

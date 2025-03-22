@@ -33,9 +33,13 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, state: GameState) -> void:
 	self._my_time_offset = 0.01
 
 func _on_game_state(state: GameState, turn: int, phase: int):
-	if turn > 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:
-		recompute_lookAt(state)
-		phantom_camera.look_at_damping = true # FIXME: Only enable after snapping into place (avoid first jump!)
+	if turn == 0:
+		if phase == SignalBus.GAME_STATE_PHASE_ANIMATE:
+			$Camera3D.current = true
+	else:
+		if phase == SignalBus.GAME_STATE_PHASE_INIT:
+			recompute_lookAt(state)
+			phantom_camera.look_at_damping = true # FIXME: Only enable after snapping into place (avoid first jump!)
 
 func _process(delta: float) -> void:
 	if self._my_time_offset > 0.0: # Wait to be enabled

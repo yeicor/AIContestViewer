@@ -19,7 +19,8 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 		player.position = spawn_pos
 		player.color = ColorGenerator.get_color(player_index)
 		add_child(player)
-	SignalBus.game_state.connect(_on_game_state)
+	if not SignalBus.game_state.is_connected(_on_game_state):
+		SignalBus.game_state.connect(_on_game_state)
 	SLog.sd("[timing] Spawned players in " + str(Time.get_ticks_msec() - start_time) + "ms")
 	GameManager.resume()
 
@@ -27,7 +28,10 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 var _player_to_next_pos: Dictionary = {}  # Precomputed during init, start animation on next phase
 var _player_attacks: Dictionary = {}
 var _last_players: Array = []
-func _on_game_state(state: GameState, _turn: int, phase: int):
+func _on_game_state(state: GameState, turn: int, phase: int):
+	if turn == 0: 
+		_player_to_next_pos.clear()
+		_last_players.clear()
 	if phase == SignalBus.GAME_STATE_PHASE_INIT:
 		# => PRECOMPUTE MOVEMENT DATA
 		_player_to_next_pos.clear()
@@ -95,7 +99,7 @@ func _on_game_state(state: GameState, _turn: int, phase: int):
 			else: # Default to idle otherwise
 				player.idle()
 				
-	else: # SignalBus.GAME_STATE_PHASE_END
+	elif SignalBus.GAME_STATE_PHASE_END:
 		for player in _player_to_next_pos:
 			var target_pos = _player_to_next_pos[player]
 			if target_pos != Vector2(player.position.x, player.position.y):

@@ -2,7 +2,7 @@ class_name GameAutoCamera3D
 extends Node3D
 
 @onready var camera_3d := $Camera3D
-@onready var phantom_camera := $PhantomCamera
+@onready var phantom_camera := $PhantomCamera3D
 @onready var camera_target_pos := $CameraTargetPos
 @onready var camera_target_look_at := $CameraTargetLookAt
 
@@ -30,7 +30,11 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, state: GameState) -> void:
 	cur_dist = IslandH.num_cells().distance_to(Vector2i.ZERO) * Settings.terrain_cell_side() / 3.0
 	recompute_lookAt_info(state)
 	self._my_time_offset = 0.0
-	self.recompute_pos(camera_3d, 0.0)
+	self.recompute_pos(camera_target_pos, 0.0)
+	self.recompute_look_at()
+	camera_3d.look_at_from_position(camera_target_pos.global_position, camera_target_look_at.global_position)
+	var sum := func(accum, number): return accum + number
+	camera_target_look_at.global_position = _keypoints.reduce(sum, Vector3.ZERO) / _keypoints.size()
 	GameManager.resume()
 
 func _on_game_state(state: GameState, turn: int, phase: int):
@@ -44,13 +48,10 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 func _process(delta: float) -> void:
 	if not _keypoints.is_empty(): # Wait to be enabled
 		self.recompute_pos(camera_target_pos, self._my_time_offset)
-		var sum := func(accum, number): return accum + number
-		camera_target_look_at.global_position = _keypoints.reduce(sum, Vector3.ZERO) / _keypoints.size()
-		if self._my_time_offset == 0.0:
-			camera_3d.look_at(camera_target_look_at.position)
-		else:
-			phantom_camera.look_at_damping = true # FIXME: Only enable after snapping into place (avoid first jump!)
-			#phantom_camera.follow_damping = true # FIXME: Only enable after snapping into place (avoid first jump!)
+		self.recompute_look_at()
+		if self._my_time_offset > 0.0: # Avoid initial "tween"
+			phantom_camera.look_at_damping = true
+			#phantom_camera.follow_damping = true
 		self._my_time_offset += delta
 
 var cur_dist := 100.0
@@ -66,12 +67,18 @@ func recompute_pos(cam: Node3D, time: float):
 		wanted_dist_delta = max(wanted_dist_delta, UI.distance_to_game_area(p) - 1.0)
 	#print("wanted_dist_delta:", wanted_dist_delta)
 	cur_dist = cur_dist + 0.25 * wanted_dist_delta * Settings.terrain_cell_side()
+	cur_dist = max(cur_dist, 5 * Settings.terrain_cell_side())
 	cam.position = cur_dist * dir
 	 # Help camera look at everything given the offset caused by the right UI panel
-	var wanted_offset = UI.projected_game_area_center(cur_dist) - camera_target_look_at.position
-	phantom_camera.look_at_offset = wanted_offset.length() * camera_3d.transform.basis.x
-	phantom_camera.look_at_offset.y = -0.3 * IslandH.num_cells().distance_to(Vector2i.ZERO) * Settings.terrain_cell_side() # Why?!
-	#print("wanted_offset:", wanted_offset.length(), "\t| ", camera_target_look_at.position)
+	if time > 0.1: # Avoid jumping look at offset at start!
+		var wanted_offset = UI.projected_game_area_center(cur_dist) - camera_target_look_at.position
+		phantom_camera.look_at_offset = wanted_offset.length() * camera_3d.transform.basis.x
+		#print("wanted_offset:", wanted_offset.length(), "\t| ", camera_target_look_at.position)
+
+func recompute_look_at():
+	var sum := func(accum, number): return accum + number
+	camera_target_look_at.global_position = _keypoints.reduce(sum, Vector3.ZERO) / _keypoints.size()
+
 
 func recompute_lookAt_info(state: GameState):
 	# Look at targets (predict currently animating turn locations, smooth)

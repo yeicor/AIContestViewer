@@ -1,10 +1,11 @@
-@tool
+#@tool
 extends Node3D
 class_name PlayerScene
 
 @onready var animation_player: AnimationPlayer = $gandalf/AnimationPlayer
 @onready var mesh_instance: MeshInstance3D = $gandalf/Armature/Skeleton3D/mesh_001
 @onready var skeleton: Skeleton3D = $gandalf/Armature/Skeleton3D
+@onready var light: SpotLight3D = $Light
 
 var new_mat := ShaderMaterial.new()
 # The color of the player
@@ -12,6 +13,7 @@ var new_mat := ShaderMaterial.new()
 	set(new_val):
 		color = new_val
 		new_mat.set_shader_parameter("color_to", color)
+		if light != null: light.light_color = color
 
 var attack_lightnings: Array = []
 @onready var lightning_plane := preload("res://island/player/lightning/lightning_plane.tscn")
@@ -19,7 +21,8 @@ var attack_lightnings: Array = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	mesh_instance.scale *= 4  # Easier to see, less "realistic"...
+	light.light_color = color
+	scale *= 4  # Easier to see, less "realistic"...
 	new_mat.shader = preload("res://island/lighthouse/recolor.gdshader")
 	new_mat.set_shader_parameter("tex", preload("res://island/player/model/gandalf_texture.tres"))
 	new_mat.set_shader_parameter("color_from", Vector3(0.5, 0.7, 0.8))
@@ -29,6 +32,7 @@ func _ready() -> void:
 	for hand_bone_name in ["mixamorig_LeftHand", "mixamorig_RightHand"]:
 		var lp := lightning_plane.instantiate()
 		add_child(lp)
+		lp.scale /= 4.0
 		lp.name = "attack_lightning_" + hand_bone_name
 		lp.color = color
 		lp.start_freedom = 0.0
@@ -38,10 +42,10 @@ func _ready() -> void:
 	# Make it more visible by adding ball of lightning on target
 	var ls := lightning_sphere.instantiate()
 	add_child(ls)
+	ls.scale /= 4.0
 	ls.name = "attack_lightning_sphere"
 	ls.color = color
 	attack_lightnings.append([ls])
-	attack(position + Vector3.UP * 25)
 
 func idle():
 	_anim_common("Idle", true)
@@ -65,7 +69,7 @@ func attack(_target: Vector3, strength01: float = 1.0, _delta_secs: float = Sett
 			alp[0].unit_width = strength01 * 0.75
 		else:
 			alp[0].unit_width = strength01 * 0.5
-			alp[0].scale = Vector3.ONE * 0.75 * Settings.terrain_cell_side() * strength01
+			alp[0].scale = Vector3.ONE * 0.75 * Settings.terrain_cell_side() * strength01 / scale.x
 	walk_from_transform = Transform3D.IDENTITY
 	target = _target
 	_anim_common("Attack", true, _delta_secs)
@@ -121,7 +125,7 @@ func _process(_delta: float) -> void:
 				var lightning_from := Transform3D.IDENTITY.rotated(Vector3.RIGHT, PI/2) * \
 				mesh_instance.transform * skeleton.transform * skeleton.get_bone_global_pose(alp[1]).origin
 				# FIXME: target - position is "close enough" but not correct (check by reducing end_freedom)
-				lightning.set_endpoints(lightning_from, target - position)
+				lightning.set_endpoints(lightning_from, (target - position) / 4.0)
 				# TODO: Also make sure it keeps looking at the camera for a better effect
 			else: # Sphere lightnings at target
 				lightning.global_position = target

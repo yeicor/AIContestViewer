@@ -47,6 +47,7 @@ func _get_conn_id(other: LighthouseScene) -> String:
 func connect_to(other: LighthouseScene):
 	var lp: LightningPlane = await lightning_plane_pool.spawn()
 	lp.name = _get_conn_id(other)
+	lp.layers = 2 # Ignore player lights
 	lp.color = color
 	lp.start_freedom = 0.0
 	lp.end_freedom = 0.0

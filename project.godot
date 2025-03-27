@@ -112,6 +112,10 @@ fullscreen={
 ]
 }
 
+[layer_names]
+
+3d_render/layer_2="TriangleAreas"
+
 [rendering]
 
 textures/vram_compression/import_etc2_astc=true

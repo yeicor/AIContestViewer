@@ -122,4 +122,5 @@ func make_tri_node(tri: Array, color: Color) -> MeshInstance3D:
 	# TODO: Text overlay with score of area that always looks at camera
 	var mesh_node := MeshInstance3D.new()
 	mesh_node.mesh = mesh
+	mesh_node.layers = 2 # Ignore light from players
 	return mesh_node

@@ -66,8 +66,8 @@ static func _thread(game_paths: PackedStringArray):
 		var same_game_round := true
 		last_turn = 0
 		while same_game_round:
-			# For debugging round changes, finish early
-			#if last_turn > 10: break
+			# For debugging round changes, finish early: 
+			if last_turn > 10: break
 			# Read game state asynchronously (complete round -- ignore intermediate states)
 			var state := reader.parse_next_round()
 			end_sem.wait() # Wait for the previous listeners to end while we are ready for next round
@@ -76,13 +76,15 @@ static func _thread(game_paths: PackedStringArray):
 			_emit_and_wait_phases_main_thread.bind(last_state, last_turn, end_sem).call_deferred()
 			same_game_round = await _wait_unpaused_ms(0, true) # Never awaits thanks to sleep
 			last_turn += 1
-		_emit_and_wait_phase_main_thread.bind(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_ROUND, 0).call_deferred() # TODO: Configurable time in settings
-	_emit_and_wait_phase_main_thread.bind(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_GAME, 0).call_deferred() # TODO: Configurable time in settings
+		(func(): await _emit_and_wait_phase_main_thread(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_ROUND, Settings.common_end_turn_secs()); end_sem.post()).call_deferred()
+		end_sem.wait()
+	(func(): await _emit_and_wait_phase_main_thread(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_GAME, Settings.common_end_game_turn_secs()); end_sem.post()).call_deferred()
+	end_sem.wait()
 
 static func _emit_and_wait_phases_main_thread(state: GameState, turn: int, end_sem: Semaphore):
 	# Interested nodes can connect to this signal to receive game states.
 	if await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_INIT, 0):
-		if await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_ANIMATE, Settings.common_turn_secs()):
+		if await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_ANIMATE, Settings.common_turn_secs() if turn > 0 else Settings.common_start_turn_secs()):
 			await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_END, 0)
 	end_sem.post()
 

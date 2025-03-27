@@ -22,7 +22,6 @@ var attack_lightnings: Array = []
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	light.light_color = color
-	scale *= 4  # Easier to see, less "realistic"...
 	new_mat.shader = preload("res://island/lighthouse/recolor.gdshader")
 	new_mat.set_shader_parameter("tex", preload("res://island/player/model/gandalf_texture.tres"))
 	new_mat.set_shader_parameter("color_from", Vector3(0.5, 0.7, 0.8))
@@ -32,7 +31,7 @@ func _ready() -> void:
 	for hand_bone_name in ["mixamorig_LeftHand", "mixamorig_RightHand"]:
 		var lp := lightning_plane.instantiate()
 		add_child(lp)
-		lp.scale /= 4.0
+		lp.scale /= scale.x
 		lp.name = "attack_lightning_" + hand_bone_name
 		lp.color = color
 		lp.start_freedom = 0.0
@@ -42,7 +41,7 @@ func _ready() -> void:
 	# Make it more visible by adding ball of lightning on target
 	var ls := lightning_sphere.instantiate()
 	add_child(ls)
-	ls.scale /= 4.0
+	ls.scale /= scale.x
 	ls.name = "attack_lightning_sphere"
 	ls.color = color
 	attack_lightnings.append([ls])
@@ -52,11 +51,16 @@ func idle():
 	walk_from_transform = Transform3D.IDENTITY
 	anim_dest_time = anim_from_time
 
+func podium(order: int):
+	_anim_common("Podium" + str(min(order + 1, 4)), true)
+	walk_from_transform = Transform3D.IDENTITY
+	anim_dest_time = anim_from_time
+
 func walk_to(center: Vector2, _delta_secs: float = Settings.common_turn_secs()):
 	# TODO: Avoid some props and follow terrain shape better? Auto-generated navmesh may cause issues?
 	var walk_to_pos = Vector3(center.x, -999, center.y)
 	walk_to_pos.y = max(0.0, IslandH.height_at_global(center))  # Walk on water (should not be required...)
-	_walk_to(walk_to_pos, _delta_secs)
+	walk_to_3d(walk_to_pos, _delta_secs)
 
 func set_pos(center: Vector2):
 	walk_to(center, 0.0)
@@ -75,7 +79,7 @@ func attack(_target: Vector3, strength01: float = 1.0, _delta_secs: float = Sett
 	_anim_common("Attack", true, _delta_secs)
 
 var walk_from_transform: Transform3D = Transform3D.IDENTITY
-func _walk_to(destination: Vector3, _delta_secs: float = Settings.common_turn_secs()) -> void:
+func walk_to_3d(destination: Vector3, _delta_secs: float = Settings.common_turn_secs()) -> void:
 	"""Makes the player walk toward a specified destination."""
 	walk_from_transform = transform.orthonormalized()
 	target = destination

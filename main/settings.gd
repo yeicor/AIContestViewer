@@ -248,6 +248,21 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating each turn of the game, in seconds.",
 		},
+		"common/start_turn_secs": {
+			"default": 1.0,
+			"type": TYPE_FLOAT,
+			"info": "The time to spend animating the starting turn of each round, in seconds.",
+		},
+		"common/end_turn_secs": {
+			"default": 5.0,
+			"type": TYPE_FLOAT,
+			"info": "The time to spend animating the ending turn of each round, in seconds.",
+		},
+		"common/end_game_turn_secs": {
+			"default": 0.0,
+			"type": TYPE_FLOAT,
+			"info": "The time to spend animating the ending turn of the whole game, in seconds.",
+		},
 		"common/start_paused": {
 			"default": false,
 			"type": TYPE_BOOL,
@@ -327,6 +342,11 @@ static var _all_settings_info: Dictionary = \
 			"default": "",
 			"type": -RenderingServer.GLOBAL_VAR_TYPE_SAMPLER2D,
 			"info": "Internal texture representing energy of each cell to use in shaders.",
+		},
+		"player/scale": {
+			"default": 4.0, 
+			"type": TYPE_FLOAT,
+			"info": "The scale for all players and related structures."
 		},
 		"ocean/vertex_count": {
 			"default": 10000, # A quality preset will always override this
@@ -408,6 +428,9 @@ static func common_seed() -> int: return _s_val("common/seed")
 
 static func common_turn_secs() -> float: return _s_val("common/turn_secs")
 static func common_turn_secs_multiplier() -> float: return common_turn_secs() / 0.5
+static func common_start_turn_secs() -> float: return _s_val("common/start_turn_secs")
+static func common_end_turn_secs() -> float: return _s_val("common/end_turn_secs")
+static func common_end_game_turn_secs() -> float: return _s_val("common/end_game_turn_secs")
 
 
 static func common_start_paused() -> bool: return _s_val("common/start_paused")
@@ -511,6 +534,9 @@ static func island_energymap_image() -> Image:
 	if _island_energymap_cache == null:
 		_island_energymap_cache = island_energymap().get_image()
 	return _island_energymap_cache
+
+
+static func player_scale() -> float: return _s_val("player/scale")
 
 
 static func ocean_vertex_count() -> int: return _s_val("ocean/vertex_count")

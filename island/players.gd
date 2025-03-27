@@ -18,6 +18,7 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 		player.name = "Player" + str(player_index) + "@" + player_meta.name()
 		player.position = spawn_pos
 		player.color = ColorGenerator.get_color(player_index)
+		player.scale = Vector3.ONE * Settings.player_scale()
 		add_child(player)
 	if not SignalBus.game_state.is_connected(_on_game_state):
 		SignalBus.game_state.connect(_on_game_state)
@@ -105,3 +106,8 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 			if target_pos != Vector2(player.position.x, player.position.y):
 				player.set_pos(target_pos) # Force it (shouldn't be necessary...)
 		_last_players = state.players()
+		
+	elif SignalBus.GAME_STATE_PHASE_END_ROUND:
+		for player in _player_to_next_pos:
+			player.idle()
+		

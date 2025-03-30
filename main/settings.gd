@@ -268,11 +268,6 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_BOOL,
 			"info": "Start the game paused. Press P, Space or click the turn indicator to unpause.",
 		},
-		"common/turn_count": {
-			"default": 500,
-			"type": TYPE_INT,
-			"info": "If known (> 0), it is a hint providing the expected number of turns per rounds. Helps visualize progress.",
-		},
 		"common/props_multiplier": {
 			"default": 1.0,
 			"type": TYPE_FLOAT,
@@ -364,12 +359,12 @@ static var _all_settings_info: Dictionary = \
 			"info": "The camera mode, which can be 'auto' or 'manual'",
 		},
 		"camera/auto/pitch": {
-			"default": -65.0,
+			"default": -60.0,
 			"type": TYPE_FLOAT,
 			"info": "The pitch angle of the camera, in degrees. 0 is horizontal and -90 is vertical.",
 		},
 		"camera/auto/rot_speed": {
-			"default": -0.05,
+			"default": 0.05,
 			"type": TYPE_FLOAT,
 			"info": "The rotation speed of the camera, in radians per second.",
 		},
@@ -434,9 +429,6 @@ static func common_end_game_turn_secs() -> float: return _s_val("common/end_game
 
 
 static func common_start_paused() -> bool: return _s_val("common/start_paused")
-
-
-static func common_turn_count() -> int: return _s_val("common/turn_count")
 
 
 static func common_props_multiplier() -> float: return _s_val("common/props_multiplier")

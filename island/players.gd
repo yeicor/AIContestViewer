@@ -101,13 +101,5 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 				player.idle()
 				
 	elif SignalBus.GAME_STATE_PHASE_END:
-		for player in _player_to_next_pos:
-			var target_pos = _player_to_next_pos[player]
-			if target_pos != Vector2(player.position.x, player.position.y):
-				player.set_pos(target_pos) # Force it (shouldn't be necessary...)
 		_last_players = state.players()
-		
-	elif SignalBus.GAME_STATE_PHASE_END_ROUND:
-		for player in _player_to_next_pos:
-			player.idle()
 		

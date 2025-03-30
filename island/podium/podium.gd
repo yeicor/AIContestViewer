@@ -9,11 +9,11 @@ func transform_for_player(order: int) -> Transform3D:
 	else: # Overflow to the back.
 		var my_row := 0
 		var my_col := order - 3
-		while my_col > _elems_per_overflow_row(my_row): # Untested code ;)
+		while my_col >= _elems_per_overflow_row(my_row):
 			my_col -= _elems_per_overflow_row(my_row)
 			my_row += 1
 		var x_off := my_col - _elems_per_overflow_row(my_row) / 2.0
-		var z_off = -(my_row + 1)
-		return transform.translated(Vector3(x_off * 2.1, 0, z_off * 2.1))
+		var z_off = -(my_row + 2) # Avoid hiding behind the podium
+		return Transform3D.IDENTITY.translated(Vector3(x_off * 2.1, 0, z_off * 2.1))
 
 func _elems_per_overflow_row(row: int) -> int: return 4 + 1 * row 

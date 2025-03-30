@@ -28,9 +28,7 @@ func _on_pause_action(single_step: bool = false):
 func _on_game_state(_state: GameState, turn: int, phase: int):
 	if phase == SignalBus.GAME_STATE_PHASE_INIT:
 		turn_label.text = pretty_print_number(turn)
-		if Settings.common_turn_count() > 0:
-			progress.value = float(turn % Settings.common_turn_count()) / float(Settings.common_turn_count())
-			
+	
 	if phase == SignalBus.GAME_STATE_PHASE_END:
 		if _wants_to_pause:
 			if not _is_paused:

@@ -99,7 +99,14 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 			SLog.sd("[timing] " + scatterer.name + " background build completed after " + str(Time.get_ticks_msec() - start_time) + " ms")
 			GameManager.resume(), CONNECT_ONE_SHOT)
 		scatterer.enabled = true
-		
+	
+	var listener = func(_state: GameState, turn: int, phase: int):
+		if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:
+			for scatterer_meta in _scatterers_meta:
+				scatterer_meta["scatterer"].enabled = false
+	if not SignalBus.game_state.is_connected(listener): 
+		SignalBus.game_state.connect(listener)
+	
 	GameManager.resume() # See also callback pause and resumes!
 
 

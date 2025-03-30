@@ -45,7 +45,7 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 		if phase == SignalBus.GAME_STATE_PHASE_INIT:
 			recompute_lookAt_info(state)
 	if phase == SignalBus.GAME_STATE_PHASE_END_ROUND:
-		_keypoints.clear() # Disable this camera
+		_keypoints.clear() # Stop moving while showing the podium
 
 func _process(delta: float) -> void:
 	if not _keypoints.is_empty(): # Wait to be enabled

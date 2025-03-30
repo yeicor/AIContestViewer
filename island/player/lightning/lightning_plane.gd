@@ -40,11 +40,13 @@ class_name LightningPlane
 func set_endpoints(a: Vector3, b: Vector3):  # Always looking up for now
 	var dist := a.distance_to(b)
 	scale = Vector3.ONE * dist / 2.0
+	assert(scale.is_finite())
 	var dist_sqrt = sqrt(dist)
 	width = unit_width / dist_sqrt
 	(noise_texture.noise as FastNoiseLite).frequency = unit_freq * dist_sqrt
 	#print("setting noise to ", unit_freq, " -- ", dist, " -- ", (noise_texture.noise as FastNoiseLite).frequency)
 	position = (a + b) / 2.0
+	assert(position.is_finite())
 	# Compute rotations manually because quaternions are hard ;)
 	rotation = Vector3.ZERO
 	var dist_xz := Vector2(b.x, b.z).distance_to(Vector2(a.x, a.z))

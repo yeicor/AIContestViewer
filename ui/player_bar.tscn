@@ -37,26 +37,44 @@ theme_override_constants/margin_bottom = 0
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="LabelPre" type="Label" parent="MarginContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "Label:"
 label_settings = SubResource("LabelSettings_sqjc6")
 
 [node name="Value" type="Label" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
+text = "-1"
+label_settings = SubResource("LabelSettings_uqlr6")
+
+[node name="ThisRound" type="HBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/ThisRound"]
+layout_mode = 2
+text = " ("
+label_settings = SubResource("LabelSettings_sqjc6")
+
+[node name="Value" type="Label" parent="MarginContainer/HBoxContainer/ThisRound"]
+layout_mode = 2
 size_flags_horizontal = 3
 text = "-1"
 label_settings = SubResource("LabelSettings_uqlr6")
 
+[node name="Label3" type="Label" parent="MarginContainer/HBoxContainer/ThisRound"]
+layout_mode = 2
+text = ")"
+label_settings = SubResource("LabelSettings_sqjc6")
+
 [node name="LabelPrePerTurn2" type="Label" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 10
 text = "+"
 label_settings = SubResource("LabelSettings_sqjc6")
 
 [node name="ValuePerTurn" type="Label" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
-text = "0
-"
+text = "0"
 label_settings = SubResource("LabelSettings_uqlr6")
 
 [node name="LabelPostPerTurn" type="Label" parent="MarginContainer/HBoxContainer"]

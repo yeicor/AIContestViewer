@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bwru0xvge4oj5" path="res://ui/player_bar.tscn" id="2_7kf7m"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_na4cs"]
-font_size = 48
+font_size = 36
 outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
@@ -33,10 +33,10 @@ text_overrun_behavior = 3
 
 [node name="ScoreBar" parent="." instance=ExtResource("2_7kf7m")]
 layout_mode = 2
-metadata/font_size = 36
+metadata/font_size = 33
 metadata/label_pre = "Score:"
 
 [node name="EnergyBar" parent="." instance=ExtResource("2_7kf7m")]
 layout_mode = 2
-metadata/font_size = 22
+metadata/font_size = 20
 metadata/label_pre = "Energy:"

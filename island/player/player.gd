@@ -48,16 +48,20 @@ func _ready() -> void:
 	attack_lightnings.append([ls])
 
 func idle():
-	_anim_common("Idle", true)
+	if walk_from_transform != Transform3D.IDENTITY: # Force set position
+		position = target
 	walk_from_transform = Transform3D.IDENTITY
 	anim_dest_time = anim_from_time
 	target = Vector3.INF
+	_anim_common("Idle", true)
 
 func podium(order: int, _look_at: Vector3):
-	_anim_common("Podium" + str(min(order + 1, 4)), true)
+	if walk_from_transform != Transform3D.IDENTITY: # Force set position
+		position = target
 	walk_from_transform = Transform3D.IDENTITY
 	anim_dest_time = anim_from_time
 	target = _look_at
+	_anim_common("Podium" + str(min(order + 1, 4)), true)
 
 func walk_to(center: Vector2, _delta_secs: float = Settings.common_turn_secs()):
 	# TODO: Avoid some props and follow terrain shape better? Auto-generated navmesh may cause issues?
@@ -70,6 +74,8 @@ func set_pos(center: Vector2):
 
 func attack(_target: Vector3, strength01: float = 1.0, _delta_secs: float = Settings.common_turn_secs()):
 	"""Animates the attack of the center of the cell that the player is on."""
+	if walk_from_transform != Transform3D.IDENTITY: # Force set position
+		position = target
 	walk_from_transform = Transform3D.IDENTITY
 	target = _target
 	for alp in attack_lightnings:
@@ -84,6 +90,8 @@ func attack(_target: Vector3, strength01: float = 1.0, _delta_secs: float = Sett
 var walk_from_transform: Transform3D = Transform3D.IDENTITY
 func walk_to_3d(destination: Vector3, _delta_secs: float = Settings.common_turn_secs()) -> void:
 	"""Makes the player walk toward a specified destination."""
+	if walk_from_transform != Transform3D.IDENTITY: # Force set position
+		position = target
 	walk_from_transform = transform
 	target = destination
 	_anim_common("Run", true, _delta_secs)
@@ -99,22 +107,17 @@ func _anim_common(_name: String, loop: bool, _delta_secs: float = Settings.commo
 		animation_player.speed_scale = _delta_secs / animation_player.current_animation_length
 	if _last_anim != _name:  # To avoid resetting animation when keeping the same one
 		animation_player.play(_name, _delta_secs / 4.0)  # Switch smoothly
+		_last_anim = _name
  
 
 var target: Vector3 = Vector3.INF
 var anim_from_time: float = 0
 var anim_dest_time: float = anim_from_time
-var _last_anim_progress_warn: float = -1.0
 func _process(_delta: float) -> void:
 	# Determine the percentage of walk completion (0 to 1+)
 	var anim_progress: float
-	if anim_from_time != anim_dest_time:
-		anim_progress = clampf((Time.get_ticks_msec() / 1000.0 - anim_from_time) / (anim_dest_time - anim_from_time), 0.0, 1.0)
-		if Time.get_ticks_msec() / 1000.0 - anim_dest_time > 0.1 and _last_anim_progress_warn != anim_from_time:
-			SLog.sw("Animation progress: {0}. Time: {1} | From: {2} | Dest: {3}".format([anim_progress, Time.get_ticks_msec() / 1000.0, anim_from_time, anim_dest_time]))
-			_last_anim_progress_warn = anim_from_time
-	else:
-		anim_progress = 1.0
+	if anim_from_time == anim_dest_time: anim_progress = 1.0
+	else: anim_progress = clampf((Time.get_ticks_msec() / 1000.0 - anim_from_time) / (anim_dest_time - anim_from_time), 0.0, 1.0)
 
 	# If walking, move towards the target based on the percentage of completion
 	if walk_from_transform != Transform3D.IDENTITY:

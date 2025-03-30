@@ -42,12 +42,15 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 		var pl_i = 0
 		for player in players_node.get_children():
 			var pl := player as PlayerScene
-			var order = position_in_natural_order[pl_i] + 6
+			var order = position_in_natural_order[pl_i]
 			_animate_player(pl, order, podium)
 			pl_i += 1
 
 func _animate_player(pl: PlayerScene, order: int, podium: Podium):
-	var final_t := podium.transform * podium.transform_for_player(order)
+	var t := podium.transform_for_player(order)
+	var final_t := podium.transform * t
+	if t.origin.y == 0: # order >= 4 --> place on the ground
+		final_t.origin.y = IslandH.height_at_global(Vector2(final_t.origin.x, final_t.origin.z))
 	var walk_time: float = min(3.0, Settings.common_end_turn_secs() / 3.0)
 	pl.walk_to_3d(final_t.origin, walk_time)
 	await get_tree().create_timer(walk_time).timeout

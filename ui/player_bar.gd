@@ -3,24 +3,37 @@ extends PanelContainer
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var label_pre = get_meta("label_pre")
-	$MarginContainer/HBoxContainer/LabelPre.text = label_pre
+	$MarginContainer/HBoxContainer/Label.text = label_pre
 	var font_size = get_meta("font_size")
-	for label in $MarginContainer/HBoxContainer.get_children():
-		label.label_settings = label.label_settings.duplicate()
-		label.label_settings.font_size = font_size
-		if label.name.contains("PerTurn"):
-			label.label_settings.font_size *= 0.8
+	var to_explore := $MarginContainer/HBoxContainer.get_children()
+	while not to_explore.is_empty():
+		var label = to_explore.pop_back()
+		if label is Label:
+			label.label_settings = label.label_settings.duplicate()
+			label.label_settings.font_size = font_size
+			if label.name.contains("PerTurn") or label.get_parent().name.contains("ThisRound"):
+				label.label_settings.font_size *= 0.8
+		to_explore.append_array(label.get_children())
 
 var _last_value = 0
 
 @onready var pg := $Progress
 @onready var value_label := $MarginContainer/HBoxContainer/Value
+@onready var this_round := $MarginContainer/HBoxContainer/ThisRound
+@onready var value_label_this_round := $MarginContainer/HBoxContainer/ThisRound/Value
 @onready var value_per_turn_label := $MarginContainer/HBoxContainer/ValuePerTurn
 
-func set_value(cur: float, max_others: float):
-	pg.value = _get_exponential_progress_auto(cur, max_others)
+func set_value(cur: float, max_others: float, cur_round = null):
+	var tween = create_tween()
+	tween.tween_property(pg, "value",  _get_exponential_progress_auto(cur, max_others),\
+	 Settings.common_turn_secs()).set_ease(Tween.EASE_OUT)
 	#SLog.sd("PB value: " + str(cur) + " / " + str(max_others) + " -> " + str(pg.value))
 	value_label.text = TopBar.pretty_print_number(cur)
+	if cur_round == null or cur == cur_round:
+		this_round.visible = false
+	else:
+		this_round.visible = true
+		value_label_this_round.text = TopBar.pretty_print_number(cur_round)
 	value_per_turn_label.text = TopBar.pretty_print_number(cur - _last_value)
 	_last_value = cur
 

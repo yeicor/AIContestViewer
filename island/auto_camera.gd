@@ -63,13 +63,13 @@ func recompute_pos(cam: Node3D, time: float):
 	# Slowly rotate by updating position adding some action to the scene
 	var dir := Vector3(0, 1, 0).rotated(Vector3(1,0,0), deg_to_rad(270 - Settings.camera_auto_pitch()))\
 	.rotated(Vector3(0, 1, 0), rot_angle)
-	# TODO: Adjust zoom to show every relevant object in frame! UI.distance_to_game_area()!
 	var wanted_dist_delta := -1.0
 	for p in _keypoints: # Displace the look at offset to ensure correct centering according to UI!
 		wanted_dist_delta = max(wanted_dist_delta, UI.distance_to_game_area(p) - 1.0)
 	#print("wanted_dist_delta:", wanted_dist_delta)
 	cur_dist = cur_dist + 0.25 * wanted_dist_delta * Settings.terrain_cell_side()
-	cur_dist = max(cur_dist, 5 * Settings.terrain_cell_side())
+	cur_dist = clampf(cur_dist, 5 * Settings.terrain_cell_side(), 
+			IslandH.num_cells().length() * 1.25 * Settings.terrain_cell_side())
 	cam.position = cur_dist * dir
 	 # Help camera look at everything given the offset caused by the right UI panel
 	if time > 0.1: # Avoid jumping look at offset at start!

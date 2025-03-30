@@ -2,6 +2,7 @@ extends PanelContainer
 class_name TopBar
 
 @onready var progress := $Progress
+@onready var round_label := $MarginContainer/HBoxContainer/RoundLabel
 @onready var turn_label := $MarginContainer/HBoxContainer/TurnLabel
 
 var _wants_to_pause := false
@@ -28,6 +29,8 @@ func _on_pause_action(single_step: bool = false):
 func _on_game_state(_state: GameState, turn: int, phase: int):
 	if phase == SignalBus.GAME_STATE_PHASE_INIT:
 		turn_label.text = pretty_print_number(turn)
+		if turn == 0:
+			round_label.text = str(int(round_label.text) + 1)
 	
 	if phase == SignalBus.GAME_STATE_PHASE_END:
 		if _wants_to_pause:

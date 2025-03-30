@@ -14,7 +14,7 @@ shader_parameter/bg_color = Color(0.953125, 0.481089, 0, 1)
 shader_parameter/alpha = 0.25
 
 [sub_resource type="LabelSettings" id="LabelSettings_vtwdm"]
-font_size = 48
+font_size = 33
 outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
@@ -92,6 +92,25 @@ theme_override_constants/margin_bottom = 0
 material = SubResource("ShaderMaterial_5k7yi")
 layout_mode = 2
 size_flags_horizontal = 4
+
+[node name="RoundStaticLabel" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Round: "
+label_settings = SubResource("LabelSettings_vtwdm")
+horizontal_alignment = 2
+
+[node name="RoundLabel" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_vtwdm")
+
+[node name="Sep" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "  "
+label_settings = SubResource("LabelSettings_vtwdm")
+horizontal_alignment = 2
 
 [node name="TurnStaticLabel" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2

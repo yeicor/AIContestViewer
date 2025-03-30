@@ -65,77 +65,81 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="RightPanelVBox" type="VBoxContainer" parent="GameUI/RightPanel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="GameUI/RightPanel"]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 
-[node name="TurnBar" type="PanelContainer" parent="GameUI/RightPanel/RightPanelVBox"]
+[node name="RightPanelVBox" type="VBoxContainer" parent="GameUI/RightPanel/ScrollContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="TurnBar" type="PanelContainer" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_qdduo")
 script = ExtResource("2_3cfon")
 
-[node name="Progress" type="ProgressBar" parent="GameUI/RightPanel/RightPanelVBox/TurnBar"]
+[node name="Progress" type="ProgressBar" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar"]
 layout_mode = 2
 size_flags_vertical = 1
 max_value = 1.0
 step = 0.0
 show_percentage = false
 
-[node name="MarginContainer" type="MarginContainer" parent="GameUI/RightPanel/RightPanelVBox/TurnBar"]
+[node name="MarginContainer" type="MarginContainer" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar"]
 layout_mode = 2
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar/MarginContainer"]
 material = SubResource("ShaderMaterial_5k7yi")
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="RoundStaticLabel" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
+[node name="RoundStaticLabel" type="Label" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Round: "
 label_settings = SubResource("LabelSettings_vtwdm")
 horizontal_alignment = 2
 
-[node name="RoundLabel" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
+[node name="RoundLabel" type="Label" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "0"
 label_settings = SubResource("LabelSettings_vtwdm")
 
-[node name="Sep" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
+[node name="Sep" type="Label" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "  "
 label_settings = SubResource("LabelSettings_vtwdm")
 horizontal_alignment = 2
 
-[node name="TurnStaticLabel" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
+[node name="TurnStaticLabel" type="Label" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Turn: "
 label_settings = SubResource("LabelSettings_vtwdm")
 horizontal_alignment = 2
 
-[node name="TurnLabel" type="Label" parent="GameUI/RightPanel/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
+[node name="TurnLabel" type="Label" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "-1"
 label_settings = SubResource("LabelSettings_vtwdm")
 
-[node name="PauseButton" type="Button" parent="GameUI/RightPanel/RightPanelVBox/TurnBar"]
+[node name="PauseButton" type="Button" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox/TurnBar"]
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 48
 flat = true
 
-[node name="Separator" type="Panel" parent="GameUI/RightPanel/RightPanelVBox"]
+[node name="Separator" type="Panel" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox"]
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ev8vp")
 
-[node name="Players" type="VBoxContainer" parent="GameUI/RightPanel/RightPanelVBox"]
+[node name="Players" type="VBoxContainer" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox"]
 layout_mode = 2
 script = ExtResource("3_0ss8a")
 

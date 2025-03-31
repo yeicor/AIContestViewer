@@ -4,14 +4,14 @@ extends Node3D
 @onready var _scatterers_meta: Array[Dictionary] = [
 	{"scatterer": $Trees, "per_cell": 4.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.1, "biome_mod": func(height01, normal):
 		return (1.0 - abs(0.5 - height01) / 1.0 + (normal.y - 0.7) / 0.3) if height01 >= 0.15 else 0.0},
+	{"scatterer": $DeadBranches, "per_cell": 3.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.5, "biome_mod": func(height01, normal):
+		return max(0.1, (1.0 - abs(0.5 - height01) / 1.0 + (normal.y - 0.7) / 0.3) if height01 >= 0.15 else 0.0)},
 	{"scatterer": $Rocks, "per_cell": 1.0, "biome_noise_freq": 0.2, "biome_noise_strength01": 0.1, "biome_mod": func(height01, _normal):
 		return max((height01 - 0.6) / 0.1, 1.0 - abs(0.1 - height01) / 0.4)},
 	{"scatterer": $Grass, "per_cell": 8.0, "biome_noise_freq": 0.03, "biome_noise_strength01": 0.9, "biome_mod": func(height01, _normal):
 		return 1.0 if height01 >= 0.0 else 0.0},
 	{"scatterer": $Bushes, "per_cell": 3.0, "biome_noise_freq": 0.1, "biome_noise_strength01": 0.5, "biome_mod": func(height01, _normal):
 		return 1.0 if height01 >= 0.1 else 0.0},
-	{"scatterer": $DeadBranches, "per_cell": 3.0, "biome_noise_freq": 0.05, "biome_noise_strength01": 0.5, "biome_mod": func(height01, _normal):
-		return max(0.0, 1.0 - abs(0.4 - height01) / 0.6)},
 ]
 
 func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:

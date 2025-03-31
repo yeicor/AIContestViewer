@@ -160,7 +160,7 @@ static func _apply_presets(path: String) -> Variant:
 		"ocean/screen_and_depth":
 			return preset_quality_linear(true) >= 0 and not OS.has_feature("web") # Web crashes for now
 		"common/props_multiplier":
-			if OS.is_debug_build(): return 0.0 # Faster development iterations
+			#if OS.is_debug_build(): return 0.0 # Faster development iterations
 			return 10.0 ** (preset_quality_quadratic(true) * 0.25) # 0.1, 0.56, 1, 1.78, 10
 		"common/stochastic_textures":
 			return preset_quality_linear(true) >= 2 # They really affect performance :/
@@ -277,6 +277,21 @@ static var _all_settings_info: Dictionary = \
 			"default": true,
 			"type": TYPE_BOOL,
 			"info": "Enable to hide obvious tiling when repeating textures (terrain, ocean...), at the cost of some performance.",
+		},
+		"common/variable_rate_shading": {
+			"default": true,
+			"type": TYPE_BOOL,
+			"info": "Enable to gain performance at the cost of rendering shaders at a lower resolution outside the center of the game content.",
+		},
+		"common/rendering_scale": {
+			"default": -1.0,
+			"type": TYPE_FLOAT,
+			"info": "Allows to render the whole scene at a lower resolution than native and upscaling it for performance, or at a higher resolution than native and downscaling it for quality. Set it to -1.0 for dynamic changes!",
+		},
+		"common/rendering_scale_mode": {
+			"default": "FSR",
+			"type": TYPE_STRING,
+			"info": "Choices: Bilinear, FSR, FSR2. Allows rendering at a lower resolution without losing too much quality.",
 		},
 		"game/paths": {
 			"default": "res://testdata/game.jsonl.gz;res://testdata/game.jsonl.gz;res://testdata/game.jsonl.gz",
@@ -433,6 +448,9 @@ static func common_start_paused() -> bool: return _s_val("common/start_paused")
 
 static func common_props_multiplier() -> float: return _s_val("common/props_multiplier")
 
+static func common_variable_rate_shading() -> bool: return _s_val("common/variable_rate_shading")
+static func common_rendering_scale() -> float: return _s_val("common/rendering_scale")
+static func common_rendering_scale_mode() -> String: return _s_val("common/rendering_scale_mode")
 
 static func game_paths() -> PackedStringArray: return _s_val("game/paths").split(";", false)
 

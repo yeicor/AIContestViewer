@@ -164,6 +164,9 @@ static func _apply_presets(path: String) -> Variant:
 			return 10.0 ** (preset_quality_quadratic(true) * 0.25) # 0.1, 0.56, 1, 1.78, 10
 		"common/stochastic_textures":
 			return preset_quality_linear(true) >= 2 # They really affect performance :/
+		"audio/master_volume":
+			@warning_ignore("incompatible_ternary")
+			return 0.0 if OS.is_debug_build() else null  # Disable while editing
 		_:
 			return null
 
@@ -249,17 +252,17 @@ static var _all_settings_info: Dictionary = \
 			"info": "The time to spend animating each turn of the game, in seconds.",
 		},
 		"common/start_turn_secs": {
-			"default": 1.0,
+			"default": 1.5,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating the starting turn of each round, in seconds.",
 		},
 		"common/end_turn_secs": {
-			"default": 5.0,
+			"default": 7.0,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating the ending turn of each round, in seconds.",
 		},
 		"common/end_game_turn_secs": {
-			"default": 0.0,
+			"default": 0.0, # Not actually used for anything? Podium just stays there
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating the ending turn of the whole game, in seconds.",
 		},
@@ -387,6 +390,21 @@ static var _all_settings_info: Dictionary = \
 			"default": true,
 			"type": TYPE_BOOL,
 			"info": "Whether the auto camera also includes owned lighthouses on the frame at all times or just players.",
+		},
+		"audio/master_volume": {
+			"default": 1.0,
+			"type": TYPE_FLOAT,
+			"info": "Volume control for all game audio.",
+		},
+		"audio/music_volume": {
+			"default": 1.0,
+			"type": TYPE_FLOAT,
+			"info": "Volume control for background music.",
+		},
+		"audio/effects_volume": {
+			"default": 1.0,
+			"type": TYPE_FLOAT,
+			"info": "Volume control for sound effects.",
 		},
 	}
 
@@ -569,3 +587,7 @@ static func camera_auto_pitch() -> float: return _s_val("camera/auto/pitch")
 static func camera_auto_rot_speed() -> float: return _s_val("camera/auto/rot_speed")
 
 static func camera_auto_include_owned() -> bool: return _s_val("camera/auto/include_owned")
+
+static func audio_master_volume() -> float: return _s_val("audio/master_volume")
+static func audio_music_volume() -> float: return _s_val("audio/music_volume")
+static func audio_effects_volume() -> float: return _s_val("audio/effects_volume")

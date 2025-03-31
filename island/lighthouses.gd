@@ -31,7 +31,8 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 			var lh_meta: Lighthouse = lhs_meta[lh_index]
 			var lh: LighthouseScene = get_child(lh_index)
 			lh_by_pos[lh_meta.pos()] = lh
-			lh.color = ColorGenerator.get_color(lh_meta.owner()) if lh_meta.owner() >= 0 else LighthouseScene.unowned_color
+			lh.color = ColorGenerator.get_color(lh_meta.owner(), state.players()) \
+					if lh_meta.owner() >= 0 else LighthouseScene.unowned_color
 		
 		# Update lighthouse connections
 		var conns_meta = state.connections()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bfq4y7aalc3s1"]
+[gd_scene load_steps=23 format=3 uid="uid://bfq4y7aalc3s1"]
 
 [ext_resource type="PackedScene" uid="uid://cjklklxubiss0" path="res://island/terrain/terrain.tscn" id="1_3qeog"]
 [ext_resource type="Script" uid="uid://bfn5xc7dj5xhn" path="res://island/lighthouses.gd" id="2_nth1s"]
@@ -12,13 +12,17 @@
 [ext_resource type="Script" uid="uid://b8hhnqsugykly" path="res://addons/phantom_camera/scripts/resources/camera_3d_resource.gd" id="9_8dr77"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="9_wyjn7"]
 [ext_resource type="Script" uid="uid://c1wi5kptc0sns" path="res://island/podium_mgr.gd" id="12_ah0bg"]
+[ext_resource type="Script" uid="uid://coxlljbra8dgf" path="res://island/audio_mgr.gd" id="13_hqglh"]
+[ext_resource type="AudioStream" uid="uid://djpt3is1gxdr0" path="res://audio/background1.mp3" id="14_cwta1"]
+[ext_resource type="AudioStream" uid="uid://clisll00hhra3" path="res://audio/podium1.mp3" id="15_cwta1"]
+[ext_resource type="AudioStream" uid="uid://c416ekjr37yr4" path="res://audio/lightning1.mp3" id="16_d3yxu"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_s0s0s"]
 
 [sub_resource type="Sky" id="Sky_31ni3"]
 sky_material = SubResource("PhysicalSkyMaterial_s0s0s")
 
-[sub_resource type="Environment" id="Environment_mggs4"]
+[sub_resource type="Environment" id="Environment_d3yxu"]
 background_mode = 2
 sky = SubResource("Sky_31ni3")
 
@@ -68,7 +72,7 @@ script = ExtResource("6_b7pyx")
 
 [node name="Camera3D" type="Camera3D" parent="AutoCamera"]
 transform = Transform3D(1.19209e-07, -0.995037, 0.0995039, 5.96047e-08, 0.0995039, 0.995037, -1, -1.12687e-07, 7.11706e-08, 1, 10, 0)
-environment = SubResource("Environment_mggs4")
+environment = SubResource("Environment_d3yxu")
 attributes = SubResource("CameraAttributesPhysical_wyjn7")
 
 [node name="PhantomCameraHost" type="Node" parent="AutoCamera/Camera3D"]
@@ -82,7 +86,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 10, 0)
 [node name="CameraTargetLookAt" type="Node3D" parent="AutoCamera"]
 
 [node name="PhantomCamera3D" type="Node3D" parent="AutoCamera" node_paths=PackedStringArray("follow_target", "look_at_target")]
-transform = Transform3D(1.18029e-07, -0.995031, 0.099503, 5.90143e-08, 0.0995033, 0.995029, -0.990095, -5.96043e-08, 1.19208e-07, 1, 10, 0)
+transform = Transform3D(1.17831e-07, -0.995031, 0.099503, 5.89156e-08, 0.0995033, 0.995029, -0.988439, -5.96043e-08, 1.19208e-07, 1, 10, 0)
 top_level = true
 script = ExtResource("7_l4kva")
 follow_mode = 1
@@ -102,8 +106,30 @@ look_at_damping_value = 1.0
 script = ExtResource("12_ah0bg")
 players_node = NodePath("../Players")
 
+[node name="AudioMgr" type="Node3D" parent="."]
+script = ExtResource("13_hqglh")
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="AudioMgr"]
+stream = ExtResource("14_cwta1")
+volume_db = -80.0
+autoplay = true
+parameters/looping = true
+
+[node name="PodiumMusic" type="AudioStreamPlayer" parent="AudioMgr"]
+stream = ExtResource("15_cwta1")
+volume_db = -80.0
+autoplay = true
+parameters/looping = true
+
+[node name="LightningEffects" type="AudioStreamPlayer" parent="AudioMgr"]
+stream = ExtResource("16_d3yxu")
+volume_db = -80.0
+max_polyphony = 10
+parameters/looping = false
+
 [connection signal="terrain_ready" from="Terrain" to="Lighthouses" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Props" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Players" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="Energy" method="_on_terrain_terrain_ready"]
 [connection signal="terrain_ready" from="Terrain" to="AutoCamera" method="_on_terrain_terrain_ready"]
+[connection signal="attack" from="Players" to="AudioMgr" method="_on_players_attack"]

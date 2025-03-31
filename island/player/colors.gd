@@ -18,7 +18,15 @@ static func _get_hue_levels():
 		step /= 2.0
 	return _hue_levels
 
-static func get_color(index: int) -> Color:
+static var _player_to_color := {}
+static func get_color(index, players: Array) -> Color:
+	"""Memorizes assigned colors by name so that they don't change between rounds"""
+	var stable_key: String = players[index].name()
+	if not _player_to_color.has(stable_key):
+		_player_to_color[stable_key] = _get_color(_player_to_color.size())
+	return _player_to_color[stable_key]
+
+static func _get_color(index: int) -> Color:
 	# Compute indices for hue, brightness, and saturation
 	var hue_index = index % hue_levels.size()
 	var sv_index = int(index / float(hue_levels.size())) % sv_levels.size()
@@ -38,5 +46,5 @@ func _run():
 	
 	# Generate and print the first 10 color hex codes
 	for i in range(min(10, total_colors)):
-		var color = get_color(i)
+		var color = _get_color(i)
 		print("Color ", i, ": ", color.to_html())

@@ -20,6 +20,7 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 			var pl_name = pl.name()
 			if turn == 0:
 				_score_offsets[pl_name] = _score_offsets_last.get_or_add(pl_name, 0)
+				
 			var score: int = _score_offsets[pl_name] + raw_score
 			_score_offsets_last[pl_name] = score
 			max_score = max(max_score, score)
@@ -39,7 +40,8 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 				add_child(pl_node)
 			var accum_score: int = _score_offsets_last[pl_node.name]
 			player_name_to_score[pl_node.name] = accum_score
-			pl_node.on_game_state_update(pl, i, accum_score, max_score, max_energy)
+			var color := ColorGenerator.get_color(i, players)
+			pl_node.on_game_state_update(pl, color, accum_score, max_score, max_energy)
 		# Sort players UI by current accum_score!
 		var sorted_children = get_children().filter(func(c): 
 			return not c.name.begins_with("___Separator___"))

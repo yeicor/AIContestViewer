@@ -34,9 +34,9 @@ text_overrun_behavior = 3
 [node name="ScoreBar" parent="." instance=ExtResource("2_7kf7m")]
 layout_mode = 2
 metadata/font_size = 33
-metadata/label_pre = "Score:"
+metadata/label_pre = "Score: "
 
 [node name="EnergyBar" parent="." instance=ExtResource("2_7kf7m")]
 layout_mode = 2
 metadata/font_size = 20
-metadata/label_pre = "Energy:"
+metadata/label_pre = "Energy: "

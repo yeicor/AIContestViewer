@@ -2,6 +2,7 @@
 extends Node3D
 
 @export var lighthousesParent: Node3D
+signal attack
 
 func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 	GameManager.pause() # Lock the game timer while generating
@@ -17,7 +18,7 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 		var player = preload("res://island/player/player.tscn").instantiate()
 		player.name = "Player" + str(player_index) + "@" + player_meta.name()
 		player.position = spawn_pos
-		player.color = ColorGenerator.get_color(player_index)
+		player.color = ColorGenerator.get_color(player_index, game_players)
 		player.scale = Vector3.ONE * Settings.player_scale()
 		add_child(player)
 	if not SignalBus.game_state.is_connected(_on_game_state):
@@ -97,6 +98,7 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 				attack_pos.y += lh_height
 				var attack_energy = _player_attacks[player_meta.pos()].filter(func(x): return x[0][0] == player_index)[0][1]
 				player.attack(attack_pos, attack_energy)
+				attack.emit()
 			else: # Default to idle otherwise
 				player.idle()
 				

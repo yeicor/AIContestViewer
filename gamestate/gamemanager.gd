@@ -67,7 +67,7 @@ static func _thread(game_paths: PackedStringArray):
 		last_turn = 0
 		while same_game_round:
 			# For debugging round changes, finish early:
-			if last_turn > 250: break
+			if last_turn > 50: break
 			# Read game state asynchronously (complete round -- ignore intermediate states)
 			var state := reader.parse_next_round()
 			end_sem.wait() # Wait for the previous listeners to end while we are ready for next round

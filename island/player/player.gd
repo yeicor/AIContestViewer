@@ -37,14 +37,16 @@ func _ready() -> void:
 		lp.color = color
 		lp.start_freedom = 0.0
 		lp.end_freedom = 0.3
+		lp.visible = false
 		var bone_id = skeleton.find_bone(hand_bone_name)
 		attack_lightnings.append([lp, bone_id])
 	# Make it more visible by adding ball of lightning on target
 	var ls := lightning_sphere.instantiate()
-	add_child(ls)
+	add_child(ls) 
 	ls.scale /= scale.x
 	ls.name = "attack_lightning_sphere"
 	ls.color = color
+	ls.visible = false
 	attack_lightnings.append([ls])
 
 func idle():

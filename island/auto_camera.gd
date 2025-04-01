@@ -24,7 +24,7 @@ func _ready() -> void:
 		for node in nodes:
 			node.queue_free()
 
-func _on_terrain_terrain_ready(_mi: MeshInstance3D, state: GameState) -> void:
+func _on_terrain_terrain_ready(_mi: MeshInstance3D, state: GameState, _cached: bool) -> void:
 	GameManager.pause()
 	# Wait for terrain and auto-snap in place for turn 0
 	cur_dist = IslandH.num_cells().distance_to(Vector2i.ZERO) * Settings.terrain_cell_side() / 3.0

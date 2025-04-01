@@ -5,8 +5,11 @@ extends Node3D
 
 var current_conns = {}
 var current_tris = {}
-func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
+func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState, cached: bool) -> void:
+	if cached: return
 	GameManager.pause() # Lock the game timer while generating
+	# Clear previous lighthouses
+	get_children().map(func(c): c.queue_free())
 	var start_time := Time.get_ticks_msec()
 	# Spawn the lighthouses at the appropriate locations...
 	for lh_meta in game.lighthouses():
@@ -19,11 +22,8 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 	SLog.sd("[timing] Placed lighthouses in " + str(Time.get_ticks_msec() - start_time) + "ms")
 	GameManager.resume()
 
-func _on_game_state(state: GameState, turn: int, phase: int):
+func _on_game_state(state: GameState, _turn: int, phase: int):
 	if phase == SignalBus.GAME_STATE_PHASE_INIT:
-		if turn == 0:
-			# Clear previous lighthouses
-			get_children().map(func(c): c.queue_free())
 		# Update lighthouse owners
 		var lhs_meta = state.lighthouses()
 		var lh_by_pos = {}

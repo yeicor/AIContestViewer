@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://se6kclfe11gi"]
+[gd_scene load_steps=11 format=3 uid="uid://se6kclfe11gi"]
 
 [ext_resource type="Shader" uid="uid://b14kmfqhe1sey" path="res://ui/ui_turn_shader.tres" id="1_wdddq"]
 [ext_resource type="Script" uid="uid://2vmu4jh6g5ga" path="res://ui/turn_bar.gd" id="2_3cfon"]
@@ -24,6 +24,9 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vkava"]
+bg_color = Color(0.164706, 0.164706, 0.164706, 0.329412)
 
 [sub_resource type="LabelSettings" id="LabelSettings_qm3o6"]
 font_size = 128
@@ -146,11 +149,12 @@ script = ExtResource("3_0ss8a")
 [node name="LoadingUI" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.5
+anchor_top = 0.25
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_vkava")
 
 [node name="MarginContainer" type="MarginContainer" parent="LoadingUI"]
 layout_mode = 2

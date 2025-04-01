@@ -4,7 +4,7 @@ extends Node3D
 @export var lighthousesParent: Node3D
 signal attack
 
-func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
+func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState, _cached: bool) -> void:
 	GameManager.pause() # Lock the game timer while generating
 	var start_time := Time.get_ticks_msec()
 	# Clear previous players
@@ -21,6 +21,7 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
 		player.color = ColorGenerator.get_color(player_index, game_players)
 		player.scale = Vector3.ONE * Settings.player_scale()
 		add_child(player)
+		player.idle()
 	if not SignalBus.game_state.is_connected(_on_game_state):
 		SignalBus.game_state.connect(_on_game_state)
 	SLog.sd("[timing] Spawned players in " + str(Time.get_ticks_msec() - start_time) + "ms")

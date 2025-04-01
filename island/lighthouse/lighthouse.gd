@@ -28,7 +28,7 @@ static func from_meta(_meta: Lighthouse, global_pos: Vector3) -> LighthouseScene
 	slf.position = global_pos
 	slf.rotate_y(randf() * 2 * PI)
 	slf.color = unowned_color  # Non-player color when unowned
-	#slf.color = ColorGenerator.get_color(_meta.pos().x)  # Only for testing visibility
+	(func(): slf.mesh_instance.layers = 8).call_deferred()
 	return slf
 
 @onready var lightning_plane_pool := $Spawner

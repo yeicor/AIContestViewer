@@ -158,7 +158,8 @@ static func _apply_presets(path: String) -> Variant:
 		"ocean/vertex_count":
 			return int(10000.0 * 10.0 ** preset_quality_linear(true))
 		"ocean/screen_and_depth":
-			return preset_quality_linear(true) >= 0 and not OS.has_feature("web") # Web crashes for now
+			#if OS.is_debug_build(): return false
+			return preset_quality_linear(true) > 0 and not OS.has_feature("web") # Web crashes for now
 		"common/props_multiplier":
 			#if OS.is_debug_build(): return 0.0 # Faster development iterations
 			return 10.0 ** (preset_quality_quadratic(true) * 0.25) # 0.1, 0.56, 1, 1.78, 10
@@ -262,9 +263,14 @@ static var _all_settings_info: Dictionary = \
 			"info": "The time to spend animating the ending turn of each round, in seconds.",
 		},
 		"common/end_game_turn_secs": {
-			"default": 0.0, # Not actually used for anything? Podium just stays there
+			"default": -1.0,
 			"type": TYPE_FLOAT,
-			"info": "The time to spend animating the ending turn of the whole game, in seconds.",
+			"info": "After the last round is complete and this timer ends, the visualizer closes. Set to a negative value to disable.",
+		},
+		"common/turn_max": {
+			"default": -1,
+			"type": TYPE_INT,
+			"info": "The number of turns after which each round is force-finished. Set to -1 to disable.",
 		},
 		"common/start_paused": {
 			"default": false,
@@ -459,6 +465,7 @@ static func common_turn_secs_multiplier() -> float: return common_turn_secs() / 
 static func common_start_turn_secs() -> float: return _s_val("common/start_turn_secs")
 static func common_end_turn_secs() -> float: return _s_val("common/end_turn_secs")
 static func common_end_game_turn_secs() -> float: return _s_val("common/end_game_turn_secs")
+static func common_turn_max() -> int: return _s_val("common/turn_max")
 
 
 static func common_start_paused() -> bool: return _s_val("common/start_paused")

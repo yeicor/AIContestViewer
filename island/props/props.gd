@@ -14,7 +14,8 @@ extends Node3D
 		return 1.0 if height01 >= 0.1 else 0.0},
 ]
 
-func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
+func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState, cached: bool) -> void:
+	if cached: return
 	if Settings.common_props_multiplier() <= 0.0:
 		SLog.sd("Props disabled, skipping scatterer configuration...")
 		return
@@ -40,6 +41,9 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 		var biome_noise_strength01: float = scatterer_meta["biome_noise_strength01"]
 		var biome_modifier: Callable = scatterer_meta["biome_mod"]
 		scatterer.global_seed = mseed + scatterer_meta_i
+		
+		# Clear previous props and force update
+		scatterer.enabled = false
 
 		# Adjust shape to drop only above island area
 		scatterer.get_children().map(func(shape: Node3D):
@@ -99,13 +103,6 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState) -> void:
 			SLog.sd("[timing] " + scatterer.name + " background build completed after " + str(Time.get_ticks_msec() - start_time) + " ms")
 			GameManager.resume(), CONNECT_ONE_SHOT)
 		scatterer.enabled = true
-	
-	var listener = func(_state: GameState, turn: int, phase: int):
-		if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:
-			for scatterer_meta in _scatterers_meta:
-				scatterer_meta["scatterer"].enabled = false
-	if not SignalBus.game_state.is_connected(listener): 
-		SignalBus.game_state.connect(listener)
 	
 	GameManager.resume() # See also callback pause and resumes!
 

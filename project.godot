@@ -116,6 +116,7 @@ fullscreen={
 
 3d_render/layer_2="TriangleAreas"
 3d_render/layer_3="Player"
+3d_render/layer_4="Lighthouse"
 
 [rendering]
 

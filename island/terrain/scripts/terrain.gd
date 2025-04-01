@@ -3,7 +3,7 @@ class_name Terrain
 extends Node3D
 
 ## TerrainTool organizes the code to be able to generate islands on demand and even test them in the editor.
-signal terrain_ready(mi: MeshInstance3D, game: GameState)
+signal terrain_ready(mi: MeshInstance3D, game: GameState, cached: bool)
 
 func clean():
 	for child in get_children():
@@ -54,19 +54,8 @@ func _ready():
 		cell_side = Settings.terrain_cell_side()
 		steepness = Settings.terrain_max_steepness()
 		# Prepare to generate as soon as a new game round starts
-		SignalBus.game_state.connect(func(initial_state, turn, phase):
-			# Regenerate terrain for each new game we find (it is likely to have a new map)
-			if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:
-				# Lock the game timer while generating
-				GameManager.pause()
-				terrain_ready.connect(func(_mi, _game):
-					# Wait for performance to stabilize to avoid stutter after loading the island
-					await wait_for_stable_fps()
-					GameManager.resume(), CONNECT_ONE_SHOT)
-				# TODO: Detect if there are no changes to the island and keep old mesh while triggering signal (provide cached info for listeners!)
-				# Remove any previous MeshInstance3D child and create a new one
-				get_children().map(func (x): if (x is MeshInstance3D): remove_child(x))
-				generate(initial_state))
+		if not SignalBus.game_state.is_connected(_on_game_state):
+			SignalBus.game_state.connect(_on_game_state)
 
 var _last_regeneration_frame: int = -1234
 func _regenerate_demo():
@@ -76,6 +65,23 @@ func _regenerate_demo():
 	var game_reader: GameReader = GameReader.open("res://testdata/game.jsonl.gz")
 	var first_round: GameState  = game_reader.parse_next_state()
 	generate(first_round)
+
+var _last_built_island_id: String
+func _on_game_state(state: GameState, turn: int, phase: int):
+	# Regenerate terrain for each new game we find (it is likely to have a new map)
+	if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_INIT:
+		# Lock the game timer while generating
+		if _last_built_island_id != state.island().to_ascii_string():
+			_last_built_island_id = state.island().to_ascii_string()
+			GameManager.pause()
+			terrain_ready.connect(func(_mi, _game, _cached): 
+				GameManager.resume(), CONNECT_ONE_SHOT)
+			# Remove any previous MeshInstance3D child and create a new one
+			get_children().map(func (x): if (x is MeshInstance3D): remove_child(x))
+			generate(state)
+		else:
+			SLog.sd("Reusing previous terrain, as the Island did not change!")
+			terrain_ready.emit(get_child(get_child_count() - 1), state, true) # Cached!
 
 var _generate_thread: Thread = null
 
@@ -109,17 +115,4 @@ func generate(game: GameState):
 			meshNode.mesh = hmesh
 			add_child(meshNode)
 			SLog.sd("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
-			terrain_ready.emit(meshNode, game)).call_deferred())
-
-func wait_for_stable_fps(max_frames_waiting = 10 * 60, stable_frames = 100, stable_frame_max_ms = 32) -> void:
-	var count = 0
-	var remaining = max_frames_waiting # 5 secs at 60 FPS
-	while count < 100 and remaining > 0:
-		await get_tree().process_frame
-		if Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0 < stable_frame_max_ms:
-			count += 1
-		else:
-			count = 0
-		remaining -= 1
-	Log.d("Reached stable framerate for %d frames (< %d ms) after waiting for %d frames" % [stable_frames, stable_frame_max_ms, max_frames_waiting - remaining])
-	if remaining == 0: Log.w("Gave up waiting for stable framerate...")
+			terrain_ready.emit(meshNode, game, false)).call_deferred())

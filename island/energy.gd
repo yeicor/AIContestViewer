@@ -2,7 +2,8 @@
 extends Node3D
 
 var energy_img: Image
-func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState) -> void:
+func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState, cached: bool) -> void:
+	if cached: return
 	GameManager.pause() # Lock the game timer while generating
 	var start_time := Time.get_ticks_msec()
 	var img_with_corners := Settings.island_water_level_distance_image()

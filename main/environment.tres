@@ -8,3 +8,11 @@ sky_material = SubResource("PhysicalSkyMaterial_s0s0s")
 [resource]
 background_mode = 2
 sky = SubResource("Sky_31ni3")
+tonemap_mode = 3
+glow_enabled = true
+glow_intensity = 2.0
+fog_enabled = true
+fog_mode = 1
+fog_depth_curve = 2.92817
+fog_depth_begin = 500.0
+fog_depth_end = 4000.0

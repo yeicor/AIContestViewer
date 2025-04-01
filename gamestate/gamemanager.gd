@@ -23,7 +23,11 @@ static func start(game_paths: PackedStringArray) -> void:
 	_running_mutex.unlock()
 	Log.d("Starting game manager thread...")
 	assert(OS.has_feature("threads")) # Enable thread support for web!
-	game_manager_thread.start(_thread.bind(game_paths))
+	game_manager_thread.start(func():
+		_thread(game_paths) 
+		(func(): # After the thread finishes, auto-close game cleanly
+			Engine.get_main_loop().root.propagate_notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+			Engine.get_main_loop().quit()).call_deferred())
 
 static func _pause(p: bool):
 	_running_mutex.lock()
@@ -66,8 +70,8 @@ static func _thread(game_paths: PackedStringArray):
 		var same_game_round := true
 		last_turn = 0
 		while same_game_round:
-			# For debugging round changes, finish early:
-			if last_turn > 50: break
+			# For CI/debugging, finish early:
+			if Settings.common_turn_max() >= 0 and last_turn > Settings.common_turn_max(): break
 			# Read game state asynchronously (complete round -- ignore intermediate states)
 			var state := reader.parse_next_round()
 			end_sem.wait() # Wait for the previous listeners to end while we are ready for next round
@@ -78,8 +82,10 @@ static func _thread(game_paths: PackedStringArray):
 			last_turn += 1
 		(func(): await _emit_and_wait_phase_main_thread(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_ROUND, Settings.common_end_turn_secs()); end_sem.post()).call_deferred()
 		end_sem.wait()
-	(func(): await _emit_and_wait_phase_main_thread(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_GAME, Settings.common_end_game_turn_secs()); end_sem.post()).call_deferred()
-	end_sem.wait()
+	(func():
+		await _emit_and_wait_phase_main_thread(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_GAME, Settings.common_end_game_turn_secs())
+		if Settings.common_end_game_turn_secs() >= 0: end_sem.post()).call_deferred()
+	end_sem.wait() # Waits forever if common_end_game_turn_secs < 0
 
 static func _emit_and_wait_phases_main_thread(state: GameState, turn: int, end_sem: Semaphore):
 	# Interested nodes can connect to this signal to receive game states.

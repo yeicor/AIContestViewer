@@ -105,4 +105,8 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 				
 	elif SignalBus.GAME_STATE_PHASE_END:
 		_last_players = state.players()
+		if GameManager.paused: # Idle players to avoid never-ending animation
+			for player in get_children():
+				if player._last_anim == "Run":
+					player.idle()
 		

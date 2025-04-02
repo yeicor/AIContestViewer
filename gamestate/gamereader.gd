@@ -40,7 +40,7 @@ func _init(stream_peer: StreamPeer):
 func parse_next_round() -> GameState:
 	if self.cur_state == null:
 		# Figure out how many players are there in the first round
-		parse_next_state()
+		if parse_next_state() == null: return null
 		# First state is a new round!
 		return self.cur_state
 		
@@ -86,10 +86,13 @@ func _read_json_line() -> Dictionary:
 		return { }
 	var line: String = ""
 	while true:
-		var byte: int = self._stream_peer.get_8()
+		if self._stream_peer is StreamPeerBuffer and self._stream_peer.get_available_bytes() == 0:
+			self._stream_peer_eof = true
+			return { }
+		var byte: int = self._stream_peer.get_u8()
 		if byte == -1: # EOF
 			self._stream_peer_eof = true
-			break
+			return { }
 		if byte == 10:
 			break
 		line += String(char(byte))

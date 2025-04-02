@@ -20,12 +20,12 @@ highp float noise01(highp vec2 uv) {
 	fnl_state state = fnlCreateState(my_seed);
 	state.noise_type = FNL_NOISE_OPENSIMPLEX2;
 	highp ivec2 texsize = textureSize(setting_island_water_level_distance, 0);
-	state.frequency = float(texsize.x) * 0.01;
+	state.frequency = length(vec2(texsize)) * 0.01;
 	highp float uv_y_scale = float(texsize.x) / float(texsize.y);
 	state.octaves = 15;
 	state.fractal_type = FNL_FRACTAL_PINGPONG;
 	state.domain_warp_type = FNL_DOMAIN_WARP_OPENSIMPLEX2;
-	state.domain_warp_amp = 1.0;
+	state.domain_warp_amp = 0.2;
 	// Run
 	highp float x = uv.x;
 	highp float y = uv.y * uv_y_scale;
@@ -74,7 +74,9 @@ highp float heightmap_island(highp vec2 uv_raw, highp vec2 pixel_size) {
 	highp float extreme_height = extreme_height_ramp * extreme_height_ramp_factor + extreme_height_smooth * (1.0 - extreme_height_ramp_factor);
 
 	// Apply some natural looking noise for realism, that is enforced to stay between water level and extreme_height
-	highp float noise_val = noise01(uv_fix);
+	highp float noise_val_hf = 1.0 - pow(noise01(uv_fix) / 2.0, 2.0); // More likely to stay closer to max value (to avoid big unexpected slope changes)
+	highp float noise_val_lf = noise01(uv_fix / 4.);
+	highp float noise_val = noise_val_lf * 0.9 + noise_val_hf * 0.1;
 	highp float height = (extreme_height - setting_island_water_level_at) * noise_val + setting_island_water_level_at;
 
 	// Add some cliffs close to shore to break the coastline by overlapping more noise

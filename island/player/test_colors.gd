@@ -15,7 +15,7 @@ extends GridContainer
 				var p := ColorRect.new()
 				p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				p.size_flags_vertical = Control.SIZE_EXPAND_FILL
-				p.color = ColorGenerator.get_color(i)
+				p.color = ColorGenerator._get_color(i)
 				print("Setting color " + str(i) + " to " + str(p.color))
 				add_child(p)
 				p.owner = self # Show panels in editor and save them to the test scene

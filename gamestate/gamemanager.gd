@@ -67,6 +67,9 @@ static func _thread(game_paths: PackedStringArray):
 	var last_turn := 0
 	for game_path in game_paths:
 		var reader := GameReader.open(game_path)
+		if reader == null:
+			SLog.se("Failed to open game at " + str(game_path) + ". Skipping...")
+			continue
 		var same_game_round := true
 		last_turn = 0
 		while same_game_round:
@@ -75,6 +78,7 @@ static func _thread(game_paths: PackedStringArray):
 			# Read game state asynchronously (complete round -- ignore intermediate states)
 			var state := reader.parse_next_round()
 			end_sem.wait() # Wait for the previous listeners to end while we are ready for next round
+			if state == null: break # End of replay! No more data.
 			last_state = state # We can now set the new preparsed state and insta-emit signals!
 			# Publish game state via a global signal.
 			_emit_and_wait_phases_main_thread.bind(last_state, last_turn, end_sem).call_deferred()

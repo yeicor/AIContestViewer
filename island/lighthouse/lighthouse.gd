@@ -51,8 +51,12 @@ func connect_to(other: LighthouseScene):
 	lp.color = color
 	lp.start_freedom = 0.0
 	lp.end_freedom = 0.0
+	lp.glow_strength = 1.0
 	lp.set_endpoints(top_center, transform.inverse() * other.transform * top_center)
-	lp.variation = 0.1 / pow(lp.scale.length_squared(), 0.25) # Almost straight line to correctly highlight triangle areas!
+	 # Adjust width and variation depending on length!
+	var wv_scale = pow(lp.scale.length_squared(), 0.25)
+	lp.width = 0.15 / wv_scale
+	lp.variation = 0.15 / wv_scale
 
 func disconnect_from(other: LighthouseScene) -> bool:
 	var conn := _get_connection(other)

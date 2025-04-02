@@ -60,9 +60,10 @@ textureNPlanarDefine(name##_roughness)
 texture_define(grass, vec3(0.3, 1.0, 0.3), 0.85, 0.1, 0.5)
 texture_define(rock, vec3(0.5), 0.85, 0.2, 0.05)
 texture_define(sand, vec3(0.7, 0.5, 0.0), 1.0, 0.5, 0.5)
-uniform float sand_height: hint_range(0.0, 1.0) = 0.01; // Of max theoretical height
+uniform float sand_height: hint_range(0.0, 1.0) = 0.1; // Of max theoretical height
 texture_define(snow, vec3(1.0), 1.0, 3.0, 1.5)
-uniform float snow_height: hint_range(0.0, 1.0) = 0.3; // Of max theoretical height
+uniform float snow_height: hint_range(0.0, 1.0) = 0.8; // Of max theoretical height
+uniform float max_height = 10.0; // Of max theoretical height
 
 varying vec3 _vert;
 varying vec3 _normal;
@@ -98,12 +99,15 @@ void fragment() {
 	float rock_base_strength = 1.0;
 	fragment_rock(ALBEDO, NORMAL_MAP, AO, ROUGHNESS, rock_base_strength, rockiness_raw, _vert, _normal);
 	float nonrock_strength = 1.0 - rock_base_strength;
-	float sand_max_height = sand_height * setting_terrain_cell_side * setting_terrain_max_steepness * min(setting_island_water_level_at, 1.0 - setting_island_water_level_at) / setting_island_water_level_step;
+
+	float sand_max_height = sand_height * max_height;
 	float sand_strength_v = nonrock_strength;
 	fragment_sand(ALBEDO, NORMAL_MAP, AO, ROUGHNESS, sand_strength_v, sand_max_height - _vert.y, _vert, _normal);
-	float snow_min_height = snow_height * setting_terrain_cell_side * setting_terrain_max_steepness * min(setting_island_water_level_at, 1.0 - setting_island_water_level_at) / setting_island_water_level_step;
+
+	float snow_min_height = snow_height * max_height;
 	float snow_strength_v = nonrock_strength;
 	fragment_snow(ALBEDO, NORMAL_MAP, AO, ROUGHNESS, snow_strength_v, _vert.y - snow_min_height, _vert, _normal);
+
 	float grass_strength_v = nonrock_strength - snow_strength_v - sand_strength_v;
 	fragment_grass(ALBEDO, NORMAL_MAP, AO, ROUGHNESS, grass_strength_v, 1.0, _vert, _normal);
 

@@ -40,7 +40,7 @@ static func distance_to_game_area(world: Vector3) -> float:
 	#print("AREA: ", area, "\t| SCREEN: ", screen_pos, "\t| RES: ", res)
 	return res
 
-static func projected_game_area_center(depth: float) -> Vector3:
+static func projected_game_area_center_offset(depth: float) -> Vector3:
 	if _instance == null:
 		SLog.sw("distance_to_game_area: _instance not ready!")
 		return Vector3.ZERO
@@ -51,5 +51,7 @@ static func projected_game_area_center(depth: float) -> Vector3:
 		SLog.sw("distance_to_game_area: camera_3d not set!")
 		return Vector3.ZERO
 		
-	return camera.project_position(_instance._game_area.get_global_rect().get_center(), depth)
+	var game_center = camera.project_position(_instance._game_area.get_global_rect().get_center(), depth)
+	var cam_center = camera.project_position(viewport.get_visible_rect().get_center(), depth)
+	return (cam_center - game_center) / 2
 	

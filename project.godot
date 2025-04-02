@@ -37,6 +37,11 @@ window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[editor]
+
+movie_writer/movie_file="/home/yeicor/projects/godot/AIContestViewer/aicontestviewer.avi"
+movie_writer/disable_vsync=true
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/LogDuck/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/limbo_console/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/proton_scatter/plugin.cfg", "res://addons/rts_camera_3d/plugin.cfg", "res://addons/worstconcept-spawnpool/plugin.cfg")

@@ -21,6 +21,11 @@ class_name LightningPlane
 	set(new):
 		width = new
 		mat.set_shader_parameter("width", width)
+		
+@export var glow_strength: float = 2.5:
+	set(new):
+		glow_strength = new
+		mat.set_shader_parameter("glow_strength", glow_strength)
 
 @export var start_angle: float = 0.0:
 	set(new):

@@ -15,6 +15,7 @@ uniform sampler2D noise_texture;
 uniform float speed: hint_range (-15.0,15.0) = 3;
 uniform float variation: hint_range (0.0,1.0) = 1.0;
 uniform float width: hint_range (0.0,10.0) = 0.1;
+uniform float glow_strength: hint_range(0.0,5.0) = 2.5;
 
 group_uniforms fixCorners;
 uniform float start_freedom: hint_range (0.0,1.0) = 0.0;
@@ -47,8 +48,8 @@ void fragment(){
 		sample_at = mix(centered_line, sample_at,  clamp((1.0 - rotated_uv.x) * 2.0 + end_freedom, 0.0, 1.0));
 
 		ALBEDO += color * texture(color_gradient, vec2(sample_at, sample_at)).rgb;
-		if (length(ALBEDO) > 0.1) {
-			ALBEDO *= (3.0 + mod(TIME * speed * 3.0, 2.0) * glow_sample) / length(ALBEDO);
+		if (length(ALBEDO) > 0.1 && glow_strength > 0.1) {
+			ALBEDO *= (glow_strength + mod(glow_strength * TIME * speed, glow_strength) * glow_sample) / length(ALBEDO);
 		}
 	}
 	ALPHA = clamp(length(ALBEDO.rgb), 0.0, 1.0);

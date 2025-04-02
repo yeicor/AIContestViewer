@@ -45,7 +45,7 @@ func clean():
 			clean()
 			_regenerate_demo()
 
-static var material = preload("res://island/terrain/material.tres")
+var material = preload("res://island/terrain/material.tres")
 func _ready():
 	if not Engine.is_editor_hint():
 		material.shader.code = Settings.as_defines() + material.shader.code
@@ -62,7 +62,7 @@ func _regenerate_demo():
 	if _last_regeneration_frame == Engine.get_frames_drawn():
 		return # Ignore multiple request on the same frame like while setting all properties at start.
 	_last_regeneration_frame = Engine.get_frames_drawn()
-	var game_reader: GameReader = GameReader.open("res://testdata/game.jsonl.gz")
+	var game_reader: GameReader = GameReader.open("res://testdata/small_map_10k_rounds.jsonl.gz")
 	var first_round: GameState  = game_reader.parse_next_state()
 	generate(first_round)
 
@@ -107,12 +107,14 @@ func generate(game: GameState):
 	var heightmap := $HeightMap
 	_generate_thread.start(func():
 		var hmesh: Mesh = heightmap.generate(game, my_seed, cell_side, steepness, vertex_count)
-		hmesh.surface_set_material(0, material)
 		(func():
 			_generate_thread.wait_to_finish()
 			var meshNode = MeshInstance3D.new()
 			meshNode.name = "_TerrainGen" + str(Time.get_ticks_usec())
 			meshNode.mesh = hmesh
+			var mat = material.duplicate()
+			mat.set_shader_parameter("max_height", meshNode.get_aabb().end.y)
+			hmesh.surface_set_material(0, mat)
 			add_child(meshNode)
 			SLog.sd("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")
 			terrain_ready.emit(meshNode, game, false)).call_deferred())

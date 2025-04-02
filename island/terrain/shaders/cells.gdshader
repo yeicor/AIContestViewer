@@ -8,7 +8,7 @@ global uniform sampler2D setting_island_energymap : hint_roughness_gray, filter_
 
 uniform float cell_border_scale : hint_range(0.0, 5.0, 0.1) = 2.0f; // Size of the border of each cell
 uniform vec4 above_water_color : source_color = vec4(vec3(0.75), 1.0);
-uniform vec4 below_water_color : source_color = vec4(0.5, 0.0, 0.0, 0.0);
+uniform vec4 below_water_color : source_color = vec4(0.0, 0.0, 0.0, 0.0);
 
 varying vec3 vert;
 void vertex() {
@@ -39,7 +39,7 @@ void fragment() {
 	if (lines > 0.1) {
 		ALPHA = (lines - 0.1) / 0.9;
 	} else {
-		ALPHA = 0.5 * (1.0 - energy);
+		ALPHA = 0.75 * (1.0 - energy);
 	}
 }
 

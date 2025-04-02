@@ -13,7 +13,7 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState, cached: boo
 	_on_game_state(game, -1, SignalBusStatic.GAME_STATE_PHASE_INIT) # Reuse code
 	if not SignalBus.game_state.is_connected(_on_game_state):
 		SignalBus.game_state.connect(_on_game_state)
-	SLog.sd("[timing] Energy setup in " + str(Time.get_ticks_msec() - start_time) + "ms")
+	SLog.sd("[timing] Energy set up in " + str(Time.get_ticks_msec() - start_time) + "ms")
 	GameManager.resume()
 	
 func _on_game_state(state: GameState, _turn: int, phase: int):

@@ -30,8 +30,8 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, state: GameState, _cached: b
 	cur_dist = IslandH.num_cells().distance_to(Vector2i.ZERO) * Settings.terrain_cell_side() / 3.0
 	recompute_lookAt_info(state)
 	self._my_time_offset = 0.0
-	self.recompute_pos(camera_target_pos, 0.0)
 	self.recompute_look_at()
+	self.recompute_pos(camera_target_pos, 0.0)
 	camera_3d.look_at_from_position(camera_target_pos.global_position, camera_target_look_at.global_position)
 	var sum := func(accum, number): return accum + number
 	camera_target_look_at.global_position = _keypoints.reduce(sum, Vector3.ZERO) / _keypoints.size()
@@ -49,11 +49,11 @@ func _on_game_state(state: GameState, turn: int, phase: int):
 
 func _process(delta: float) -> void:
 	if not _keypoints.is_empty(): # Wait to be enabled
-		self.recompute_pos(camera_target_pos, self._my_time_offset)
 		self.recompute_look_at()
+		self.recompute_pos(camera_target_pos, self._my_time_offset)
 		if self._my_time_offset > 0.0: # Avoid initial "tween"
 			phantom_camera.look_at_damping = true
-			#phantom_camera.follow_damping = true
+			phantom_camera.follow_damping = true
 		self._my_time_offset += delta
 
 var cur_dist := 100.0
@@ -67,19 +67,20 @@ func recompute_pos(cam: Node3D, time: float):
 	for p in _keypoints: # Displace the look at offset to ensure correct centering according to UI!
 		wanted_dist_delta = max(wanted_dist_delta, UI.distance_to_game_area(p) - 1.0)
 	#print("wanted_dist_delta:", wanted_dist_delta)
-	cur_dist = cur_dist + 0.25 * wanted_dist_delta * Settings.terrain_cell_side()
-	cur_dist = clampf(cur_dist, 5 * Settings.terrain_cell_side(), 
+	cur_dist = cur_dist + 0.5 * wanted_dist_delta * Settings.terrain_cell_side()
+	cur_dist = clampf(cur_dist, 4 * Settings.terrain_cell_side(), 
 			IslandH.num_cells().length() * 1.25 * Settings.terrain_cell_side())
-	cam.position = cur_dist * dir
-	 # Help camera look at everything given the offset caused by the right UI panel
-	if time > 0.1: # Avoid jumping look at offset at start!
-		var wanted_offset = UI.projected_game_area_center(cur_dist) - camera_target_look_at.position
-		phantom_camera.look_at_offset = wanted_offset.length() * camera_3d.transform.basis.x
-		#print("wanted_offset:", wanted_offset.length(), "\t| ", camera_target_look_at.position)
+	cam.position = camera_target_look_at.position + cur_dist * dir
+	# Help camera look at everything given the offset caused by the right UI panel
+	phantom_camera.look_at_offset = UI.projected_game_area_center_offset(cur_dist)
 
 func recompute_look_at():
 	var sum := func(accum, number): return accum + number
-	camera_target_look_at.global_position = _keypoints.reduce(sum, Vector3.ZERO) / _keypoints.size()
+	camera_target_look_at.position = _keypoints.reduce(sum, Vector3.ZERO) / _keypoints.size()
+	# Push the Y position towards 0 if we are looking from far away.
+	# This helps avoid looking too much at the sea on the top half of the screen.
+	# Caused by height differences of terrain helping to look up too much
+	camera_target_look_at.position.y *= 1 - smoothstep(0, IslandH.num_cells().length() * Settings.terrain_cell_side(), cur_dist)
 
 
 func recompute_lookAt_info(state: GameState):

@@ -233,9 +233,9 @@ static var _all_settings_info: Dictionary = \
 			"info": "The path to the settings file.",
 		},
 		"settings/create_defaults": {
-			"default": OS.has_feature("template") and not OS.has_feature("web"), # Harder to reset/edit on web
+			"default": false, # Harder to reset on some platforms, invoke only manually
 			"type": TYPE_BOOL,
-			"info": "Whether to create the default settings file if it does not exist (default is false in editor, true in export).",
+			"info": "Whether to create the default settings file if it does not exist.",
 		},
 		"settings/print": {
 			"default": true,
@@ -303,9 +303,11 @@ static var _all_settings_info: Dictionary = \
 			"info": "Choices: Bilinear, FSR, FSR2. Allows rendering at a lower resolution without losing too much quality.",
 		},
 		"game/paths": {
-			"default": "res://testdata/game.jsonl.gz;res://testdata/game.jsonl.gz;res://testdata/game.jsonl.gz",
+			"default": "res://testdata/small_map_10k_rounds.jsonl.gz",
+			#"default": "res://testdata/medium_map_all_mountain_500_rounds.jsonl.gz",
+			#"default": "res://testdata/large_map_500_rounds.jsonl.gz",
 			"type": TYPE_STRING,
-			"info": "The ;-separated game paths to load. It may be a tcp:// for a tcp server or simply a Godot data path.",
+			"info": "The ;-separated game paths to load. It may start with tcp:// for a server or it may be a Godot file path.",
 		},
 		"preset/quality": {
 			"default": "high" if OS.has_feature("pc") else "medium" if OS.has_feature("mobile") else "low",
@@ -383,7 +385,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The camera mode, which can be 'auto' or 'manual'",
 		},
 		"camera/auto/pitch": {
-			"default": -60.0,
+			"default": -50.0,
 			"type": TYPE_FLOAT,
 			"info": "The pitch angle of the camera, in degrees. 0 is horizontal and -90 is vertical.",
 		},

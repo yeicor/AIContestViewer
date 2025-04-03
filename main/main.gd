@@ -52,6 +52,9 @@ func _input(event: InputEvent) -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 
 func _setup_camera():
+	if Settings.preset_quality_linear() < 0:
+		$RTSCamera.environment.glow_enabled = false
+		$RTSCamera.environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	SignalBus.game_state.connect(func (state: GameState, turn, phase):
 		if turn == 0: # Terrain is re-generated on each initial turn, and it is a slow process
 			if phase == SignalBus.GAME_STATE_PHASE_INIT:

@@ -25,6 +25,7 @@ shader = ExtResource("1_hut0j")
 shader_parameter/cell_border_scale = 1.0
 shader_parameter/above_water_color = Color(0.75, 0.75, 0.75, 1)
 shader_parameter/below_water_color = Color(0, 0, 0, 0)
+shader_parameter/bb_half = Vector3(10, 10, 10)
 
 [resource]
 render_priority = 0
@@ -68,4 +69,4 @@ shader_parameter/snow_normal = ExtResource("17_p8hih")
 shader_parameter/snow_ao = ExtResource("16_3hjd2")
 shader_parameter/snow_roughness = ExtResource("18_6b85v")
 shader_parameter/snow_height = 0.8
-shader_parameter/max_height = 10.0
+shader_parameter/bb_half = Vector3(10, 10, 10)

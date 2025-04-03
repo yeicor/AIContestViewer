@@ -382,7 +382,7 @@ script = ExtResource("2_0yebv")
 enabled = false
 modifier_stack = SubResource("Resource_hrptc")
 Performance/use_chunks = true
-Performance/chunk_dimensions = Vector3(150, 15, 150)
+Performance/chunk_dimensions = Vector3(300, 300, 300)
 
 [node name="Tree" type="Node3D" parent="Trees"]
 script = ExtResource("9_apyay")
@@ -400,7 +400,7 @@ script = ExtResource("2_0yebv")
 enabled = false
 modifier_stack = SubResource("Resource_us5n5")
 Performance/use_chunks = true
-Performance/chunk_dimensions = Vector3(150, 15, 150)
+Performance/chunk_dimensions = Vector3(300, 300, 300)
 
 [node name="LargeRock" type="Node3D" parent="Rocks"]
 script = ExtResource("9_apyay")
@@ -425,7 +425,7 @@ script = ExtResource("2_0yebv")
 enabled = false
 modifier_stack = SubResource("Resource_akc4y")
 Performance/use_chunks = true
-Performance/chunk_dimensions = Vector3(150, 15, 150)
+Performance/chunk_dimensions = Vector3(300, 300, 300)
 
 [node name="Grass" type="Node3D" parent="Grass"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.64893, 0, -0.774464)
@@ -443,7 +443,7 @@ script = ExtResource("2_0yebv")
 enabled = false
 modifier_stack = SubResource("Resource_spxwe")
 Performance/use_chunks = true
-Performance/chunk_dimensions = Vector3(150, 15, 150)
+Performance/chunk_dimensions = Vector3(300, 300, 300)
 
 [node name="Bush" type="Node3D" parent="Bushes"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.64893, 0, -0.774464)
@@ -462,7 +462,7 @@ script = ExtResource("2_0yebv")
 enabled = false
 modifier_stack = SubResource("Resource_l404i")
 Performance/use_chunks = true
-Performance/chunk_dimensions = Vector3(150, 15, 150)
+Performance/chunk_dimensions = Vector3(300, 300, 300)
 
 [node name="DeadBranch" type="Node3D" parent="DeadBranches"]
 script = ExtResource("9_apyay")

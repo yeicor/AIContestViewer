@@ -113,7 +113,8 @@ func generate(game: GameState):
 			meshNode.name = "_TerrainGen" + str(Time.get_ticks_usec())
 			meshNode.mesh = hmesh
 			var mat = material.duplicate()
-			mat.set_shader_parameter("max_height", meshNode.get_aabb().end.y)
+			mat.set_shader_parameter("bb_half", meshNode.get_aabb().end)
+			mat.next_pass.set_shader_parameter("bb_half", meshNode.get_aabb().end)
 			hmesh.surface_set_material(0, mat)
 			add_child(meshNode)
 			SLog.sd("[TIMING] Terrain: Fully generated base heightmap mesh in " + str(Time.get_ticks_msec() - start_time) + "ms")

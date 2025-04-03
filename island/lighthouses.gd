@@ -119,6 +119,7 @@ func make_tri_node(tri: Array, color: Color) -> MeshInstance3D:
 	mat.albedo_color = color
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.no_depth_test = true
 	mat.render_priority = 1 # Avoid conflict with ocean
 	mesh.surface_set_material(mesh.get_surface_count() - 1, mat)
 	# TODO: Text overlay with score of area that always looks at camera

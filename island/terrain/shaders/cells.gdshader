@@ -10,8 +10,17 @@ uniform float cell_border_scale : hint_range(0.0, 5.0, 0.1) = 2.0f; // Size of t
 uniform vec4 above_water_color : source_color = vec4(vec3(0.75), 1.0);
 uniform vec4 below_water_color : source_color = vec4(0.0, 0.0, 0.0, 0.0);
 
+uniform vec3 bb_half = vec3(10.0); // Assume centered on 0 (except for max height being y)
+
 varying vec3 vert;
 void vertex() {
+	// Push corner vertices to "infinity" to avoid ocean transparency weirdness
+	if (abs(VERTEX.x) + 1e-2 >= bb_half.x || abs(VERTEX.z) + 1e-2 > bb_half.z) {
+		VERTEX.xz *= 100.0;
+	}
+	if (abs(VERTEX.x) + 1e-2 >= bb_half.x*0.95 || abs(VERTEX.z) + 1e-2 > bb_half.z*0.95) {
+		NORMAL = vec3(0.0, 1.0, 0.0);
+	}
 	vert = VERTEX;
 }
 
@@ -25,11 +34,14 @@ void fragment() {
 	float lines = clamp(1.0 - min(grid.x, grid.y), 0.0, 1.0);
 
 	// Is the line boundary above water o at water level?
-	bool cell_above_water =
-	texelFetch(setting_island_water_level_distance, cell_to_corner(ivec2(uv_data.xy)), 0).r > setting_island_water_level_at;
+	bool cell_above_water = texelFetch(setting_island_water_level_distance, 
+	cell_to_corner(ivec2(uv_data.xy)), 0).r > setting_island_water_level_at;
 	bool oob = uv_data.x < 0.0 || uv_data.x > uv_data.z || uv_data.y < 0.0 || uv_data.y > uv_data.w;
 	cell_above_water = cell_above_water && !oob;
-	vec4 edge_color = cell_above_water ? above_water_color : below_water_color;
+	
+	// Edit edge_color and lines based on conditions
+	vec4 edge_color = above_water_color * float(cell_above_water) + below_water_color * float(!cell_above_water);
+	lines = lines * float(!oob);
 
 	// Get the energy of the cell to highlight the ones with more
 	float energy = texelFetch(setting_island_energymap, ivec2(uv_data.xy), 0).r;

@@ -63,13 +63,20 @@ texture_define(sand, vec3(0.7, 0.5, 0.0), 1.0, 0.5, 0.5)
 uniform float sand_height: hint_range(0.0, 1.0) = 0.1; // Of max theoretical height
 texture_define(snow, vec3(1.0), 1.0, 3.0, 1.5)
 uniform float snow_height: hint_range(0.0, 1.0) = 0.8; // Of max theoretical height
-uniform float max_height = 10.0; // Of max theoretical height
+uniform vec3 bb_half = vec3(10.0); // Assume centered on 0 (except for max height being y)
 
 varying vec3 _vert;
 varying vec3 _normal;
 
 void vertex() {
-	// Obtain world space vertex and normal values.
+	// Push corner vertices to "infinity" to avoid ocean transparency weirdness
+	if (abs(VERTEX.x) + 1e-2 >= bb_half.x || abs(VERTEX.z) + 1e-2 > bb_half.z) {
+		VERTEX.xz *= 100.0;
+	}
+	if (abs(VERTEX.x) + 1e-2 >= bb_half.x*0.95 || abs(VERTEX.z) + 1e-2 > bb_half.z*0.95) {
+		NORMAL = vec3(0.0, 1.0, 0.0);
+	}
+	// Obtain local space vertex and normal values.
 	_vert = VERTEX;
 	_normal = NORMAL;
 }
@@ -95,16 +102,16 @@ void fragment() {
 	ALBEDO = vec3(0.0); NORMAL_MAP = vec3(0.0); AO = 0.0; ROUGHNESS = 0.0;
 
 	// Find and apply strength of each texture
-	float rockiness_raw = 1.0 - (_normal.y + 1.0) / 2.0; // 0 for XZ plane, 1 for -XZ plane
+	float rockiness_raw = pow(1.0 - (_normal.y + 1.0) / 2.0, 1.2);
 	float rock_base_strength = 1.0;
 	fragment_rock(ALBEDO, NORMAL_MAP, AO, ROUGHNESS, rock_base_strength, rockiness_raw, _vert, _normal);
 	float nonrock_strength = 1.0 - rock_base_strength;
 
-	float sand_max_height = sand_height * max_height;
+	float sand_max_height = sand_height * bb_half.y;
 	float sand_strength_v = nonrock_strength;
 	fragment_sand(ALBEDO, NORMAL_MAP, AO, ROUGHNESS, sand_strength_v, sand_max_height - _vert.y, _vert, _normal);
 
-	float snow_min_height = snow_height * max_height;
+	float snow_min_height = snow_height * bb_half.y;
 	float snow_strength_v = nonrock_strength;
 	fragment_snow(ALBEDO, NORMAL_MAP, AO, ROUGHNESS, snow_strength_v, _vert.y - snow_min_height, _vert, _normal);
 

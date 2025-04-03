@@ -310,7 +310,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "The ;-separated game paths to load. It may start with tcp:// for a server or it may be a Godot file path.",
 		},
 		"preset/quality": {
-			"default": "high" if OS.has_feature("pc") else "medium" if OS.has_feature("mobile") else "low",
+			"default": "medium" if OS.has_feature("pc") else "low" if OS.has_feature("mobile") else "lowest",
 			"type": TYPE_STRING,
 			"info": "The quality preset to use " + str(_preset_quality_values) + ". Overrides some settings BEFORE loading other custom overrides.",
 		},

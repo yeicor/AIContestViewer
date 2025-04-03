@@ -16,7 +16,8 @@ varying vec3 vert;
 void vertex() {
 	// Push corner vertices to "infinity" to avoid ocean transparency weirdness
 	if (abs(VERTEX.x) + 1e-2 >= bb_half.x || abs(VERTEX.z) + 1e-2 > bb_half.z) {
-		VERTEX.xz *= 100.0;
+		VERTEX.y = min(-10.0, VERTEX.y);
+		VERTEX *= 100.0;
 	}
 	if (abs(VERTEX.x) + 1e-2 >= bb_half.x*0.95 || abs(VERTEX.z) + 1e-2 > bb_half.z*0.95) {
 		NORMAL = vec3(0.0, 1.0, 0.0);

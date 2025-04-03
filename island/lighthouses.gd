@@ -1,11 +1,16 @@
 @tool
+class_name Lighthouses
 extends Node3D
 
 @export var lhTriAreasParent: Node3D
 
+static var instance 
+static func any() -> LighthouseScene: return instance.get_child(0)
+
 var current_conns = {}
 var current_tris = {}
 func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState, cached: bool) -> void:
+	instance = self
 	if cached: return
 	GameManager.pause() # Lock the game timer while generating
 	# Clear previous lighthouses

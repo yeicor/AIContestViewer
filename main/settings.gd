@@ -162,7 +162,8 @@ static func _apply_presets(path: String) -> Variant:
 			return preset_quality_linear(true) > 0 and not OS.has_feature("web") # Web crashes for now
 		"common/props_multiplier":
 			#if OS.is_debug_build(): return 0.0 # Faster development iterations
-			return 10.0 ** (preset_quality_quadratic(true) * 0.25) # 0.1, 0.56, 1, 1.78, 10
+			if preset_quality_linear(true) == -2: return 0.0 # Force disable all props on lowest
+			return 10.0 ** (preset_quality_quadratic(true) * 0.25) # (0.1 -> 0.0), 0.56, 1, 1.78, 10
 		"common/stochastic_textures":
 			return preset_quality_linear(true) >= 2 # They really affect performance :/
 		"audio/master_volume":
@@ -303,8 +304,8 @@ static var _all_settings_info: Dictionary = \
 			"info": "Choices: Bilinear, FSR, FSR2. Allows rendering at a lower resolution without losing too much quality.",
 		},
 		"game/paths": {
-			"default": "res://testdata/small_map_10k_rounds.jsonl.gz",
-			#"default": "res://testdata/medium_map_all_mountain_500_rounds.jsonl.gz",
+			#"default": "res://testdata/small_map_10k_rounds.jsonl.gz",
+			"default": "res://testdata/medium_map_all_mountain_500_rounds.jsonl.gz",
 			#"default": "res://testdata/large_map_500_rounds.jsonl.gz",
 			"type": TYPE_STRING,
 			"info": "The ;-separated game paths to load. It may start with tcp:// for a server or it may be a Godot file path.",

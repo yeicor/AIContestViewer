@@ -23,13 +23,13 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState, cached: boo
 	#Common
 	var mseed := Settings.common_seed()
 	var aabb = mi.get_aabb()
-	var num_cells: Vector2i = Vector2i((Settings.island_water_level_distance().get_size() - Vector2.ONE) / 2.0)
+	var num_cells: Vector2i = IslandH.num_cells()
 	var props_mult := Settings.common_props_multiplier()
 	if props_mult < 1.0:
 		props_mult = pow(props_mult, 4.0)  # More intense reduction
 
 	# Collision
-	add_collision_shape(mi, num_cells * 3 * int(props_mult), num_cells)
+	add_collision_shape(mi, num_cells * max(1, int(3 * props_mult)), num_cells)
 	
 	#Handle all scatterers similarly, but with some customization
 	for scatterer_meta_i in range(_scatterers_meta.size()):
@@ -52,7 +52,7 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState, cached: boo
 				shape.shape.size = aabb.size)
 
 		# Set the amount according to the per_cell modifier
-		scatterer.modifier_stack.stack[0].amount = int(per_cell * num_cells.x * num_cells.y * props_mult)
+		scatterer.modifier_stack.stack[0].amount = max(1, int(per_cell * num_cells.x * num_cells.y * props_mult))
 
 		# Build biomes
 		# - Create noise for more natural looking results
@@ -96,14 +96,17 @@ func _on_terrain_terrain_ready(mi: MeshInstance3D, _game: GameState, cached: boo
 		#biome_img.save_png(OS.get_environment("HOME") + "/biome_"+scatterer.name+".png")
 
 		SLog.sd("[timing] " + scatterer.name + " setup completed after " + str(Time.get_ticks_msec() - start_time) + "ms (will build " + str(scatterer.modifier_stack.stack[0].amount) + " elements)")
-		scatterer.chunk_dimensions = Vector3.ONE * 20.0 * aabb.size / Vector3(num_cells.x, 1, num_cells.y)
+		scatterer.chunk_dimensions = Vector3.ONE * 10.0 * aabb.size / Vector3(num_cells.x, 1, num_cells.y)
 		start_time = Time.get_ticks_msec()
 		GameManager.pause() # Lock the game timer while generating
-		scatterer.connect("build_completed", func():
+		scatterer.build_completed.connect(func():
 			SLog.sd("[timing] " + scatterer.name + " background build completed after " + str(Time.get_ticks_msec() - start_time) + " ms")
 			GameManager.resume(), CONNECT_ONE_SHOT)
 		scatterer.enabled = true
-	
+		# XXX: build_completed is not triggered when no objects are placed, so hack a solution
+		scatterer.modifier_stack.transforms_ready.connect(func(t):
+			if len(t.list) == 0: scatterer.build_completed.emit())
+		
 	GameManager.resume() # See also callback pause and resumes!
 
 

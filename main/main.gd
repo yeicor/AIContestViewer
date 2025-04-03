@@ -74,12 +74,13 @@ func _setup_rendering():
 		get_window().connect("size_changed", func():
 			viewport.vrs_update_mode = Viewport.VRS_UPDATE_ONCE)
 	
-	match(Settings.common_rendering_scale_mode()):
-		"Bilinear": viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
-		"FSR": viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR
-		"FSR2": viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR2
-		_: SLog.sw("Ignoring invalid rendering scale mode of " + 
-		Settings.common_rendering_scale_mode() + ". Valid options are: Bilinear, FSR, FSR2.")
+	if RenderingServer.get_current_rendering_method() == "forward_plus": # Otherwise unsupported
+		match(Settings.common_rendering_scale_mode()):
+			"Bilinear": viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+			"FSR": viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR
+			"FSR2": viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR2
+			_: SLog.sw("Ignoring invalid rendering scale mode of " + 
+			Settings.common_rendering_scale_mode() + ". Valid options are: Bilinear, FSR, FSR2.")
 	
 	if Settings.common_rendering_scale() > 0.0:
 		viewport.scaling_3d_scale = Settings.common_rendering_scale()

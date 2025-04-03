@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dr2f6dywskc6p"
+uid="uid://cx4x53g7yybja"
 path="res://.godot/imported/gandalf.glb-155d172351b4c9ca9897863b7f5882c4.scn"
 
 [deps]
@@ -17,7 +17,7 @@ nodes/root_type=""
 nodes/root_name=""
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
-nodes/import_as_skeleton_bones=false
+nodes/import_as_skeleton_bones=true
 nodes/use_node_type_suffixes=true
 meshes/ensure_tangents=true
 meshes/generate_lods=true
@@ -32,21 +32,6 @@ animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
-_subresources={
-"materials": {
-"base_material": {
-"use_external/enabled": false,
-"use_external/path": "res://player/model/base_material.tres"
-}
-},
-"nodes": {
-"PATH:Armature/Skeleton3D": {
-"rest_pose/external_animation_library": null
-},
-"PATH:Armature/Skeleton3D/mesh_001": {
-"physics/body_type": 2
-}
-}
-}
+_subresources={}
 gltf/naming_version=1
-gltf/embedded_image_handling=2
+gltf/embedded_image_handling=1

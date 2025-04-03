@@ -3,8 +3,8 @@ extends Node3D
 class_name PlayerScene
 
 @onready var animation_player: AnimationPlayer = $gandalf/AnimationPlayer
-@onready var mesh_instance: MeshInstance3D = $gandalf/Armature/Skeleton3D/mesh_001
-@onready var skeleton: Skeleton3D = $gandalf/Armature/Skeleton3D
+@onready var mesh_instance: MeshInstance3D = $gandalf/Skeleton3D/mesh_001
+@onready var skeleton: Skeleton3D = $gandalf/Skeleton3D
 @onready var light: SpotLight3D = $Light
 
 var new_mat := ShaderMaterial.new()
@@ -24,7 +24,7 @@ func _ready() -> void:
 	light.light_color = color
 	mesh_instance.layers = 4 # Ignored by own light
 	new_mat.shader = preload("res://island/lighthouse/recolor.gdshader")
-	new_mat.set_shader_parameter("tex", preload("res://island/player/model/gandalf_texture.tres"))
+	new_mat.set_shader_parameter("tex", (mesh_instance.get_active_material(0) as StandardMaterial3D).albedo_texture)
 	new_mat.set_shader_parameter("color_from", Vector3(0.5, 0.7, 0.8))
 	new_mat.set_shader_parameter("sensitivity", 0.2)
 	mesh_instance.set_surface_override_material(0, new_mat)

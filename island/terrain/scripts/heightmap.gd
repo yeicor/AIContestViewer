@@ -97,8 +97,9 @@ func generate(game: GameState, mseed: int, cell_side: float, steepness: float, t
 				vn_off_z = _read_height(x, z + 1, min_height, max_height) * y_step - _read_height(x, z - 1, min_height, max_height) * y_step
 			else:
 				vn_off_z = 0 # For z_inf and boundaries
-			var vn := Vector3(-2 * vn_off_x, 4, -2 * vn_off_z).normalized()
+			var vn := Vector3(-2 * vn_off_x, 4 * Settings.terrain_cell_side() / n, -2 * vn_off_z).normalized()
 			mdt.set_vertex_normal(v_id, vn)
+			#print("Normal: " + str(vn))
 			var vt := Plane(vn.cross(Vector3.FORWARD).normalized())
 			mdt.set_vertex_tangent(v_id, vt)
 			mdt.set_vertex(v_id, Vector3(v_x, v_y, v_z))

@@ -96,3 +96,4 @@ func recompute_lookAt_info(state: GameState):
 		for lh in state.lighthouses():
 			if lh.owner() >= 0:
 				_keypoints.push_back(IslandH.hit_pos_at_cell(Vector2(lh.pos()) + Vector2.ONE * 0.5))
+				_keypoints.push_back(IslandH.hit_pos_at_cell(Vector2(lh.pos()) + Vector2.ONE * 0.5) + Lighthouses.any().top_center)

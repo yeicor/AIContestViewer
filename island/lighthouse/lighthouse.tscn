@@ -9,6 +9,7 @@ script = ExtResource("1_mjv0r")
 color = Color(0, 1, 0.189945, 1)
 
 [node name="lighthouse" parent="." instance=ExtResource("1_534e3")]
+transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Spawner" type="Node3D" parent="."]
 script = ExtResource("3_nnyu7")

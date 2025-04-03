@@ -23,10 +23,6 @@ float noise01( in vec2 p )
 }
 
 #include "cells.gdshaderinc"
-global uniform float setting_island_water_level_at;
-global uniform float setting_island_water_level_step;
-global uniform float setting_terrain_max_steepness;
-
 #include "hextilingHelper.gdshaderinc"
 #include "nplanarHelper.gdshaderinc"
 
@@ -71,7 +67,8 @@ varying vec3 _normal;
 void vertex() {
 	// Push corner vertices to "infinity" to avoid ocean transparency weirdness
 	if (abs(VERTEX.x) + 1e-2 >= bb_half.x || abs(VERTEX.z) + 1e-2 > bb_half.z) {
-		VERTEX.xz *= 100.0;
+		VERTEX.y = min(-10.0, VERTEX.y);
+		VERTEX *= 100.0;
 	}
 	if (abs(VERTEX.x) + 1e-2 >= bb_half.x*0.95 || abs(VERTEX.z) + 1e-2 > bb_half.z*0.95) {
 		NORMAL = vec3(0.0, 1.0, 0.0);
@@ -102,7 +99,7 @@ void fragment() {
 	ALBEDO = vec3(0.0); NORMAL_MAP = vec3(0.0); AO = 0.0; ROUGHNESS = 0.0;
 
 	// Find and apply strength of each texture
-	float rockiness_raw = pow(1.0 - (_normal.y + 1.0) / 2.0, 1.2);
+	float rockiness_raw = smoothstep(0.0, 1.0, 2.0 * (1.0 - _normal.y));
 	float rock_base_strength = 1.0;
 	fragment_rock(ALBEDO, NORMAL_MAP, AO, ROUGHNESS, rock_base_strength, rockiness_raw, _vert, _normal);
 	float nonrock_strength = 1.0 - rock_base_strength;

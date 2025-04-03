@@ -18,7 +18,7 @@ var new_mat := ShaderMaterial.new()
 
 var top_center: Vector3:
 	get():
-		var aabb := mesh_instance.get_aabb()
+		var aabb := mesh_instance.get_parent_node_3d().transform * mesh_instance.get_aabb()
 		return (aabb.get_center() + Vector3(0.0, aabb.size.y / 2.0, 0.0))
 
 static func from_meta(_meta: Lighthouse, global_pos: Vector3) -> LighthouseScene:

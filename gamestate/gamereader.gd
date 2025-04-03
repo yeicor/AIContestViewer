@@ -38,11 +38,11 @@ func _init(stream_peer: StreamPeer):
 
 ## Parse the complete next round state, including moves from all bots. Remember to free the returned state!
 func parse_next_round() -> GameState:
-	if self.cur_state == null:
+	if cur_state == null:
 		# Figure out how many players are there in the first round
 		if parse_next_state() == null: return null
 		# First state is a new round!
-		return self.cur_state
+		return cur_state
 		
 	var num_updates_per_round: int = cur_state.players().size() + 1 # Pre-init state
 	var _expected_round: int = cur_state.round()

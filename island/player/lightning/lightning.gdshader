@@ -2,8 +2,7 @@
 // Modified
 
 shader_type spatial;
-// Disable cull to render both sides, and depth to always show connections
-render_mode cull_disabled, depth_test_disabled;
+render_mode cull_disabled;
 
 group_uniforms line;
 uniform sampler2D color_gradient : repeat_disable;

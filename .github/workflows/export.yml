@@ -23,7 +23,7 @@ jobs:
         archive_output: true
     
     - uses: "firebelley/godot-export@v6.0.0"
-      id: "export"
+      id: "export2"
       with: # TODO: Auto-update godot
         export_debug: true
         presets_to_export: "Android"
@@ -35,4 +35,6 @@ jobs:
         
     - uses: "actions/upload-artifact@v4"
       with:
-        path: "${{ steps.export.outputs.archive_directory }}"
+        path: |
+          ${{ steps.export.outputs.archive_directory }}
+          ${{ steps.export2.outputs.archive_directory }}

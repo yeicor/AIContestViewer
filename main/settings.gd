@@ -253,12 +253,12 @@ static var _all_settings_info: Dictionary = \
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating each turn of the game, in seconds.",
 		},
-		"common/start_turn_secs": {
+		"common/start_round_secs": {
 			"default": 1.5,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating the starting turn of each round, in seconds.",
 		},
-		"common/end_turn_secs": {
+		"common/end_round_secs": {
 			"default": 7.0,
 			"type": TYPE_FLOAT,
 			"info": "The time to spend animating the ending turn of each round, in seconds.",
@@ -269,7 +269,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "After the last round is complete and this timer ends, the visualizer closes. Set to a negative value to disable.",
 		},
 		"common/turn_max": {
-			"default": -1,
+			"default": 25,
 			"type": TYPE_INT,
 			"info": "The number of turns after which each round is force-finished. Set to -1 to disable.",
 		},
@@ -304,9 +304,9 @@ static var _all_settings_info: Dictionary = \
 			"info": "Choices: Bilinear, FSR, FSR2. Allows rendering at a lower resolution without losing too much quality.",
 		},
 		"game/paths": {
-			#"default": "res://testdata/small_map_10k_rounds.jsonl.gz",
-			"default": "res://testdata/medium_map_all_mountain_500_rounds.jsonl.gz",
-			#"default": "res://testdata/large_map_500_rounds.jsonl.gz",
+			"default": "res://testdata/small_round1.jsonl.gz;res://testdata/small_round2.jsonl.gz;res://testdata/small_round3.jsonl.gz",
+			#"default": "res://testdata/medium.jsonl.gz",
+			#"default": "res://testdata/large.gz",
 			"type": TYPE_STRING,
 			"info": "The ;-separated game paths to load. It may start with tcp:// for a server or it may be a Godot file path.",
 		},
@@ -465,8 +465,8 @@ static func common_seed() -> int: return _s_val("common/seed")
 
 static func common_turn_secs() -> float: return _s_val("common/turn_secs")
 static func common_turn_secs_multiplier() -> float: return common_turn_secs() / 0.5
-static func common_start_turn_secs() -> float: return _s_val("common/start_turn_secs")
-static func common_end_turn_secs() -> float: return _s_val("common/end_turn_secs")
+static func common_start_round_secs() -> float: return _s_val("common/start_round_secs")
+static func common_end_round_secs() -> float: return _s_val("common/end_round_secs")
 static func common_end_game_turn_secs() -> float: return _s_val("common/end_game_turn_secs")
 static func common_turn_max() -> int: return _s_val("common/turn_max")
 

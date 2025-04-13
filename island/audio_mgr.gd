@@ -16,7 +16,7 @@ func _ready() -> void:
 		SignalBus.game_state.connect(_on_game_state)
 
 func _on_game_state(_state: GameState, turn: int, phase: int):
-	var music_fade_time := Settings.common_end_turn_secs() / 4
+	var music_fade_time := Settings.common_end_round_secs() / 4
 	if turn == 0 and phase == SignalBus.GAME_STATE_PHASE_ANIMATE:
 		var tween := create_tween()
 		tween.tween_callback(func(): bg_music.stream_paused = false)
@@ -29,7 +29,7 @@ func _on_game_state(_state: GameState, turn: int, phase: int):
 		podium_music.stream_paused = false
 		tween.parallel().tween_property(podium_music, "volume_linear", music_volume, music_fade_time)
 		tween.tween_callback(func(): bg_music.stream_paused = true)
-		tween.tween_interval(Settings.common_end_turn_secs() - music_fade_time * 2)
+		tween.tween_interval(Settings.common_end_round_secs() - music_fade_time * 2)
 		tween.tween_property(podium_music, "volume_linear", 0.0, music_fade_time)
 		tween.tween_callback(func(): podium_music.stream_paused = true)
 

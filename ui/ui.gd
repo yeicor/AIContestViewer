@@ -5,6 +5,8 @@ static var _instance: Control = null
 
 @warning_ignore("unused_private_class_variable")
 @onready var _game_area: Control = $"%GameArea"
+@warning_ignore("unused_private_class_variable")
+@onready var _players: Control = $"%Players"
 
 func _ready() -> void:
 	if _instance != null:
@@ -55,3 +57,11 @@ static func projected_game_area_center_offset(depth: float) -> Vector3:
 	var cam_center = camera.project_position(viewport.get_visible_rect().get_center(), depth)
 	return (cam_center - game_center) / 2
 	
+static func player_names_by_total_score() -> Array:
+	if _instance == null:
+		SLog.sw("player_names_by_total_score: _instance not ready!")
+		return []
+	
+	return _instance._players.get_children()\
+		.map(func(c): return c.name)\
+		.filter(func(c): return not c.begins_with("___Separator___"))

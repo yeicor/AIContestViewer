@@ -8,7 +8,7 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState, _cached: bo
 	GameManager.pause() # Lock the game timer while generating
 	var start_time := Time.get_ticks_msec()
 	# Clear previous players
-	get_children().map(func(c): c.queue_free())
+	get_children().map(func(c): c.free()) # Do it now to avoid name collisions!
 	# Spawn each player as determined by the inital state
 	var game_players := game.players()
 	for player_index in range(game_players.size()):
@@ -16,7 +16,7 @@ func _on_terrain_terrain_ready(_mi: MeshInstance3D, game: GameState, _cached: bo
 		var spawn_pos := IslandH.hit_pos_at_cell(Vector2(player_meta.pos()) + Vector2(0.5, 0.5))
 		
 		var player = preload("res://island/player/player.tscn").instantiate()
-		player.name = "Player" + str(player_index) + "@" + player_meta.name()
+		player.name = player_meta.name() # XXX: Assumes no bad chars
 		player.position = spawn_pos
 		player.color = ColorGenerator.get_color(player_index, game_players)
 		player.scale = Vector3.ONE * Settings.player_scale()

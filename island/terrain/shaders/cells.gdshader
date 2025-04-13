@@ -35,11 +35,11 @@ void fragment() {
 	float lines = clamp(1.0 - min(grid.x, grid.y), 0.0, 1.0);
 
 	// Is the line boundary above water o at water level?
-	bool cell_above_water = texelFetch(setting_island_water_level_distance, 
+	bool cell_above_water = texelFetch(setting_island_water_level_distance,
 	cell_to_corner(ivec2(uv_data.xy)), 0).r > setting_island_water_level_at;
 	bool oob = uv_data.x < 0.0 || uv_data.x > uv_data.z || uv_data.y < 0.0 || uv_data.y > uv_data.w;
 	cell_above_water = cell_above_water && !oob;
-	
+
 	// Edit edge_color and lines based on conditions
 	vec4 edge_color = above_water_color * float(cell_above_water) + below_water_color * float(!cell_above_water);
 	lines = lines * float(!oob);

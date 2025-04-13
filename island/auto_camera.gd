@@ -68,7 +68,7 @@ func recompute_pos(cam: Node3D, time: float, delta: float):
 	for p in _keypoints: # Displace the look at offset to ensure correct centering according to UI!
 		wanted_dist_delta = max(wanted_dist_delta, UI.distance_to_game_area(p) - 1.0)
 	# Zoom much faster at the start (converge instantly)
-	var wanted_dist_delta_scale = 500 - 475 * smoothstep(0, Settings.common_start_turn_secs(), time)
+	var wanted_dist_delta_scale = 500 - 475 * smoothstep(0, Settings.common_start_round_secs(), time)
 	wanted_dist_delta *= wanted_dist_delta_scale * delta
 	#print("wanted_dist_delta:", wanted_dist_delta)
 	cur_dist = cur_dist + wanted_dist_delta * Settings.terrain_cell_side()

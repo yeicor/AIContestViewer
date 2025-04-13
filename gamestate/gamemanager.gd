@@ -62,7 +62,7 @@ static func stop() -> void:
 
 static func _thread(game_paths: PackedStringArray):
 	var end_sem := Semaphore.new()
-	end_sem.post()
+	end_sem.post() # Allow loading first state (not async like all others)
 	var last_state: GameState = null
 	var last_turn := 0
 	for game_path in game_paths:
@@ -84,17 +84,19 @@ static func _thread(game_paths: PackedStringArray):
 			_emit_and_wait_phases_main_thread.bind(last_state, last_turn, end_sem).call_deferred()
 			same_game_round = await _wait_unpaused_ms(0, true) # Never awaits thanks to sleep
 			last_turn += 1
-		(func(): await _emit_and_wait_phase_main_thread(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_ROUND, Settings.common_end_turn_secs()); end_sem.post()).call_deferred()
 		end_sem.wait()
+		(func(): await _emit_and_wait_phase_main_thread(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_ROUND, Settings.common_end_round_secs()); end_sem.post()).call_deferred()
+		Log.d("Finished round")
 	(func():
 		await _emit_and_wait_phase_main_thread(last_state, last_turn, SignalBusStatic.GAME_STATE_PHASE_END_GAME, Settings.common_end_game_turn_secs())
 		if Settings.common_end_game_turn_secs() >= 0: end_sem.post()).call_deferred()
 	end_sem.wait() # Waits forever if common_end_game_turn_secs < 0
+	Log.d("Finished game")
 
 static func _emit_and_wait_phases_main_thread(state: GameState, turn: int, end_sem: Semaphore):
 	# Interested nodes can connect to this signal to receive game states.
 	if await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_INIT, 0):
-		if await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_ANIMATE, Settings.common_turn_secs() + (0.0 if turn > 0 else Settings.common_start_turn_secs())):
+		if await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_ANIMATE, Settings.common_turn_secs() + (0.0 if turn > 0 else Settings.common_start_round_secs())):
 			await _emit_and_wait_phase_main_thread(state, turn, SignalBusStatic.GAME_STATE_PHASE_END, 0)
 	end_sem.post()
 

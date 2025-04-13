@@ -143,6 +143,7 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ev8vp")
 
 [node name="Players" type="VBoxContainer" parent="GameUI/RightPanel/ScrollContainer/RightPanelVBox"]
+unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("3_0ss8a")
 

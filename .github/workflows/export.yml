@@ -1,0 +1,20 @@
+on: "push"
+
+jobs:
+  export_game:
+    runs-on: "ubuntu-latest"
+    steps:
+    - uses: "actions/checkout@v4"
+    
+    - uses: "firebelley/godot-export@v6.0.0"
+      id: "export"
+      with: # TODO: Auto-update godot
+        godot_executable_download_url: "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip"
+        godot_export_templates_download_url: "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+        relative_project_path: "./"
+        cache: true
+        archive_output: true
+        
+    - uses: "actions/upload-artifact@v4"
+      with:
+        path: "${{ steps.export.outputs.archive_directory }}"

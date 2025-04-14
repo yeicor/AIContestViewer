@@ -51,7 +51,7 @@ jobs:
           fi
           
           echo "Importing the game with the editor before running..."
-          $GODOT_CMD --editor --quit --verbose --path . 2>&1 | tee import.log # Ignore errors during first import!
+          $GODOT_CMD --editor --import --verbose --path . 2>&1 | tee import.log # Ignore errors during first import!
           # Ensure all scenes are actually imported instead of just the auto-detected ones
           #find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 $GODOT_CMD --import --verbose 2>&1 >> import.log
           

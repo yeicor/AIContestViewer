@@ -17,7 +17,6 @@ concurrency:
 
 env:
   GODOT_VERSION: "4.4.1"  # TODO: auto-update!
-  EXPORT_NAME: "${{ github.event.repository.name }}"
 
 jobs:
   test:
@@ -37,12 +36,11 @@ jobs:
           echo "Trying to avoid headless mode..."
           GODOT_CMD="godot --headless"
           if [[ "${{ matrix.platform }}" == "ubuntu-latest" ]]; then
-            sudo apt-get install -y xvfb
             GODOT_CMD="xvfb-run godot"
           fi
           
           echo "Running the game..."
-          $GODOT_CMD --verbose --path . --debug 2>&1 | tee run.log
+          $GODOT_CMD --verbose --path . 2>&1 | tee run.log
           
           echo "Checking the log for errors..."
           grep -Ei 'err|fail|warn' run.log | \
@@ -56,7 +54,46 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ["Linux/X11", "Windows Desktop", "Android", "Web"]
+        include:
+          - exportname: "Linux"
+            arch: "x86_64"
+            extension: "x86_64"
+#           - exportname: "Linux"
+#             arch: "x86_64"
+#             extension: "x86_32"
+#           - exportname: "Linux"
+#             arch: "arm64"
+#             extension: "arm64"
+#           - exportname: "Linux"
+#             arch: "arm32"
+#             extension: "arm32"
+# 
+#           - exportname: "WindowsDesktop"
+#             arch: "x86_64"
+#             extension: "exe"
+#           - exportname: "WindowsDesktop"
+#             arch: "x86_32"
+#             extension: "exe"
+#           - exportname: "WindowsDesktop"
+#             arch: "arm64"
+#             extension: "exe"
+#             
+#           - exportname: "Android"
+#             arch: "arm64-v8a"
+#             extension: "arm64-v8a"
+#           - exportname: "Android"
+#             arch: "armeabi-v7a"
+#             extension: "armeabi-v7a"
+#           - exportname: "Android"
+#             arch: "x86_64"
+#             extension: "x86_64"
+#           - exportname: "Android"
+#             arch: "x86"
+#             extension: "x86"
+#             
+#           - exportname: "Web"
+#             arch: "wasm"
+#             extension: "html"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
@@ -65,19 +102,20 @@ jobs:
           use-dotnet: false
           include-templates: true
       - run: |
-          sudo apt-get install -y xvfb
-          
           EXPORT_ARG="--export-release"
-          if [[ "${{ matrix.platform }}" == "Android" ]]; then
+          if [[ "${{ matrix.exportname }}" == "Android" ]]; then
             EXPORT_ARG="--export-debug"  # XXX: Avoid messing with keystore
           fi
           
-          mkdir -p "build/${{ matrix.platform }}"
-          xvfb-run godot --verbose $EXPORT_ARG "${{ matrix.platform }}" "build/${{ matrix.platform }}/${{ env.EXPORT_NAME }}" || exit 1
+          # TODO: Edit preset config file to force select architecture
+          
+          FOLDER="build/${{ matrix.exportname }}-${{ matrix.arch }}"
+          mkdir -p "${FOLDER}"
+          xvfb-run godot --verbose $EXPORT_ARG "${{ matrix.exportname }}" "${FOLDER}/${{ matrix.exportname }}.${{ matrix.extension }}"
       - uses: "actions/upload-artifact@v4"
         with:
-          name: "${{ matrix.platform }}"
-          path: "build/${{ matrix.platform }}"
+          name: "${{ matrix.exportname }}-${{ matrix.arch }}"
+          path: "build/${{ matrix.exportname }}-${{ matrix.arch }}"
 
   deploy:
     needs: "export"

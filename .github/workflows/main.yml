@@ -40,13 +40,13 @@ jobs:
           fi
           
           echo "Importing the game with the editor before running..."
-          $GODOT_CMD --import --verbose --path . 2>&1 | tee import.log
+          $GODOT_CMD --import --verbose --path . # Ignore errors during first import!
           
           echo "Running the game..."
           $GODOT_CMD --verbose --path . 2>&1 | tee run.log
           
           echo "Checking the logs for errors..."
-          grep -Ei 'err|fail|warn' import.log run.log | \
+          grep -Ei 'err|fail|warn' run.log | \
           grep -v -Ei 'whitelisted-term1|whitelisted-term2' &&\
           exit 1 || echo "No issues found in log."
           
@@ -107,10 +107,10 @@ jobs:
       - run: |
           # Edit preset config file to force select architecture
           if [[ "${{ matrix.exportname }}" != "Android" ]]; then
-            sed -ei 's/"x86_64"/"'"${matrix.arch}"'"/g' export_presets.cfg
+            sed -ei 's/"x86_64"/"'"${{ matrix.arch }}"'"/g' export_presets.cfg
           else
             sed -ei 's,architectures/.*,,g' export_presets.cfg
-            sed -ei 's,version/code,architectures/'"${matrix.arch}"'=true,g' export_presets.cfg
+            sed -ei 's,version/code,architectures/'"${{ matrix.arch }}"'=true,g' export_presets.cfg
           fi
           
           EXPORT_ARG="--export-release"

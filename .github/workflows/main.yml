@@ -50,12 +50,12 @@ jobs:
           
           echo "Importing the game with the editor before running..."
           # Ensure all scenes are actually imported instead of just the auto-detected ones
-          find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 godot --editor --import --verbose 2>&1 >> import.log
-          godot --editor --import --verbose --path . 2>&1 | tee -a import.log
+          find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 ${{matrix.godot}} --editor --import --verbose 2>&1 >> import.log
+          ${{matrix.godot}} --editor --import --verbose --path . 2>&1 | tee -a import.log
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          godot --verbose --path . 2>&1 | tee run.log
+          ${{matrix.godot}} --verbose --path . 2>&1 | tee run.log
           
           echo "Gathering errors from the log..."
           # | grep -v -Ei 'whitelisted-term1|whitelisted-term2' \

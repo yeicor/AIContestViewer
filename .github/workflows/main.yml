@@ -51,9 +51,9 @@ jobs:
           fi
           
           echo "Importing the game with the editor before running..."
-          $GODOT_CMD --import --verbose --path . # Ignore errors during first import!
+          $GODOT_CMD --import --verbose --path . 2>&1 | tee import.log # Ignore errors during first import!
           # Ensure all scenes are actually imported instead of just the auto-detected ones
-          find . -name "*.tscn" -print0 | xargs --null --verbose --max-args=1 $GODOT_CMD --import --verbose
+          find . -name "*.tscn" -print0 | xargs --null --verbose --max-args=1 $GODOT_CMD --import --verbose 2>&1 > import.log
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
@@ -76,7 +76,7 @@ jobs:
             arch: "x86_64"
             extension: "x86_64"
           - exportname: "Linux"
-            arch: "x86_64"
+            arch: "x86_32"
             extension: "x86_32"
           - exportname: "Linux"
             arch: "arm64"
@@ -136,7 +136,7 @@ jobs:
           
           FOLDER="build/${{ matrix.exportname }}-${{ matrix.arch }}"
           mkdir -p "${FOLDER}"
-          xvfb-run godot --verbose $EXPORT_ARG "${{ matrix.exportname }}" "${FOLDER}/${{ matrix.exportname }}.${{ matrix.extension }}"
+          xvfb-run godot --verbose $EXPORT_ARG "${{ matrix.exportname }}" "${FOLDER}/${{ github.event.repository.name }}-${{ matrix.exportname }}-${{ matrix.arch }}.${{ matrix.extension }}"
       - uses: "actions/upload-artifact@v4"
         with:
           name: "${{ matrix.exportname }}-${{ matrix.arch }}"
@@ -144,7 +144,7 @@ jobs:
 
   deploy:
     needs: "export"
-    if: "github.ref == 'refs/heads/main'"
+    if: "github.ref == 'refs/heads/master'"
     runs-on: "ubuntu-latest"
     name: "Deploy to GitHub Pages"
     steps:

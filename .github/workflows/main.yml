@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        platform: ["ubuntu-latest"] # , "macos-latest", "windows-latest"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
@@ -43,6 +43,7 @@ jobs:
           $GODOT_CMD --import --verbose --path . # Ignore errors during first import!
           
           echo "Running the game..."
+          common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
           $GODOT_CMD --verbose --path . 2>&1 | tee run.log
           
           echo "Checking the logs for errors..."

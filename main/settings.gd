@@ -221,7 +221,7 @@ static func as_defines() -> String:
 			_:
 				print("[before-logging?] (SettingsAutoloaded) Unsupported type for setting " + setting_name + ": " + str(_all_settings_info[setting_name]["type"]))
 	# Also publish the rendering_method as a define to help work around incompatibilities
-	defines += "#define rendering_method \"" + ProjectSettings.get_setting_with_override("rendering/renderer/rendering_method") + "\"\n"
+	defines += "#define rendering_method \"" + RenderingServer.get_current_rendering_method() + "\"\n"
 	return defines
 
 # ========== ALL SETTINGS ==========
@@ -269,7 +269,7 @@ static var _all_settings_info: Dictionary = \
 			"info": "After the last round is complete and this timer ends, the visualizer closes. Set to a negative value to disable.",
 		},
 		"common/turn_max": {
-			"default": 25,
+			"default": -1,
 			"type": TYPE_INT,
 			"info": "The number of turns after which each round is force-finished. Set to -1 to disable.",
 		},

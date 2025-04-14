@@ -33,6 +33,8 @@ jobs:
           use-dotnet: false
       - shell: "bash"
         run: |
+          set -x
+          
           echo "Trying to avoid headless mode..."
           GODOT_CMD="godot --headless"
           if [[ "${{ matrix.platform }}" == "ubuntu-latest" ]]; then
@@ -110,10 +112,10 @@ jobs:
           
           # Edit preset config file to force select architecture
           if [[ "${{ matrix.exportname }}" != "Android" ]]; then
-            sed -ei 's/"x86_64"/"'"${{ matrix.arch }}"'"/g' export_presets.cfg
+            sed -i -e 's/"x86_64"/"'"${{ matrix.arch }}"'"/g' export_presets.cfg
           else
-            sed -ei 's,architectures/.*,,g' export_presets.cfg
-            sed -ei 's,version/code,architectures/'"${{ matrix.arch }}"'=true,g' export_presets.cfg
+            sed -i -e 's,architectures/.*,,g' export_presets.cfg
+            sed -i -e 's,version/code,architectures/'"${{ matrix.arch }}"'=true,g' export_presets.cfg
           fi
           
           EXPORT_ARG="--export-release"

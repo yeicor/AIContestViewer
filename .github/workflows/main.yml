@@ -1,0 +1,96 @@
+name: "Godot CI/CD"
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  pages: "write"
+  id-token: "write"
+  
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: "4.4.1"  # TODO: auto-update!
+  EXPORT_NAME: "${{ github.event.repository.name }}"
+
+jobs:
+  test:
+    runs-on: "${{ matrix.platform }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ["ubuntu-latest", "macos-latest", "windows-latest"]
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "chickensoft-games/setup-godot@v2"
+        with:
+          version: "${{ env.GODOT_VERSION }}"
+          use-dotnet: false
+      - shell: "bash"
+        run: |
+          echo "Trying to avoid headless mode..."
+          GODOT_CMD="godot --headless"
+          if [[ "${{ matrix.platform }}" == "ubuntu-latest" ]]; then
+            sudo apt-get install -y xvfb
+            GODOT_CMD="xvfb-run godot"
+          fi
+          
+          echo "Running the game..."
+          $GODOT_CMD --verbose --path . --debug 2>&1 | tee run.log
+          
+          echo "Checking the log for errors..."
+          grep -Ei 'err|fail|warn' run.log | \
+          grep -v -Ei 'whitelisted-term1|whitelisted-term2' &&\
+          exit 1 || echo "No issues found in log."
+          
+          # TODO: Record game video and upload preview to main README.md
+
+  export:
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ["Linux/X11", "Windows Desktop", "Android", "Web"]
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "chickensoft-games/setup-godot@v2"
+        with:
+          version: "${{ env.GODOT_VERSION }}"
+          use-dotnet: false
+          include-templates: true
+      - run: |
+          sudo apt-get install -y xvfb
+          
+          EXPORT_ARG="--export-release"
+          if [[ "${{ matrix.platform }}" == "Android" ]]; then
+            EXPORT_ARG="--export-debug"  # XXX: Avoid messing with keystore
+          fi
+          
+          mkdir -p "build/${{ matrix.platform }}"
+          xvfb-run godot --verbose $EXPORT_ARG "${{ matrix.platform }}" "build/${{ matrix.platform }}/${{ env.EXPORT_NAME }}" || exit 1
+      - uses: "actions/upload-artifact@v4"
+        with:
+          name: "${{ matrix.platform }}"
+          path: "build/${{ matrix.platform }}"
+
+  deploy:
+    needs: "export"
+    if: "github.ref == 'refs/heads/main'"
+    runs-on: "ubuntu-latest"
+    name: "Deploy to GitHub Pages"
+    steps:
+      - uses: "actions/download-artifact@v4"
+        with:
+          name: "Web"
+          path: "web-export"
+      - uses: "actions/configure-pages@v5"
+      - uses: "actions/upload-pages-artifact@v3"
+        with:
+          path: "web-export"
+      - uses: "actions/deploy-pages@v4"

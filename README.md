@@ -2,7 +2,9 @@
 
 ## Quickstart
 
-TODO
+1. Download [lighthouses_aicontest](https://github.com/yeicor/lighthouses_aicontest)
+and run a game saving the output to a file (it is also possible to stream it live to the viewer).
+2. Download this viewer for your operating system (see [Builds](Builds))
 
 ## Builds
 

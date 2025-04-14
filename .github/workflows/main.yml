@@ -48,20 +48,14 @@ jobs:
         run: |
           set -x
           
-          echo "Trying to avoid headless mode..."
-          GODOT_CMD="godot --headless"
-          if [[ "${{ matrix.platform }}" == "ubuntu-latest" ]]; then
-            GODOT_CMD="xvfb-run godot"
-          fi
-          
           echo "Importing the game with the editor before running..."
-          $GODOT_CMD --editor --import --verbose --path . 2>&1 | tee import.log # Ignore errors during first import!
           # Ensure all scenes are actually imported instead of just the auto-detected ones
-          find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 $GODOT_CMD --editor --import --verbose 2>&1 >> import.log
+          find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 godot --editor --import --verbose 2>&1 >> import.log
+          godot --editor --import --verbose --path . 2>&1 | tee -a import.log
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          $GODOT_CMD --verbose --path . 2>&1 | tee run.log
+          godot --verbose --path . 2>&1 | tee run.log
           
           echo "Gathering errors from the log..."
           # | grep -v -Ei 'whitelisted-term1|whitelisted-term2' \
@@ -159,7 +153,6 @@ jobs:
     needs: "export"
     if: "github.ref == 'refs/heads/master'"
     runs-on: "ubuntu-latest"
-    name: "Deploy to GitHub Pages"
     steps:
       - uses: "actions/download-artifact@v4"
         with:

@@ -5,11 +5,11 @@
 
 1. Download [lighthouses_aicontest](https://github.com/yeicor/lighthouses_aicontest).
 2. Run a game following its instructions and save the output to a file.
-	2.1. It is possible to stream it live to the viewer (see [settings](#settings)).
+	1. It is possible to stream it live to the viewer (see [settings](#settings)).
 3. Download this viewer for your operating system (see [builds](#builds)).
-	3.1. It is possible to use the web viewer to avoid any installation.
+	1. It is possible to use the web viewer to avoid any installation.
 4. Execute the viewer while pointing it to the game.
-	4.1. Provide multiple games to accumulate scores.
+	1. Provide multiple games to accumulate scores.
 
 ## Builds
 

@@ -50,7 +50,7 @@ jobs:
           
           echo "Importing the game with the editor before running..."
           # Ensure all assets are actually imported instead of just the auto-detected ones
-          git ls-files ../.. | grep -Ev ".import|.uid|.txt|.cfg|.md|.git" | \
+          git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git" | \
           xargs --null --verbose --max-args=1 \
           ${{matrix.godot}} --editor --import --verbose 2>&1 >> import.log
           ${{matrix.godot}} --editor --import --verbose . 2>&1 | tee -a import.log

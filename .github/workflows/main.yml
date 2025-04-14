@@ -35,11 +35,15 @@ jobs:
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
-      - uses: "humbletim/setup-vulkan-sdk@v1"
+      - uses: "jakoch/install-vulkan-sdk-action@v1"
         with:
-          vulkan-query-version: "1.4.304.1"
-          vulkan-components: "Vulkan-Headers, Vulkan-Loader"
-          vulkan-use-cache: true
+          optional_components: "com.lunarg.vulkan.vma"
+          install_runtime: true
+          cache: true
+          stripdown: true
+          # You can install a software rasterizer.
+          install_swiftshader: true
+          install_lavapipe: true
       - shell: "bash"
         run: |
           set -x
@@ -53,7 +57,7 @@ jobs:
           echo "Importing the game with the editor before running..."
           $GODOT_CMD --editor --import --verbose --path . 2>&1 | tee import.log # Ignore errors during first import!
           # Ensure all scenes are actually imported instead of just the auto-detected ones
-          #find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 $GODOT_CMD --import --verbose 2>&1 >> import.log
+          #find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 $GODOT_CMD --editor --import --verbose 2>&1 >> import.log
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \

@@ -49,9 +49,11 @@ jobs:
           set -x
           
           echo "Importing the game with the editor before running..."
-          # Ensure all scenes are actually imported instead of just the auto-detected ones
-          find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 ${{matrix.godot}} --editor --import --verbose 2>&1 >> import.log
-          ${{matrix.godot}} --editor --import --verbose --path . 2>&1 | tee -a import.log
+          # Ensure all assets are actually imported instead of just the auto-detected ones
+          find .  -print0 | xargs --null --verbose --max-args=1 ${{matrix.godot}} --editor --import --verbose 2>&1 >> import.log
+          ${{matrix.godot}} --editor --import --verbose . 2>&1 | tee -a import.log
+          
+          echo "DEBUG: Imported .godot contents..."; find .godot
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
@@ -70,6 +72,7 @@ jobs:
           path: |
             import.log
             run.log
+            .godot
 
   export:
     runs-on: "ubuntu-latest"

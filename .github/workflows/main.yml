@@ -43,15 +43,17 @@ jobs:
           
           echo "Importing the game with the editor before running..."
           $GODOT_CMD --import --verbose --path . # Ignore errors during first import!
+          # Ensure all scenes are actually imported instead of just the auto-detected ones
+          find ../.. -name "*.tscn" -print0 | xargs -0 -n 1 $GODOT_CMD --import --verbose
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
           $GODOT_CMD --verbose --path . 2>&1 | tee run.log
           
-          echo "Checking the logs for errors..."
-          grep -Ei 'err|fail|warn' run.log | \
-          grep -v -Ei 'whitelisted-term1|whitelisted-term2' &&\
-          exit 1 || echo "No issues found in log."
+          echo "Gathering errors from the log..."
+          # | grep -v -Ei 'whitelisted-term1|whitelisted-term2' \
+          grep -Ei 'err|fail|warn' run.log \
+          && exit 1 || echo "No issues found in log."
           
           # TODO: Record game video and upload preview to main README.md
 

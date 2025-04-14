@@ -53,7 +53,7 @@ jobs:
           echo "Importing the game with the editor before running..."
           $GODOT_CMD --import --verbose --path . 2>&1 | tee import.log # Ignore errors during first import!
           # Ensure all scenes are actually imported instead of just the auto-detected ones
-          find . -name "*.tscn" -print0 | xargs --null --verbose --max-args=1 $GODOT_CMD --import --verbose 2>&1 > import.log
+          find . \( -name "*.tscn" -or -name "*.glb" \) -print0 | xargs --null --verbose --max-args=1 $GODOT_CMD --import --verbose 2>&1 >> import.log
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
@@ -65,6 +65,13 @@ jobs:
           && exit 1 || echo "No issues found in log."
           
           # TODO: Record game video and upload preview to main README.md
+      
+      - uses: "actions/upload-artifact@v4"
+        with:
+          name: "test-logs"
+          path: |
+            import.log
+            run.log
 
   export:
     runs-on: "ubuntu-latest"
@@ -94,19 +101,19 @@ jobs:
           - exportname: "WindowsDesktop"
             arch: "arm64"
             extension: "exe"
-#             
-#           - exportname: "Android"
-#             arch: "arm64-v8a"
-#             extension: "arm64-v8a"
-#           - exportname: "Android"
-#             arch: "armeabi-v7a"
-#             extension: "armeabi-v7a"
-#           - exportname: "Android"
-#             arch: "x86_64"
-#             extension: "x86_64"
-#           - exportname: "Android"
-#             arch: "x86"
-#             extension: "x86"
+            
+          - exportname: "Android"
+            arch: "arm64-v8a"
+            extension: "arm64-v8a"
+          - exportname: "Android"
+            arch: "armeabi-v7a"
+            extension: "armeabi-v7a"
+          - exportname: "Android"
+            arch: "x86_64"
+            extension: "x86_64"
+          - exportname: "Android"
+            arch: "x86"
+            extension: "x86"
             
           - exportname: "Web"
             arch: "wasm"
@@ -150,7 +157,7 @@ jobs:
     steps:
       - uses: "actions/download-artifact@v4"
         with:
-          name: "Web"
+          name: "Web-wasm"
           path: "web-export"
       - uses: "actions/configure-pages@v5"
       - uses: "actions/upload-pages-artifact@v3"

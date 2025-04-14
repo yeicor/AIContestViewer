@@ -104,16 +104,16 @@ jobs:
             
           - exportname: "Android"
             arch: "arm64-v8a"
-            extension: "arm64-v8a"
+            extension: "apk"
           - exportname: "Android"
             arch: "armeabi-v7a"
-            extension: "armeabi-v7a"
+            extension: "apk"
           - exportname: "Android"
             arch: "x86_64"
-            extension: "x86_64"
+            extension: "apk"
           - exportname: "Android"
             arch: "x86"
-            extension: "x86"
+            extension: "apk"
             
           - exportname: "Web"
             arch: "wasm"
@@ -133,7 +133,9 @@ jobs:
             sed -i -e 's/"x86_64"/"'"${{ matrix.arch }}"'"/g' export_presets.cfg
           else
             sed -i -e 's,architectures/.*,,g' export_presets.cfg
-            sed -i -e 's,version/code,architectures/'"${{ matrix.arch }}"'=true,g' export_presets.cfg
+            sed -i -e 's,version/code,architectures/'"${{ matrix.arch }}"'=true|version/code,g' export_presets.cfg
+            tr '|' '\n' <export_presets.cfg >export_presets2.cfg
+            mv export_presets2.cfg export_presets.cfg
           fi
           
           EXPORT_ARG="--export-release"

@@ -105,6 +105,8 @@ jobs:
           use-dotnet: false
           include-templates: true
       - run: |
+          set -x
+          
           # Edit preset config file to force select architecture
           if [[ "${{ matrix.exportname }}" != "Android" ]]; then
             sed -ei 's/"x86_64"/"'"${{ matrix.arch }}"'"/g' export_presets.cfg

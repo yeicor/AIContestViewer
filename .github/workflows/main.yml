@@ -26,9 +26,11 @@ jobs:
       matrix:
         include:
           - platform: "ubuntu-latest"
-            init: "Xvfb :99 > /dev/null 2>&1 & sudo apt install -y pv mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+            init: "sudo apt install -y pv mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+            godot: "xvfb-run godot"
           # - platform: "windows-latest"
           #   init: ""
+          #   godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
@@ -41,7 +43,7 @@ jobs:
           install_runtime: true
           cache: true
           stripdown: true
-          # You can install a software rasterizer.
+          # You can install a software rasterizer (windows-only).
           install_swiftshader: true
           install_lavapipe: true
       - shell: "bash"
@@ -52,9 +54,9 @@ jobs:
           # Ensure all assets are actually imported instead of just the auto-detected ones
           ALL_IMPORTS=$(git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git|LICENSE")
           echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
-          xargs --verbose --max-args=1 --max-procs=32 sh -c \
-          "godot --verbose --import 2>&1 || true >> import.log"
-          godot --verbose --import . 2>&1 | tee -a import.log || true
+          xargs --verbose --max-args=1 --max-procs=1 sh -c \
+          "${{matrix.godot}} --verbose --import 2>&1 || true >> import.log"
+          ${{matrix.godot}} --verbose --import . 2>&1 | tee -a import.log || true
       
       - uses: "actions/upload-artifact@v4"
         with:
@@ -71,9 +73,11 @@ jobs:
       matrix:
         include:
           - platform: "ubuntu-latest"
-            init: "Xvfb :99 > /dev/null 2>&1 & sudo apt install -y pv mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+            init: "sudo apt install -y pv mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+            godot: "xvfb-run godot"
           # - platform: "windows-latest"
           #   init: ""
+          #   godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/download-artifact@v4"
@@ -90,7 +94,7 @@ jobs:
           install_runtime: true
           cache: true
           stripdown: true
-          # You can install a software rasterizer.
+          # You can install a software rasterizer (windows-only).
           install_swiftshader: true
           install_lavapipe: true
       - shell: "bash"
@@ -100,7 +104,7 @@ jobs:
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          godot --verbose --path . 2>&1 | tee run.log
+          ${{matrix.godot}} --verbose --path . 2>&1 | tee run.log
           
           echo "Gathering errors from the log..."
           # | grep -v -Ei 'whitelisted-term1|whitelisted-term2' \

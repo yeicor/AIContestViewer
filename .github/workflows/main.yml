@@ -49,9 +49,9 @@ jobs:
           set -x
           
           # Ensure all assets are actually imported instead of just the auto-detected ones
-          #git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git" | \
-          #xargs --verbose --max-args=1 \
-          #${{matrix.godot}} --verbose --import 2>&1 >> import.log
+          git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git" | \
+          xargs --verbose --max-args=1 \
+          ${{matrix.godot}} --verbose --import 2>&1 >> import.log
           ${{matrix.godot}} --verbose --import . 2>&1 | tee -a import.log
       
       - uses: "actions/upload-artifact@v4"

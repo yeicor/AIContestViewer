@@ -26,9 +26,9 @@ jobs:
       matrix:
         include:
           - platform: "ubuntu-latest"
-            godot: "xvfb-run godot"
-          # - platform: "windows-latest"
-          #   godot: "godot"
+            init: "Xvfb :99 > /dev/null 2>&1 &"
+          - platform: "windows-latest"
+            init: ""
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
@@ -47,12 +47,15 @@ jobs:
       - shell: "bash"
         run: |
           set -x
+          ${{ matrix.init }}
           
           # Ensure all assets are actually imported instead of just the auto-detected ones
-          git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git" | \
-          xargs --verbose --max-args=1 \
-          ${{matrix.godot}} --verbose --import 2>&1 >> import.log
-          ${{matrix.godot}} --verbose --import . 2>&1 | tee -a import.log
+          ALL_IMPORTS=$(git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git|LICENSE")
+          sudo apt-get install -y pv
+          echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l)\
+          xargs --verbose --max-args=1 --max-procs=32 \
+          godot --verbose --import 2>&1 >> import.log
+          godot --verbose --import . 2>&1 | tee -a import.log
       
       - uses: "actions/upload-artifact@v4"
         with:
@@ -69,9 +72,9 @@ jobs:
       matrix:
         include:
           - platform: "ubuntu-latest"
-            godot: "xvfb-run godot"
-          # - platform: "windows-latest"
-          #   godot: "godot"
+            init: "Xvfb :99 > /dev/null 2>&1 &"
+          - platform: "windows-latest"
+            init: ""
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/download-artifact@v4"
@@ -94,10 +97,11 @@ jobs:
       - shell: "bash"
         run: |
           set -x
+          ${{matrix.init}}
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          ${{matrix.godot}} --verbose --path . 2>&1 | tee run.log
+          godot --verbose --path . 2>&1 | tee run.log
           
           echo "Gathering errors from the log..."
           # | grep -v -Ei 'whitelisted-term1|whitelisted-term2' \

@@ -55,7 +55,7 @@ jobs:
           #ALL_IMPORTS=$(git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git|LICENSE|.gd")
           #echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
           #xargs --verbose --max-args=1 --max-procs=1 -I {} sh -c \
-          "${{matrix.godot-pre}} godot --verbose --import {} || true"  >import.log
+          #"${{matrix.godot-pre}} godot --verbose --import {} || true"  >import.log
           ${{matrix.godot-pre}} godot --verbose --import . 2>&1 | tee -a import.log || true
       
       - uses: "actions/upload-artifact@v4"

@@ -27,10 +27,10 @@ jobs:
         include:
           - platform: "ubuntu-latest"
             init: "sudo apt install -y pv mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
-            godot: "xvfb-run godot"
+            godot-pre: "xvfb-run"
           # - platform: "windows-latest"
           #   init: ""
-          #   godot: "godot"
+          #   godot-pre: ""
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
@@ -53,10 +53,10 @@ jobs:
           
           # Ensure all assets are actually imported instead of just the auto-detected ones
           ALL_IMPORTS=$(git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git|LICENSE")
-          echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
+          ${{matrix.godot-pre}} echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
           xargs --verbose --max-args=1 --max-procs=32 -I {} sh -c \
-          "${{matrix.godot}} --verbose --import {} 2>&1 || true >> import.log"
-          ${{matrix.godot}} --verbose --import . 2>&1 | tee -a import.log || true
+          "godot --verbose --import {} 2>&1 || true >> import.log"
+          ${{matrix.godot-pre}} godot --verbose --import . 2>&1 | tee -a import.log || true
       
       - uses: "actions/upload-artifact@v4"
         with:

@@ -55,8 +55,8 @@ jobs:
           #ALL_IMPORTS=$(git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git|LICENSE|.gd")
           #echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
           #xargs --verbose --max-args=1 --max-procs=1 -I {} sh -c \
-          #"${{matrix.godot-pre}} godot --verbose --import {} || true"  >import.log
-          ${{matrix.godot-pre}} godot --verbose --import . 2>&1 | tee -a import.log || true
+          #"${{matrix.godot-pre}} godot --editor --verbose --audio-driver Dummy --import {} || true"  >import.log
+          ${{matrix.godot-pre}} godot --editor --verbose --audio-driver Dummy --import . 2>&1 | tee -a import.log || true
       
       - uses: "actions/upload-artifact@v4"
         with:
@@ -104,7 +104,7 @@ jobs:
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          ${{matrix.godot}} --verbose --path . 2>&1 | tee run.log
+          ${{matrix.godot}} --verbose --audio-driver Dummy --path . 2>&1 | tee run.log
           
           echo "Gathering errors from the log..."
           # | grep -v -Ei 'whitelisted-term1|whitelisted-term2' \

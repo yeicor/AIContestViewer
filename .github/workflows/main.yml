@@ -19,16 +19,8 @@ env:
   GODOT_VERSION: "4.4.1"  # TODO: auto-update!
 
 jobs:
-  test:
-    runs-on: "${{ matrix.platform }}"
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: "ubuntu-latest"
-            godot: "xvfb-run godot"
-          # - platform: "windows-latest"
-          #   godot: "godot"
+  import:
+    runs-on: "ubuntu-latest"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
@@ -48,14 +40,52 @@ jobs:
         run: |
           set -x
           
-          echo "Importing the game with the editor before running..."
           # Ensure all assets are actually imported instead of just the auto-detected ones
-          git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git" | \
-          xargs --verbose --max-args=1 \
-          ${{matrix.godot}} --editor --import 2>&1 >> import.log
-          ${{matrix.godot}} --editor --import . 2>&1 | tee -a import.log
-          
-          echo "DEBUG: Imported .godot contents..."; find .godot
+          #git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git" | \
+          #xargs --verbose --max-args=1 \
+          #${{matrix.godot}} --verbose --import 2>&1 >> import.log
+          ${{matrix.godot}} --verbose --import . 2>&1 | tee -a import.log
+      
+      - uses: "actions/upload-artifact@v4"
+        with:
+          name: "import"
+          path: |
+            import.log
+            .godot
+
+  test:
+    needs: "import"
+    runs-on: "${{ matrix.platform }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "ubuntu-latest"
+            godot: "xvfb-run godot"
+          # - platform: "windows-latest"
+          #   godot: "godot"
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "actions/download-artifact@v4"
+        with:
+          name: "import"
+          path: "."
+      - uses: "chickensoft-games/setup-godot@v2"
+        with:
+          version: "${{ env.GODOT_VERSION }}"
+          use-dotnet: false
+      - uses: "jakoch/install-vulkan-sdk-action@v1"
+        with:
+          optional_components: "com.lunarg.vulkan.vma"
+          install_runtime: true
+          cache: true
+          stripdown: true
+          # You can install a software rasterizer.
+          install_swiftshader: true
+          install_lavapipe: true
+      - shell: "bash"
+        run: |
+          set -x
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
@@ -70,13 +100,12 @@ jobs:
       
       - uses: "actions/upload-artifact@v4"
         with:
-          name: "test-logs"
+          name: "test"
           path: |
-            import.log
             run.log
-            .godot
 
   export:
+    needs: "import"
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
@@ -123,6 +152,10 @@ jobs:
             extension: "html"
     steps:
       - uses: "actions/checkout@v4"
+      - uses: "actions/download-artifact@v4"
+        with:
+          name: "import"
+          path: "."
       - uses: "chickensoft-games/setup-godot@v2"
         with:
           version: "${{ env.GODOT_VERSION }}"

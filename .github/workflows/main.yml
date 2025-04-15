@@ -20,7 +20,15 @@ env:
 
 jobs:
   import:
-    runs-on: "ubuntu-latest"
+    runs-on: "${{ matrix.platform }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "ubuntu-latest"
+            godot: "xvfb-run godot"
+          # - platform: "windows-latest"
+          #   godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
@@ -48,7 +56,7 @@ jobs:
       
       - uses: "actions/upload-artifact@v4"
         with:
-          name: "import"
+          name: "import-${{ matrix.platform }}"
           path: |
             import.log
             .godot
@@ -68,7 +76,7 @@ jobs:
       - uses: "actions/checkout@v4"
       - uses: "actions/download-artifact@v4"
         with:
-          name: "import"
+          name: "import-${{ matrix.platform }}"
           path: "."
       - uses: "chickensoft-games/setup-godot@v2"
         with:
@@ -154,7 +162,7 @@ jobs:
       - uses: "actions/checkout@v4"
       - uses: "actions/download-artifact@v4"
         with:
-          name: "import"
+          name: "import-ubuntu-latest"
           path: "."
       - uses: "chickensoft-games/setup-godot@v2"
         with:
@@ -188,7 +196,7 @@ jobs:
           path: "build/${{ matrix.exportname }}-${{ matrix.arch }}"
 
   deploy:
-    needs: "export"
+    needs: ["export", "test"] # Export for artifact and test for validation
     if: "github.ref == 'refs/heads/master'"
     runs-on: "ubuntu-latest"
     steps:

@@ -53,9 +53,9 @@ jobs:
           
           # Ensure all assets are actually imported instead of just the auto-detected ones
           ALL_IMPORTS=$(git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git|LICENSE")
-          ${{matrix.godot-pre}} echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
-          xargs --verbose --max-args=1 --max-procs=32 -I {} sh -c \
-          "godot --verbose --import {} 2>&1 || true >> import.log"
+          echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
+          xargs --verbose --max-args=1 --max-procs=1 -I {} sh -c \
+          "${{matrix.godot-pre}} godot --verbose --import {} 2>&1 || true >> import.log"
           ${{matrix.godot-pre}} godot --verbose --import . 2>&1 | tee -a import.log || true
       
       - uses: "actions/upload-artifact@v4"

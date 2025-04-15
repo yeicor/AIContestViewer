@@ -56,8 +56,10 @@ jobs:
           #echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
           #xargs --verbose --max-args=1 --max-procs=1 -I {} sh -c \
           #"${{matrix.godot-pre}} godot --editor --verbose --audio-driver Dummy --import {} || true"  >import.log
-          ${{matrix.godot-pre}} godot --editor --verbose --audio-driver Dummy --import . 2>&1 | tee -a import.log || true
-      
+          ${{matrix.godot-pre}} godot --editor --audio-driver Dummy --import . 2>&1 | tee -a import.log || true
+          
+          find
+          
       - uses: "actions/upload-artifact@v4"
         with:
           name: "import-${{ matrix.platform }}"

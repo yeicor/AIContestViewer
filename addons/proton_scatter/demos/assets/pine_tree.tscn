@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3 uid="uid://caqxfqurbp3ku"]
+
+[ext_resource type="PackedScene" uid="uid://bhums0j31gm5n" path="res://addons/proton_scatter/demos/assets/models/pine_tree.glb" id="1_hw1e5"]
+[ext_resource type="Material" uid="uid://d01d0h08lqqn6" path="res://addons/proton_scatter/demos/assets/materials/m_trunk.tres" id="2_cgtpc"]
+[ext_resource type="Texture2D" uid="uid://ctpb1w0cr8tqc" path="res://addons/proton_scatter/demos/assets/textures/t_pine_branch.png" id="3_kw1ag"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l3iak"]
+transparency = 1
+albedo_color = Color(0.270588, 0.690196, 0.313726, 1)
+albedo_texture = ExtResource("3_kw1ag")
+distance_fade_mode = 3
+distance_fade_min_distance = 400.0
+distance_fade_max_distance = 200.0
+
+[node name="pine_tree" instance=ExtResource("1_hw1e5")]
+
+[node name="Trunk" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_cgtpc")
+
+[node name="Leaves" parent="." index="1"]
+surface_material_override/0 = SubResource("StandardMaterial3D_l3iak")

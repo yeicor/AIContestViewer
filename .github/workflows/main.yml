@@ -108,7 +108,9 @@ jobs:
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          ${{matrix.godot}} --audio-driver Dummy --path . 2>&1 | tee run.log
+          ${{matrix.godot}} --audio-driver Dummy --write-movie recording.png \
+          --gpu-profile --profiling --debug --resolution 320x180 --quit-after 30 \
+          --verbose --path . 2>&1 | tee run.log
           
           echo "Gathering errors from the log..."
           # | grep -v -Ei 'whitelisted-term1|whitelisted-term2' \
@@ -121,6 +123,7 @@ jobs:
         with:
           name: "test"
           path: |
+            recording*
             run.log
 
   export:

@@ -57,7 +57,7 @@ jobs:
           #echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
           #xargs --verbose --max-args=1 --max-procs=1 -I {} sh -c \
           #"${{matrix.godot}} --audio-driver Dummy --import {} || true"  >import.log
-          ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
+          strace ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
           echo "Godot import failed with exit code $?. Continuing anyway..."
           
           find
@@ -164,17 +164,7 @@ jobs:
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
-      - if: "matrix.platform == 'windows-latest'"
-        uses: "jakoch/install-vulkan-sdk-action@v1"
-        with:
-          optional_components: "com.lunarg.vulkan.vma"
-          install_runtime: true
-          cache: true
-          stripdown: true
-          install_swiftshader: true
-          install_lavapipe: true
-      - if: "matrix.platform == 'ubuntu-latest'"
-        run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+      - run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
         
       - run: |
           set -x
@@ -182,7 +172,7 @@ jobs:
           # Edit preset config file to force select target architecture
           if [[ "${{ matrix.exportname }}" == "Android" ]]; then
             # Android architectures have different names and different format in export_presets.cfg
-            matrix_arch="$(echo "${{ matrix.arch }}" | sed 's/x86_32/x86/;s/arm64/arm64-v8a/;s/arm32/armeabi-v7a')"
+            matrix_arch="$(echo "${{ matrix.arch }}" | sed 's/x86_32/x86/;s/arm64/arm64-v8a/;s/arm32/armeabi-v7a/')"
             sed -i -e 's,architectures/.*,,g' export_presets.cfg
             sed -i -e 's,version/code,architectures/'"${matrix_arch}"'=true|version/code,g' export_presets.cfg
             tr '|' '\n' <export_presets.cfg >export_presets2.cfg
@@ -196,9 +186,9 @@ jobs:
             EXPORT_ARG="--export-debug"
           fi
           
-          FOLDER="dist"
-          mkdir -p "${FOLDER}"
-          xvfb-run godot "$EXPORT_ARG" "${{ matrix.exportname }}" "${FOLDER}/${{ github.event.repository.name }}-${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release' }}.${{ matrix.extension }}"
+          mkdir -p "dist"
+          FILE="dist/${{ github.event.repository.name }}-${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release' }}.${{ matrix.extension }}"
+          xvfb-run godot --audio-driver Dummy "$EXPORT_ARG" "${{ matrix.exportname }}" "$FILE"
           
       - uses: "actions/upload-artifact@v4"
         with:

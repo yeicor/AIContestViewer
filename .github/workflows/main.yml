@@ -26,7 +26,7 @@ jobs:
       matrix:
         include:
           - platform: "ubuntu-latest"
-            godot: "xvfb-run godot"
+            godot: "xvfb-run strace godot"
           # - platform: "windows-latest"
           #   godot: "godot"
     steps:
@@ -57,7 +57,7 @@ jobs:
           #echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
           #xargs --verbose --max-args=1 --max-procs=1 -I {} sh -c \
           #"${{matrix.godot}} --audio-driver Dummy --import {} || true"  >import.log
-          strace ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
+          ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
           echo "Godot import failed with exit code $?. Continuing anyway..."
           
           find

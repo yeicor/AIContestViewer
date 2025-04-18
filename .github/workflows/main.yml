@@ -37,15 +37,6 @@ jobs:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
           cache: false
-      - uses: "jakoch/install-vulkan-sdk-action@v1"
-        if: "matrix.platform == 'windows-latest'"
-        with:
-          optional_components: "com.lunarg.vulkan.vma"
-          install_runtime: true
-          cache: true
-          stripdown: true
-          install_swiftshader: true
-          install_lavapipe: true
       - if: "matrix.platform == 'ubuntu-latest'"
         run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
         
@@ -72,8 +63,8 @@ jobs:
         include:
           - platform: "ubuntu-latest"
             godot: "xvfb-run godot"
-          - platform: "windows-latest"
-            godot: "godot"
+          #- platform: "windows-latest" # Segmentation fault: process completed with exit code 139
+          #  godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/download-artifact@v4"
@@ -86,13 +77,6 @@ jobs:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
           cache: false
-      - if: "matrix.platform == 'windows-latest'"
-        uses: "jakoch/install-vulkan-sdk-action@v1"
-        with:
-          install_runtime: true
-          cache: true
-          stripdown: true
-          install_lavapipe: true
       - if: "matrix.platform == 'ubuntu-latest'"
         run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
         

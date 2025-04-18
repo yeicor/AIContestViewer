@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  GODOT_VERSION: "4.4.1"  # TODO: auto-update!
+  GODOT_VERSION: "4.4.1-stable" # <-- Auto-updated, do not edit format
 
 jobs:
   import:

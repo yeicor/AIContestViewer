@@ -26,37 +26,39 @@ jobs:
       matrix:
         include:
           - platform: "ubuntu-latest"
-            init: "sudo apt install -y pv mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
-            godot-pre: "xvfb-run"
+            godot: "xvfb-run godot"
           # - platform: "windows-latest"
-          #   init: ""
-          #   godot-pre: ""
+          #   godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
+      # Install vulkan software rasterizer for advanced features (Windows)
       - uses: "jakoch/install-vulkan-sdk-action@v1"
+        if: "matrix.platform == 'windows-latest'"
         with:
           optional_components: "com.lunarg.vulkan.vma"
           install_runtime: true
           cache: true
           stripdown: true
-          # You can install a software rasterizer (windows-only).
           install_swiftshader: true
           install_lavapipe: true
+      # Install vulkan software rasterizer for advanced features (Linux)
+      - if: "matrix.platform == 'ubuntu-latest'"
+        run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
       - shell: "bash"
         run: |
           set -x
-          ${{ matrix.init }}
           
           # Ensure all assets are actually imported instead of just the auto-detected ones
           #ALL_IMPORTS=$(git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git|LICENSE|.gd")
           #echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
           #xargs --verbose --max-args=1 --max-procs=1 -I {} sh -c \
-          #"${{matrix.godot-pre}} godot --editor --verbose --audio-driver Dummy --import {} || true"  >import.log
-          ${{matrix.godot-pre}} godot --editor --audio-driver Dummy --import . 2>&1 | tee -a import.log || true
+          #"${{matrix.godot}} --audio-driver Dummy --import {} || true"  >import.log
+          ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
+          echo "Godot import failed with exit code $?. Continuing anyway..."
           
           find
           
@@ -75,10 +77,8 @@ jobs:
       matrix:
         include:
           - platform: "ubuntu-latest"
-            init: "sudo apt install -y pv mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
             godot: "xvfb-run godot"
           # - platform: "windows-latest"
-          #   init: ""
           #   godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
@@ -86,19 +86,23 @@ jobs:
         with:
           name: "import-${{ matrix.platform }}"
           path: "."
+          
       - uses: "chickensoft-games/setup-godot@v2"
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
-      - uses: "jakoch/install-vulkan-sdk-action@v1"
+      - if: "matrix.platform == 'windows-latest'"
+        uses: "jakoch/install-vulkan-sdk-action@v1"
         with:
           optional_components: "com.lunarg.vulkan.vma"
           install_runtime: true
           cache: true
           stripdown: true
-          # You can install a software rasterizer (windows-only).
           install_swiftshader: true
           install_lavapipe: true
+      - if: "matrix.platform == 'ubuntu-latest'"
+        run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+        
       - shell: "bash"
         run: |
           set -x
@@ -106,7 +110,7 @@ jobs:
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          ${{matrix.godot}} --verbose --audio-driver Dummy --path . 2>&1 | tee run.log
+          ${{matrix.godot}} --audio-driver Dummy --path . 2>&1 | tee run.log
           
           echo "Gathering errors from the log..."
           # | grep -v -Ei 'whitelisted-term1|whitelisted-term2' \
@@ -127,45 +131,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - exportname: "Linux"
-            arch: "x86_64"
-            extension: "x86_64"
-          - exportname: "Linux"
-            arch: "x86_32"
-            extension: "x86_32"
-          - exportname: "Linux"
-            arch: "arm64"
-            extension: "arm64"
-          - exportname: "Linux"
+        exportname: ["Linux", "WindowsDesktop", "Android", "Web"]
+        arch: ["x86_64", "x86_32", "arm64", "arm32"]
+        debug: ["true", "false"]
+        exclude: # Not all configs are supported
+          - exportname: "WindowsDesktop"
             arch: "arm32"
-            extension: "arm32"
-
-          - exportname: "WindowsDesktop"
-            arch: "x86_64"
-            extension: "exe"
-          - exportname: "WindowsDesktop"
-            arch: "x86_32"
-            extension: "exe"
-          - exportname: "WindowsDesktop"
-            arch: "arm64"
-            extension: "exe"
-            
           - exportname: "Android"
-            arch: "arm64-v8a"
-            extension: "apk"
-          - exportname: "Android"
-            arch: "armeabi-v7a"
-            extension: "apk"
-          - exportname: "Android"
-            arch: "x86_64"
-            extension: "apk"
-          - exportname: "Android"
-            arch: "x86"
-            extension: "apk"
-            
+            debug: "false" # XXX: Avoid messing with secret release keystores
           - exportname: "Web"
-            arch: "wasm"
+            arch: "x86_32" # XXX: Supports any architecture in a common build
+          - exportname: "Web"
+            arch: "arm64"
+          - exportname: "Web"
+            arch: "arm32"
+        include: # Append platform-specific attributes
+          - exportname: "Linux"
+            extension: "bin"
+          - exportname: "WindowsDesktop"
+            extension: "exe"
+          - exportname: "Android"
+            extension: "apk"
+          - exportname: "Web"
             extension: "html"
     steps:
       - uses: "actions/checkout@v4"
@@ -173,36 +160,51 @@ jobs:
         with:
           name: "import-ubuntu-latest"
           path: "."
+          
       - uses: "chickensoft-games/setup-godot@v2"
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
-          include-templates: true
+      - if: "matrix.platform == 'windows-latest'"
+        uses: "jakoch/install-vulkan-sdk-action@v1"
+        with:
+          optional_components: "com.lunarg.vulkan.vma"
+          install_runtime: true
+          cache: true
+          stripdown: true
+          install_swiftshader: true
+          install_lavapipe: true
+      - if: "matrix.platform == 'ubuntu-latest'"
+        run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+        
       - run: |
           set -x
           
-          # Edit preset config file to force select architecture
-          if [[ "${{ matrix.exportname }}" != "Android" ]]; then
-            sed -i -e 's/"x86_64"/"'"${{ matrix.arch }}"'"/g' export_presets.cfg
-          else
+          # Edit preset config file to force select target architecture
+          if [[ "${{ matrix.exportname }}" == "Android" ]]; then
+            # Android architectures have different names and different format in export_presets.cfg
+            matrix_arch="$(echo "${{ matrix.arch }}" | sed 's/x86_32/x86/;s/arm64/arm64-v8a/;s/arm32/armeabi-v7a')"
             sed -i -e 's,architectures/.*,,g' export_presets.cfg
-            sed -i -e 's,version/code,architectures/'"${{ matrix.arch }}"'=true|version/code,g' export_presets.cfg
+            sed -i -e 's,version/code,architectures/'"${matrix_arch}"'=true|version/code,g' export_presets.cfg
             tr '|' '\n' <export_presets.cfg >export_presets2.cfg
             mv export_presets2.cfg export_presets.cfg
+          else # Desktop platforms are easier... (web ignores arch)
+            sed -i -e 's/"x86_64"/"'"${{ matrix.arch }}"'"/g' export_presets.cfg
           fi
           
           EXPORT_ARG="--export-release"
-          if [[ "${{ matrix.exportname }}" == "Android" ]]; then
-            EXPORT_ARG="--export-debug"  # XXX: Avoid messing with keystore
+          if [[ "${{ matrix.debug }}" == "true" ]]; then
+            EXPORT_ARG="--export-debug"
           fi
           
-          FOLDER="build/${{ matrix.exportname }}-${{ matrix.arch }}"
+          FOLDER="dist"
           mkdir -p "${FOLDER}"
-          xvfb-run godot --verbose $EXPORT_ARG "${{ matrix.exportname }}" "${FOLDER}/${{ github.event.repository.name }}-${{ matrix.exportname }}-${{ matrix.arch }}.${{ matrix.extension }}"
+          xvfb-run godot "$EXPORT_ARG" "${{ matrix.exportname }}" "${FOLDER}/${{ github.event.repository.name }}-${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release }}.${{ matrix.extension }}"
+          
       - uses: "actions/upload-artifact@v4"
         with:
-          name: "${{ matrix.exportname }}-${{ matrix.arch }}"
-          path: "build/${{ matrix.exportname }}-${{ matrix.arch }}"
+          name: "${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release }}"
+          path: "dist"
 
   deploy:
     needs: ["export", "test"] # Export for artifact and test for validation
@@ -211,7 +213,7 @@ jobs:
     steps:
       - uses: "actions/download-artifact@v4"
         with:
-          name: "Web-wasm"
+          name: "Web-x86_64"
           path: "web-export"
       - run: "mv web-export/AIContestViewer-Web-wasm.html web-export/index.html"
       - uses: "actions/configure-pages@v5"

@@ -60,7 +60,7 @@ jobs:
           ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
           echo "Godot import failed with exit code $?. Continuing anyway..."
           
-          find
+          find /home/runner/
           
       - uses: "actions/upload-artifact@v4"
         with:
@@ -164,6 +164,7 @@ jobs:
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
+          include-templates: true
       - run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
         
       - run: |

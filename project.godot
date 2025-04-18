@@ -39,6 +39,7 @@ window/stretch/aspect="expand"
 
 [editor]
 
+movie_writer/mjpeg_quality=1.0
 movie_writer/movie_file="/home/yeicor/Downloads/aicontestviewer/frame.png"
 movie_writer/disable_vsync=true
 

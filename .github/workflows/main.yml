@@ -108,13 +108,13 @@ jobs:
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          ${{matrix.godot}} --audio-driver Dummy --write-movie recording.png \
-          --gpu-profile --profiling --debug --resolution 320x180 --quit-after 600 \
+          ${{matrix.godot}} --audio-driver Dummy --write-movie recording.avi \
+          --gpu-profile --profiling --debug --resolution 320x180 --quit-after 60 \
           --verbose --path . 2>&1 | tee run.log
           
           echo "Gathering possible errors from the log..."
           grep -Ei 'err|fail|warn' run.log \
-          | grep -v -Ei 'terrain|setting overrides|ShaderRD|' \
+          | grep -v -Ei 'terrain|setting overrides|ShaderRD' \
           && echo "::warning ::Recorded some possible log errors while running the game" \
           || echo "No issues found in log."
           

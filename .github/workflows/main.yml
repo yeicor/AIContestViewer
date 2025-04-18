@@ -27,8 +27,8 @@ jobs:
         include:
           - platform: "ubuntu-latest"
             godot: "xvfb-run strace godot"
-          # - platform: "windows-latest"
-          #   godot: "godot"
+          - platform: "windows-latest"
+            godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "chickensoft-games/setup-godot@v2"
@@ -203,7 +203,7 @@ jobs:
     steps:
       - uses: "actions/download-artifact@v4"
         with:
-          name: "Web-x86_64"
+          name: "Web-x86_64-release"
           path: "web-export"
       - run: "mv web-export/AIContestViewer-Web-wasm.html web-export/index.html"
       - uses: "actions/configure-pages@v5"

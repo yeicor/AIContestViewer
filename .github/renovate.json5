@@ -21,8 +21,8 @@
       "customType": "regex",
       "fileMatch": ["/.github/workflows/main.yml$"],
       "matchStrings": ["GODOT_VERSION: *\"(?<currentValue>.+?)\""],
-      "datasource": "github-releases",
-      "depName": "godotengine/godot",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "godotengine/godot",
     }
   ]
 }

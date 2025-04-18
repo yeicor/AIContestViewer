@@ -26,7 +26,7 @@ jobs:
       matrix:
         include:
           - platform: "ubuntu-latest"
-            godot: "xvfb-run strace godot"
+            godot: "xvfb-run godot"
           - platform: "windows-latest"
             godot: "godot"
     steps:
@@ -60,14 +60,10 @@ jobs:
           ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
           echo "Godot import failed with exit code $?. Continuing anyway..."
           
-          find /home/runner/
-          
       - uses: "actions/upload-artifact@v4"
         with:
           name: "import-${{ matrix.platform }}"
-          path: |
-            import.log
-            .godot
+          path: ".godot/"
 
   test:
     needs: "import"

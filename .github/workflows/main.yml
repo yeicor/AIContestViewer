@@ -106,7 +106,6 @@ jobs:
       - shell: "bash"
         run: |
           set -x
-          ${{matrix.init}}
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
@@ -199,11 +198,11 @@ jobs:
           
           FOLDER="dist"
           mkdir -p "${FOLDER}"
-          xvfb-run godot "$EXPORT_ARG" "${{ matrix.exportname }}" "${FOLDER}/${{ github.event.repository.name }}-${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release }}.${{ matrix.extension }}"
+          xvfb-run godot "$EXPORT_ARG" "${{ matrix.exportname }}" "${FOLDER}/${{ github.event.repository.name }}-${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release' }}.${{ matrix.extension }}"
           
       - uses: "actions/upload-artifact@v4"
         with:
-          name: "${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release }}"
+          name: "${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release' }}"
           path: "dist"
 
   deploy:

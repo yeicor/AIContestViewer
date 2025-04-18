@@ -27,15 +27,15 @@ jobs:
         include:
           - platform: "ubuntu-latest"
             godot: "xvfb-run godot"
-          # - platform: "windows-latest"
-          #   godot: "godot"
+          - platform: "windows-latest"
+            godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
+      
       - uses: "chickensoft-games/setup-godot@v2"
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
-      # Install vulkan software rasterizer for advanced features (Windows)
       - uses: "jakoch/install-vulkan-sdk-action@v1"
         if: "matrix.platform == 'windows-latest'"
         with:
@@ -45,18 +45,12 @@ jobs:
           stripdown: true
           install_swiftshader: true
           install_lavapipe: true
-      # Install vulkan software rasterizer for advanced features (Linux)
       - if: "matrix.platform == 'ubuntu-latest'"
         run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+        
       - shell: "bash"
         run: |
           set -x
-          
-          # Ensure all assets are actually imported instead of just the auto-detected ones
-          #ALL_IMPORTS=$(git ls-files | grep -Ev ".import|.uid|.txt|.cfg|.md|.git|LICENSE|.gd")
-          #echo "$ALL_IMPORTS" | pv --line-mode --size $(echo "$ALL_IMPORTS" | wc -l) | \
-          #xargs --verbose --max-args=1 --max-procs=1 -I {} sh -c \
-          #"${{matrix.godot}} --audio-driver Dummy --import {} || true"  >import.log
           ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
           echo "Godot import failed with exit code $?. Continuing anyway..."
           
@@ -77,8 +71,8 @@ jobs:
         include:
           - platform: "ubuntu-latest"
             godot: "xvfb-run godot"
-          # - platform: "windows-latest"
-          #   godot: "godot"
+          - platform: "windows-latest"
+            godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/download-artifact@v4"
@@ -108,17 +102,15 @@ jobs:
           
           echo "Running the game..."
           common_turn_secs=0 common_start_round_secs=0 common_end_round_secs=0 common_end_game_turn_secs=0 \
-          ${{matrix.godot}} --audio-driver Dummy --write-movie recording.avi \
-          --gpu-profile --profiling --debug --resolution 320x180 --quit-after 60 \
+          ${{matrix.godot}} --audio-driver Dummy --write-movie recording.png \
+          --gpu-profile --debug --resolution 320x180 --quit-after 60 \
           --verbose --path . 2>&1 | tee run.log
           
           echo "Gathering possible errors from the log..."
           grep -Ei 'err|fail|warn' run.log \
-          | grep -v -Ei 'terrain|setting overrides|ShaderRD' \
-          && echo "::warning ::Recorded some possible log errors while running the game" \
+          | grep -v -Ei 'terrain|setting overrides|ShaderRD|Orphan StringName' \
+          && echo "Found some possible errors while running the game (this is normal...)" \
           || echo "No issues found in log."
-          
-          # TODO: Record game video and upload preview to main README.md
       
       - uses: "actions/upload-artifact@v4"
         with:
@@ -156,6 +148,7 @@ jobs:
             extension: "apk"
           - exportname: "Web"
             extension: "html"
+            arch: "wasm"
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/download-artifact@v4"
@@ -206,9 +199,11 @@ jobs:
     steps:
       - uses: "actions/download-artifact@v4"
         with:
-          name: "Web-x86_64-release"
+          name: "Web-wasm-release"
           path: "web-export"
-      - run: "mv web-export/AIContestViewer-Web-wasm.html web-export/index.html"
+
+      - run: "mv web-export/AIContestViewer-Web-wasm-release.html web-export/index.html"
+
       - uses: "actions/configure-pages@v5"
       - uses: "actions/upload-pages-artifact@v3"
         with:

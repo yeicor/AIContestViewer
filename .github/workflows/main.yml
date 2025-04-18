@@ -63,7 +63,10 @@ jobs:
       - uses: "actions/upload-artifact@v4"
         with:
           name: "import-${{ matrix.platform }}"
-          path: ".godot/"
+          include-hidden-files: true
+          path: |
+            import.log
+            .godot
 
   test:
     needs: "import"

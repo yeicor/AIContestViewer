@@ -36,6 +36,7 @@ jobs:
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
+          cache: false
       - uses: "jakoch/install-vulkan-sdk-action@v1"
         if: "matrix.platform == 'windows-latest'"
         with:
@@ -84,14 +85,13 @@ jobs:
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
+          cache: false
       - if: "matrix.platform == 'windows-latest'"
         uses: "jakoch/install-vulkan-sdk-action@v1"
         with:
-          optional_components: "com.lunarg.vulkan.vma"
           install_runtime: true
           cache: true
           stripdown: true
-          install_swiftshader: true
           install_lavapipe: true
       - if: "matrix.platform == 'ubuntu-latest'"
         run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
@@ -160,6 +160,7 @@ jobs:
         with:
           version: "${{ env.GODOT_VERSION }}"
           use-dotnet: false
+          cache: false
           include-templates: true
       - run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
         

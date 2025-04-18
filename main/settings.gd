@@ -184,7 +184,8 @@ static func project_godot() -> ConfigFile:
 	# HACK: In order to ensure persistence, the project.godot file must be edited directly
 	if _project_godot == null and FileAccess.file_exists("res://project.godot"):
 		_project_godot = ConfigFile.new()
-		assert(_project_godot.load("res://project.godot") == OK)
+		var res := _project_godot.load("res://project.godot")
+		assert(res == OK)
 	return _project_godot
 
 

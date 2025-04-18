@@ -55,7 +55,8 @@ func _on_game_state(state: GameState, _turn: int, phase: int):
 			tri_helper.get_or_add(conn_meta.from(), []).append(conn_meta.to())
 			tri_helper.get_or_add(conn_meta.to(), []).append(conn_meta.from())
 		for stable_key in current_conns.keys():
-			assert(stable_key[0].disconnect_from(stable_key[1]))
+			var done = stable_key[0].disconnect_from(stable_key[1])
+			assert(done)
 		current_conns = next_conns
 		
 		# Detect triangles

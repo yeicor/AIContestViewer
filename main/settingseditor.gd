@@ -38,5 +38,6 @@ func _run() -> void:
 				"value": Settings._s_val(setting_name) if shader_type != "sampler2D" else "icon.svg"
 			})
 	
-	assert(cfg.save("res://project.godot") == OK)
+	var res = cfg.save("res://project.godot")
+	assert(res == OK)
 	SLog.sd("[settings-editor] Modified project.godot to include the latest shader_globals, you should reload the project now")

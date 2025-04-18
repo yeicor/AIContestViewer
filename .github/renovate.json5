@@ -19,7 +19,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["/.github/workflows/main.yml$"],
+      "fileMatch": ["^.github/workflows/main.yml$"],
       "matchStrings": ["GODOT_VERSION: *\"(?<currentValue>.+?)\""],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "godotengine/godot",

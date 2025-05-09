@@ -170,6 +170,9 @@ jobs:
           
           mkdir -p "dist"
           FILE="dist/${{ github.event.repository.name }}-${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release' }}.${{ matrix.extension }}"
+          if [[ "${{ matrix.exportname }}" == "Web" ]]; then # Use index.html for web
+            FILE="dist/index${{ matrix.debug == 'true' && '-debug' || '' }}.${{ matrix.extension }}"
+          fi
           xvfb-run godot --audio-driver Dummy "$EXPORT_ARG" "${{ matrix.exportname }}" "$FILE"
           
       - uses: "actions/upload-artifact@v4"
@@ -186,8 +189,6 @@ jobs:
         with:
           name: "Web-wasm-release"
           path: "web-export"
-
-      - run: "mv web-export/AIContestViewer-Web-wasm-release.html web-export/index.html"
 
       - uses: "actions/configure-pages@v5"
       - uses: "actions/upload-pages-artifact@v3"

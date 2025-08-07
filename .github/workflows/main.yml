@@ -38,7 +38,7 @@ jobs:
           use-dotnet: false
           cache: false
       - if: "matrix.platform == 'ubuntu-latest'"
-        run: "sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
+        run: "sudo apt update && sudo apt install -y mesa-vulkan-drivers libvulkan1 vulkan-tools vulkan-validationlayers"
         
       - shell: "bash"
         run: |

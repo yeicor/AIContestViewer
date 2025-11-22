@@ -191,7 +191,7 @@ jobs:
           path: "web-export"
 
       - uses: "actions/configure-pages@v5"
-      - uses: "actions/upload-pages-artifact@v3"
+      - uses: "actions/upload-pages-artifact@v4"
         with:
           path: "web-export"
       - uses: "actions/deploy-pages@v4"

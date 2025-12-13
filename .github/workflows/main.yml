@@ -46,7 +46,7 @@ jobs:
           ${{matrix.godot}} --audio-driver Dummy --import . 2>&1 | tee -a import.log || \
           echo "Godot import failed with exit code $?. Continuing anyway..."
           
-      - uses: "actions/upload-artifact@v4"
+      - uses: "actions/upload-artifact@v6"
         with:
           name: "import-${{ matrix.platform }}"
           include-hidden-files: true
@@ -67,7 +67,7 @@ jobs:
           #  godot: "godot"
     steps:
       - uses: "actions/checkout@v4"
-      - uses: "actions/download-artifact@v4"
+      - uses: "actions/download-artifact@v7"
         with:
           name: "import-${{ matrix.platform }}"
           path: "."
@@ -96,7 +96,7 @@ jobs:
           && echo "Found some possible errors while running the game (this is normal...)" \
           || echo "No issues found in log."
       
-      - uses: "actions/upload-artifact@v4"
+      - uses: "actions/upload-artifact@v6"
         with:
           name: "test"
           path: |
@@ -135,7 +135,7 @@ jobs:
             arch: "wasm"
     steps:
       - uses: "actions/checkout@v4"
-      - uses: "actions/download-artifact@v4"
+      - uses: "actions/download-artifact@v7"
         with:
           name: "import-ubuntu-latest"
           path: "."
@@ -175,7 +175,7 @@ jobs:
           fi
           xvfb-run godot --audio-driver Dummy "$EXPORT_ARG" "${{ matrix.exportname }}" "$FILE"
           
-      - uses: "actions/upload-artifact@v4"
+      - uses: "actions/upload-artifact@v6"
         with:
           name: "${{ matrix.exportname }}-${{ matrix.arch }}-${{ matrix.debug == 'true' && 'debug' || 'release' }}"
           path: "dist"
@@ -185,7 +185,7 @@ jobs:
     if: "github.ref == 'refs/heads/master'"
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/download-artifact@v4"
+      - uses: "actions/download-artifact@v7"
         with:
           name: "Web-wasm-release"
           path: "web-export"

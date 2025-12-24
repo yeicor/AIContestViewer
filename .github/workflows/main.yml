@@ -30,7 +30,7 @@ jobs:
           - platform: "windows-latest"
             godot: "godot"
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v6"
       
       - uses: "chickensoft-games/setup-godot@v2"
         with:
@@ -66,7 +66,7 @@ jobs:
           #- platform: "windows-latest" # Segmentation fault: process completed with exit code 139
           #  godot: "godot"
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v6"
       - uses: "actions/download-artifact@v7"
         with:
           name: "import-${{ matrix.platform }}"
@@ -134,7 +134,7 @@ jobs:
             extension: "html"
             arch: "wasm"
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v6"
       - uses: "actions/download-artifact@v7"
         with:
           name: "import-ubuntu-latest"
